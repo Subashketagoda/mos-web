@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mosphere — Haute Grooming & Luxury Salon Appointments</title>
+  <meta name="description" content="Book bespoke hair styling, precision beard architecture, and rejuvenation rituals at Mosphere. Real-time Google Calendar integration.">
+  
+  <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand-logo">
+        <div class="brand-emblem" style="padding: 4px; overflow: hidden; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+          <img src="/images/mosphere-emblem-gold.png" alt="Mosphere" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">MOSPHERE</span>
+          <span class="brand-subtitle">GRAB LIFE</span>
+        </div>
+      </a>
+      
+      <div class="nav-actions">
+        <a href="#bookingWizard" class="nav-link">Book Online</a>
+        <a href="#bookingWizard" class="btn btn-primary btn-sm">Reserve Now</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-tagline">
+        <span>✦</span> Bespoke Grooming Rituals & Architecture <span>✦</span>
+      </div>
+      <h1 class="hero-title">
+        The Pinnacle of <br>
+        <span class="gold-gradient-text">Personal Elevation</span>
+      </h1>
+      <p class="hero-description">
+        Experience tailored grooming by master artisans. Real-time scheduling synchronized directly with our private concierge calendar.
+      </p>
+      
+      <div class="hero-trust-badges">
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Instant Google Calendar Sync</span>
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Guaranteed Zero Double-Booking</span>
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Private Concierge Suites</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking System Core Section -->
+  <section id="bookingWizard" class="booking-section">
+    <div class="container">
+      <div class="booking-card">
+        
+        <!-- Step Wizard Tabs -->
+        <div class="wizard-steps">
+          <button class="wizard-step active" data-step="1" id="stepTab1">
+            <span class="step-num">1</span>
+            <span>Select Service</span>
+          </button>
+          <button class="wizard-step" data-step="2" id="stepTab2">
+            <span class="step-num">2</span>
+            <span>Date & Time</span>
+          </button>
+          <button class="wizard-step" data-step="3" id="stepTab3">
+            <span class="step-num">3</span>
+            <span>Your Details</span>
+          </button>
+          <button class="wizard-step" data-step="4" id="stepTab4">
+            <span class="step-num">4</span>
+            <span>Confirmation</span>
+          </button>
+        </div>
+
+        <!-- Wizard Content Area -->
+        <div class="wizard-content">
+
+          <!-- ==========================================
+               STEP 1: SELECT SERVICE
+               ========================================== -->
+          <div class="step-panel active" data-step="1" id="panelStep1">
+            <div class="step-header">
+              <h2 class="step-title">Choose Your Grooming Ritual</h2>
+              <p class="step-subtitle">All services are performed by senior stylists using curated organic formulations.</p>
+            </div>
+
+            <!-- Categories Filter -->
+            <div id="categoryFilter" class="category-filter"></div>
+
+            <!-- Services Dynamic Grid -->
+            <div id="servicesGrid" class="services-grid">
+              <div class="no-slots-notice">Loading bespoke services...</div>
+            </div>
+
+            <div class="wizard-actions">
+              <div></div>
+              <button id="toStep2Btn" class="btn btn-primary" disabled>
+                <span>Continue to Date & Time</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==========================================
+               STEP 2: DATE & TIME PICKER
+               ========================================== -->
+          <div class="step-panel" data-step="2" id="panelStep2">
+            <div class="step-header">
+              <h2 class="step-title">Select Appointment Schedule</h2>
+              <p class="step-subtitle">Real-time availability computed directly against our Google Calendar schedule.</p>
+            </div>
+
+            <div class="date-time-layout">
+              <!-- Custom Calendar Widget -->
+              <div class="calendar-widget">
+                <div class="calendar-header">
+                  <span id="calendarMonthYear" class="calendar-month-year">August 2026</span>
+                  <div style="display: flex; gap: 6px;">
+                    <button id="prevMonthBtn" class="calendar-nav-btn" aria-label="Previous Month">‹</button>
+                    <button id="nextMonthBtn" class="calendar-nav-btn" aria-label="Next Month">›</button>
+                  </div>
+                </div>
+
+                <div class="calendar-weekdays">
+                  <div>Su</div>
+                  <div>Mo</div>
+                  <div>Tu</div>
+                  <div>We</div>
+                  <div>Th</div>
+                  <div>Fr</div>
+                  <div>Sa</div>
+                </div>
+
+                <div id="calendarDays" class="calendar-days-grid"></div>
+              </div>
+
+              <!-- Available Time Slots -->
+              <div class="slots-container">
+                <div class="slots-header">
+                  <div>
+                    <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); display: block;">Selected Date</span>
+                    <span id="selectedDateLabel" class="selected-date-label">Today</span>
+                  </div>
+                  <div id="slotsCountBadge" class="slots-status-badge" style="display: none;">
+                    ● Checking Slots
+                  </div>
+                </div>
+
+                <div id="slotsContainer">
+                  <div class="no-slots-notice">
+                    Please select a date from the calendar to view genuinely available appointment slots.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard-actions">
+              <button id="backToStep1Btn" class="btn btn-secondary">
+                <span>← Back to Services</span>
+              </button>
+              <button id="toStep3Btn" class="btn btn-primary" disabled>
+                <span>Continue to Details</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==========================================
+               STEP 3: CUSTOMER DETAILS & SUMMARY
+               ========================================== -->
+          <div class="step-panel" data-step="3" id="panelStep3">
+            <div class="step-header">
+              <h2 class="step-title">Guest Details & Preferences</h2>
+              <p class="step-subtitle">Provide your contact info to receive calendar invites and appointment updates.</p>
+            </div>
+
+            <div class="form-layout">
+              <div class="form-fields">
+                <div class="form-group">
+                  <label class="form-label" for="inputName">Full Name <span class="required">*</span></label>
+                  <input type="text" id="inputName" class="form-input" placeholder="e.g. Alexander Vance" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="inputPhone">Phone Number (WhatsApp) <span class="required">*</span></label>
+                  <input type="tel" id="inputPhone" class="form-input" placeholder="e.g. +91 98765 43210" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="inputEmail">Email Address (Optional for Google Calendar invite)</label>
+                  <input type="email" id="inputEmail" class="form-input" placeholder="alexander@example.com">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="inputNotes">Special Requests or Stylist Notes (Optional)</label>
+                  <textarea id="inputNotes" class="form-textarea" placeholder="Let us know about beard styling preferences, scalp sensitivity, or beverage choice..."></textarea>
+                </div>
+              </div>
+
+              <!-- Booking Summary Sidebar -->
+              <div class="summary-box">
+                <h3 class="summary-title">Appointment Summary</h3>
+                <div class="summary-item">
+                  <span class="label">Service</span>
+                  <span id="summaryService" class="val">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Duration</span>
+                  <span id="summaryDuration" class="val">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Date</span>
+                  <span id="summaryDate" class="val">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Time</span>
+                  <span id="summaryTime" class="val">-</span>
+                </div>
+                <div class="summary-total">
+                  <span class="total-label">Total Amount</span>
+                  <span id="summaryTotal" class="total-price">₹0</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 12px; text-align: center;">
+                  Pay upon service completion at Mosphere Concierge.
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard-actions">
+              <button id="backToStep2Btn" class="btn btn-secondary">
+                <span>← Back to Schedule</span>
+              </button>
+              <button id="confirmBookingBtn" class="btn btn-primary btn-lg">
+                <span>Confirm Appointment</span>
+                <span>✨</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==========================================
+               STEP 4: CONFIRMED SCREEN
+               ========================================== -->
+          <div class="step-panel" data-step="4" id="panelStep4">
+            <div class="confirmation-panel">
+              <div class="confirm-badge-wrap">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+
+              <h2 class="confirmation-title">Booking Confirmed</h2>
+              <p class="confirmation-subtitle">Your appointment has been registered and synced directly with our salon schedule.</p>
+
+              <div class="booking-ref-chip">
+                <span>Reference:</span>
+                <span id="confirmRef" style="letter-spacing: 0.05em; font-family: monospace;">MOS-20260829-0000</span>
+              </div>
+
+              <div class="confirm-details-card">
+                <div class="confirm-row">
+                  <span class="row-label">Guest Name</span>
+                  <span id="confirmName" class="row-value">-</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="row-label">Service</span>
+                  <span id="confirmService" class="row-value">-</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="row-label">Date & Time</span>
+                  <span id="confirmDateTime" class="row-value">-</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="row-label">Duration</span>
+                  <span id="confirmDuration" class="row-value">-</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="row-label">Estimated Total</span>
+                  <span id="confirmPrice" class="row-value" style="color: var(--gold-light); font-weight: 700;">-</span>
+                </div>
+              </div>
+
+              <div class="confirm-actions">
+                <a id="confirmGcalBtn" class="btn btn-google btn-sm" href="#" target="_blank">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <span>Add to Google Calendar</span>
+                </a>
+                <a id="confirmWhatsAppBtn" class="btn btn-whatsapp btn-sm" href="#" target="_blank">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                  <span>WhatsApp Concierge</span>
+                </a>
+                <button id="confirmIcsBtn" class="btn btn-secondary btn-sm" type="button">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Download .ICS</span>
+                </button>
+              </div>
+
+              <div style="margin-top: 30px;">
+                <button id="bookAnotherBtn" class="btn btn-outline-gold btn-sm">
+                  <span>Book Another Appointment</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky Mobile Action CTA -->
+  <div id="mobileCta" class="sticky-mobile-cta">
+    <div class="mobile-cta-info">
+      <span id="mobileCtaService" class="mobile-cta-service">Select a Service</span>
+      <span id="mobileCtaPrice" class="mobile-cta-price">Haute Grooming</span>
+    </div>
+    <button id="mobileCtaBtn" class="btn btn-primary btn-sm">
+      <span>Book Now</span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="brand-emblem" style="width: 32px; height: 32px; font-size: 16px;">M</div>
+            <span class="brand-title" style="font-size: 18px;">Mosphere</span>
+          </div>
+          <p>Where architectural grooming meets bespoke luxury. Certified Google Calendar scheduling with instant slot synchronization.</p>
+        </div>
+        <div>
+          <h4 style="color: #fff; margin-bottom: 12px; font-size: 15px;">Salon Hours</h4>
+          <p style="margin-bottom: 6px;">Daily: 10:00 AM – 08:00 PM</p>
+          <p>Private VIP Bookings by request.</p>
+        </div>
+        <div>
+          <h4 style="color: #fff; margin-bottom: 12px; font-size: 15px;">Concierge Contact</h4>
+          <p style="margin-bottom: 6px;">📞 +91 98765 43210</p>
+          <p>📍 The Palladium Gallery, Suite 101</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Mosphere Grooming Studio. All rights reserved. Server-side Google Calendar API integration active.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
