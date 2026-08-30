@@ -126,7 +126,9 @@ export default function ColomboFooter({ onOpenLocationSwitcher }: ColomboFooterP
           </div>
           <div className="flex items-center gap-6">
             <span>422A NAWALA RD, RAJAGIRIYA</span>
-            <span>SRI LANKA</span>
+            <Link href="/admin" className="text-white/30 hover:text-mosphere-gold transition-colors text-[10px] uppercase">
+              Staff Portal
+            </Link>
           </div>
         </div>
 

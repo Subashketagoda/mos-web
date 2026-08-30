@@ -122,8 +122,10 @@ export default function NegomboFooter({ onOpenLocationSwitcher }: NegomboFooterP
             © 2026 MOSPHERE NEGOMBO. ALL RIGHTS RESERVED. &ldquo;GRAB LIFE&rdquo;
           </div>
           <div className="flex items-center gap-6">
-            <span>NEGOMBO, SRI LANKA</span>
-            <span>COASTAL SANCTUARY</span>
+            <span>51 GALISON MAWATHA, NEGOMBO</span>
+            <Link href="/admin" className="text-emerald-300/30 hover:text-[#E5B842] transition-colors text-[10px] uppercase">
+              Staff Portal
+            </Link>
           </div>
         </div>
 
