@@ -81,7 +81,7 @@ export default function NegomboFinalCTA() {
           </a>
 
           <a
-            href={salonConfig.instagram}
+            href={salonConfig.locations.negombo.instagram}
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-4 rounded-full text-xs sm:text-sm font-medium tracking-wider text-emerald-100 bg-[#02180F]/90 hover:bg-[#062A1D] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2.5"

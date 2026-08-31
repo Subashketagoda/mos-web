@@ -99,12 +99,12 @@ export default function NegomboFooter({ onOpenLocationSwitcher }: NegomboFooterP
             <div className="flex items-center gap-2.5 text-xs text-emerald-100/80">
               <Instagram className="w-4 h-4 text-[#E5B842] shrink-0" />
               <a
-                href={salonConfig.instagram}
+                href={loc.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#E5B842] transition-colors inline-flex items-center gap-1"
               >
-                <span>{salonConfig.instagramHandle}</span>
+                <span>{loc.instagramHandle}</span>
                 <ArrowUpRight className="w-3 h-3" />
               </a>
             </div>

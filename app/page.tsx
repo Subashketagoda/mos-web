@@ -85,7 +85,7 @@ export default function HomePage() {
             initialLocation="negombo"
           />
           <NegomboLocation />
-          <InstagramSection />
+          <InstagramSection location="negombo" />
           <NegomboFinalCTA />
           <NegomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
         </div>
@@ -108,7 +108,7 @@ export default function HomePage() {
             initialLocation="colombo"
           />
           <ColomboLocation />
-          <InstagramSection />
+          <InstagramSection location="colombo" />
           <FinalCTA />
           <ColomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
         </div>

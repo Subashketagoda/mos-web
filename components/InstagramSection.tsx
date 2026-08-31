@@ -32,35 +32,54 @@ const instagramPosts = [
   },
 ];
 
-export default function InstagramSection() {
+interface InstagramSectionProps {
+  location?: 'colombo' | 'negombo';
+}
+
+export default function InstagramSection({ location = 'colombo' }: InstagramSectionProps) {
+  const isNegombo = location === 'negombo';
+  const branchConfig = isNegombo ? salonConfig.locations.negombo : salonConfig.locations.colombo;
+  const instagramUrl = branchConfig?.instagram || salonConfig.instagram;
+  const instagramHandle = branchConfig?.instagramHandle || salonConfig.instagramHandle;
+
   return (
-    <section className="py-24 sm:py-32 relative bg-[#060608] border-t border-white/5 overflow-hidden">
+    <section className={`py-24 sm:py-32 relative border-t overflow-hidden ${
+      isNegombo ? 'bg-[#03150F] border-emerald-500/20' : 'bg-[#060608] border-white/5'
+    }`}>
       
       <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
         
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-6 border-b border-white/10 pb-6">
+        <div className={`flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-6 border-b pb-6 ${
+          isNegombo ? 'border-emerald-500/20' : 'border-white/10'
+        }`}>
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-xs font-mono text-mosphere-gold font-semibold">09</span>
+              <span className={`text-xs font-mono font-semibold ${isNegombo ? 'text-[#E5B842]' : 'text-mosphere-gold'}`}>09</span>
               <span className="text-white/20">/</span>
               <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
-                SOCIAL JOURNAL
+                SOCIAL JOURNAL {isNegombo ? '• NEGOMBO' : '• COLOMBO'}
               </span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-5xl font-light text-white tracking-tight">
-              FOLLOW <span className="italic text-mosphere-goldLight">MOSPHERE</span>
+              FOLLOW <span className={`italic ${isNegombo ? 'text-[#F3CC68]' : 'text-mosphere-goldLight'}`}>
+                {isNegombo ? 'MOSPHERE NEGOMBO' : 'MOSPHERE NAWALA'}
+              </span>
             </h2>
           </div>
 
           <a
-            href={salonConfig.instagram}
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 hover:bg-mosphere-gold/10 border border-white/10 hover:border-mosphere-gold/40 text-xs font-mono uppercase tracking-widest text-mosphere-gold transition-all"
+            className={`group inline-flex items-center gap-3 px-6 py-3 rounded-full border text-xs font-mono uppercase tracking-widest transition-all ${
+              isNegombo
+                ? 'bg-emerald-950/40 hover:bg-[#E5B842]/10 border-emerald-500/30 hover:border-[#E5B842] text-[#E5B842]'
+                : 'bg-white/5 hover:bg-mosphere-gold/10 border-white/10 hover:border-mosphere-gold/40 text-mosphere-gold'
+            }`}
           >
-            <span>{salonConfig.instagramHandle}</span>
+            <span>{instagramHandle}</span>
             <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
         </div>
@@ -70,7 +89,7 @@ export default function InstagramSection() {
           {instagramPosts.map((post, idx) => (
             <motion.a
               key={post.id}
-              href={salonConfig.instagram}
+              href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
