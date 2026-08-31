@@ -96,7 +96,7 @@ export default function NegomboReviews() {
   };
 
   return (
-    <section id="reviews" className="py-28 sm:py-36 relative bg-[#041c14] border-t border-emerald-500/20 overflow-hidden">
+    <section id="reviews" className="py-28 sm:py-36 relative bg-[#041c14] border-t border-emerald-500/20 overflow-hidden section-optimize">
       
       {/* Toast Notification */}
       <AnimatePresence>

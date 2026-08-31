@@ -12,7 +12,8 @@ import {
   Sparkles,
   CheckCircle,
   Upload,
-  Calendar
+  Calendar,
+  Image as ImageIcon
 } from 'lucide-react';
 
 const galleryItems = [
@@ -146,7 +147,7 @@ export default function GallerySection() {
   };
 
   return (
-    <section id="gallery" className="py-28 sm:py-36 relative bg-[#070709] border-t border-white/5 overflow-hidden">
+    <section id="gallery" className="py-28 sm:py-36 relative bg-[#070709] border-t border-white/5 overflow-hidden section-optimize">
       
       {/* Toast Notification */}
       <AnimatePresence>

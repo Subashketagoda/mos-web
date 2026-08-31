@@ -65,6 +65,8 @@ export const metadata: Metadata = {
   },
 };
 
+import SmoothScroll from '@/components/SmoothScroll';
+
 export default function RootLayout({
   children,
 }: {
@@ -115,7 +117,9 @@ export default function RootLayout({
         suppressHydrationWarning
         className="bg-mosphere-black text-mosphere-cream font-sans antialiased selection:bg-mosphere-gold selection:text-mosphere-black"
       >
-        {children}
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

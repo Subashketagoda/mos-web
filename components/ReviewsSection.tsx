@@ -100,7 +100,7 @@ export default function ReviewsSection() {
   };
 
   return (
-    <section id="reviews" className="py-28 sm:py-36 relative bg-[#060608] border-t border-white/5 overflow-hidden">
+    <section id="reviews" className="py-28 sm:py-36 relative bg-[#060608] border-t border-white/5 overflow-hidden section-optimize">
       
       {/* Toast Notification */}
       <AnimatePresence>

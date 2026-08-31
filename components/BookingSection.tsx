@@ -41,6 +41,11 @@ interface AvailableSlot {
   durationMinutes: number;
 }
 
+export interface BookingSectionProps {
+  initialSelectedService?: Service | null;
+  initialLocation?: 'colombo' | 'negombo';
+}
+
 const fallbackServices: Service[] = [
   {
     id: 'srv-1',

@@ -6,6 +6,8 @@ export interface BranchConfig {
   heroHeadline: string;
   heroSubheadline: string;
   theme: 'urban-noir' | 'emerald-gold';
+  logo: string;
+  emblem: string;
   address: string;
   addressFull: string;
   phone: string;
@@ -55,6 +57,8 @@ export const salonConfig = {
       heroHeadline: 'A MODERN BEAUTY EXPERIENCE',
       heroSubheadline: 'Urban Haute Sanctuary in Rajagiriya',
       theme: 'urban-noir',
+      logo: '/images/mosphere-logo-gold.png',
+      emblem: '/images/mosphere-emblem-gold.png',
       address: '422A Nawala Rd, Rajagiriya',
       addressFull: '422A Nawala Rd, Sri Jayawardenepura Kotte 10107, Sri Lanka',
       phone: '0777 29 16 29',
@@ -95,7 +99,7 @@ export const salonConfig = {
       googleMapsEmbed: 'https://maps.google.com/maps?q=51+Galison+Mawatha,+Negombo,+Sri+Lanka&t=&z=16&ie=UTF8&iwloc=&output=embed',
       instagram: 'https://www.instagram.com/mosphere_negombo/',
       instagramHandle: '@mosphere_negombo',
-      heroImage: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=2400&q=85',
+      heroImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85',
       experienceImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85',
     } as BranchConfig,
   },

@@ -52,10 +52,10 @@ export default function HomePage() {
       {/* Bespoke Desktop Cursor */}
       <CustomCursor />
 
-      {/* 01. Initial Cinematic 1.2s Loading Screen */}
+      {/* 01. Initial Cinematic Loading Screen */}
       <LoadingScreen />
 
-      {/* 02. Location Selection Screen (shown if no location chosen yet) */}
+      {/* 02. Location Selection Choice Screen (Shown until user selects Colombo or Negombo) */}
       {!selectedLocation && (
         <LocationSelector onSelectLocation={handleLocationSelected} />
       )}

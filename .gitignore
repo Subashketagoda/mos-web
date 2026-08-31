@@ -15,6 +15,7 @@ service-account-key.json
 out/
 build/
 dist/
+*.tsbuildinfo
 
 # SQLite & Database files
 *.db

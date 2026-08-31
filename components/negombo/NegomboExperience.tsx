@@ -22,9 +22,10 @@ export default function NegomboExperience() {
     >
       {/* Scaling Parallax Image */}
       <motion.div
-        style={{ scale, y }}
-        className="absolute inset-0 w-full h-full bg-cover bg-center"
+        className="absolute inset-0 w-full h-full bg-cover bg-center transform-gpu will-change-transform"
         style={{
+          scale,
+          y,
           backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85')`,
         }}
       />

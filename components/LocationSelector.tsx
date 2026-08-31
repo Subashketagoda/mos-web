@@ -171,9 +171,8 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
               loop
               muted
               playsInline
-              preload="auto"
-              poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1600&q=85"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+              preload="metadata"
+              className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#02180F]"
             >
               <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
               <source src="/api/video" type="video/mp4" />

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const token = jwt.sign(
       { userId: user.id, username: user.username, role: user.role },
       salonConfig.jwtSecret,
-      { expiresIn: salonConfig.jwtExpiresIn }
+      { expiresIn: salonConfig.jwtExpiresIn as any }
     );
 
     return NextResponse.json({
