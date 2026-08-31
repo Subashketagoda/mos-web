@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Calendar, ArrowRight, ArrowDown, Volume2, VolumeX, Maximize2, X, Play } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
@@ -9,6 +9,36 @@ export default function NegomboHero() {
   const [isMuted, setIsMuted] = useState(true);
   const [isCinemaOpen, setIsCinemaOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+
+    const tryPlay = () => {
+      const p = video.play();
+      if (p !== undefined) {
+        p.catch(() => {
+          const unlock = () => {
+            video.play().catch(() => {});
+            window.removeEventListener('click', unlock);
+            window.removeEventListener('touchstart', unlock);
+            window.removeEventListener('scroll', unlock);
+          };
+          window.addEventListener('click', unlock, { once: true });
+          window.addEventListener('touchstart', unlock, { once: true });
+          window.addEventListener('scroll', unlock, { once: true });
+        });
+      }
+    };
+
+    tryPlay();
+  }, []);
 
   const toggleSound = () => {
     if (videoRef.current) {
@@ -30,9 +60,12 @@ export default function NegomboHero() {
           loop
           muted
           playsInline
+          preload="auto"
+          poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=2400&q=85"
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/videos/negombo-hero-bg.mp4?v=2026" type="video/mp4" />
+          <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+          <source src="/api/video" type="video/mp4" />
         </video>
 
         {/* Minimal Luxury Vignette (Keeps Video Ultra-Bright & Clear) */}
@@ -155,11 +188,11 @@ export default function NegomboHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5"
+              className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3"
             >
               <a
                 href="#booking"
-                className="group relative overflow-hidden px-8 py-4 rounded-full text-xs font-bold tracking-[0.18em] text-black uppercase transition-all duration-300 shadow-[0_0_25px_rgba(229,184,66,0.45)] hover:shadow-[0_0_35px_rgba(229,184,66,0.8)] flex items-center justify-center gap-2"
+                className="group relative overflow-hidden px-7 py-3.5 rounded-full text-xs font-bold tracking-[0.18em] text-black uppercase transition-all duration-300 shadow-[0_0_25px_rgba(229,184,66,0.45)] hover:shadow-[0_0_35px_rgba(229,184,66,0.8)] flex items-center justify-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #E5B842 0%, #F3CC68 50%, #9B7617 100%)',
                 }}
@@ -168,9 +201,17 @@ export default function NegomboHero() {
                 <span>BOOK NOW</span>
               </a>
 
+              <button
+                onClick={() => setIsCinemaOpen(true)}
+                className="px-6 py-3.5 rounded-full text-xs font-semibold tracking-[0.18em] text-[#E5B842] bg-black/80 hover:bg-black border border-[#E5B842]/60 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(229,184,66,0.3)] hover:scale-105"
+              >
+                <Play className="w-3.5 h-3.5 fill-[#E5B842] text-[#E5B842]" />
+                <span>WATCH LAUNCH FILM</span>
+              </button>
+
               <a
                 href="#services"
-                className="px-7 py-4 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-[#062A1D]/80 hover:bg-[#0A3B29] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group"
+                className="px-6 py-3.5 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-[#062A1D]/80 hover:bg-[#0A3B29] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group"
               >
                 <span>EXPLORE MENU</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#E5B842] group-hover:translate-x-1 transition-transform" />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, MapPin, ChevronRight } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
@@ -12,6 +12,37 @@ interface LocationSelectorProps {
 export default function LocationSelector({ onSelectLocation }: LocationSelectorProps) {
   const [hovered, setHovered] = useState<'colombo' | 'negombo' | null>(null);
   const [selected, setSelected] = useState<'colombo' | 'negombo' | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+
+    const tryPlay = () => {
+      const p = video.play();
+      if (p !== undefined) {
+        p.catch(() => {
+          const unlock = () => {
+            video.play().catch(() => {});
+            window.removeEventListener('click', unlock);
+            window.removeEventListener('touchstart', unlock);
+            window.removeEventListener('scroll', unlock);
+          };
+          window.addEventListener('click', unlock, { once: true });
+          window.addEventListener('touchstart', unlock, { once: true });
+          window.addEventListener('scroll', unlock, { once: true });
+        });
+      }
+    };
+
+    tryPlay();
+  }, []);
 
   const handleSelect = (loc: 'colombo' | 'negombo') => {
     setSelected(loc);
@@ -135,13 +166,17 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           {/* Background Video Visual - Crystal Clear & Vivid */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
+              preload="auto"
+              poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1600&q=85"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
             >
-              <source src="/videos/negombo-hero-bg.mp4?v=2026" type="video/mp4" />
+              <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+              <source src="/api/video" type="video/mp4" />
             </video>
             {/* Subtle Luxury Gradient Overlay (Keeps video bright & vibrant) */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/15 group-hover:via-black/10 transition-colors duration-500" />
