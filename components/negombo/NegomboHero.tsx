@@ -188,11 +188,11 @@ export default function NegomboHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5"
             >
               <a
                 href="#booking"
-                className="group relative overflow-hidden px-7 py-3.5 rounded-full text-xs font-bold tracking-[0.18em] text-black uppercase transition-all duration-300 shadow-[0_0_25px_rgba(229,184,66,0.45)] hover:shadow-[0_0_35px_rgba(229,184,66,0.8)] flex items-center justify-center gap-2"
+                className="group relative overflow-hidden px-8 py-4 rounded-full text-xs font-bold tracking-[0.18em] text-black uppercase transition-all duration-300 shadow-[0_0_25px_rgba(229,184,66,0.45)] hover:shadow-[0_0_35px_rgba(229,184,66,0.8)] flex items-center justify-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #E5B842 0%, #F3CC68 50%, #9B7617 100%)',
                 }}
@@ -201,17 +201,9 @@ export default function NegomboHero() {
                 <span>BOOK NOW</span>
               </a>
 
-              <button
-                onClick={() => setIsCinemaOpen(true)}
-                className="px-6 py-3.5 rounded-full text-xs font-semibold tracking-[0.18em] text-[#E5B842] bg-black/80 hover:bg-black border border-[#E5B842]/60 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(229,184,66,0.3)] hover:scale-105"
-              >
-                <Play className="w-3.5 h-3.5 fill-[#E5B842] text-[#E5B842]" />
-                <span>WATCH LAUNCH FILM</span>
-              </button>
-
               <a
                 href="#services"
-                className="px-6 py-3.5 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-[#062A1D]/80 hover:bg-[#0A3B29] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group"
+                className="px-7 py-4 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-[#062A1D]/80 hover:bg-[#0A3B29] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group"
               >
                 <span>EXPLORE MENU</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#E5B842] group-hover:translate-x-1 transition-transform" />
