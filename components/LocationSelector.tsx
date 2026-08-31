@@ -141,7 +141,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
               playsInline
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
             >
-              <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+              <source src="/videos/negombo-hero-bg.mp4?v=2026" type="video/mp4" />
             </video>
             {/* Subtle Luxury Gradient Overlay (Keeps video bright & vibrant) */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/15 group-hover:via-black/10 transition-colors duration-500" />

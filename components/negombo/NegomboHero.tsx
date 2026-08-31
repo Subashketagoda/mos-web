@@ -32,7 +32,7 @@ export default function NegomboHero() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+          <source src="/videos/negombo-hero-bg.mp4?v=2026" type="video/mp4" />
         </video>
 
         {/* Minimal Luxury Vignette (Keeps Video Ultra-Bright & Clear) */}
@@ -233,7 +233,7 @@ export default function NegomboHero() {
                 playsInline
                 className="w-full h-full object-contain"
               >
-                <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+                <source src="/videos/negombo-hero-bg.mp4?v=2026" type="video/mp4" />
               </video>
             </div>
           </motion.div>
