@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Calendar, ArrowRight, ArrowDown } from 'lucide-react';
+import { Sparkles, Calendar, ArrowRight, ArrowDown, Play } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 
 export default function NegomboHero() {
@@ -136,11 +136,11 @@ export default function NegomboHero() {
               </a>
 
               <a
-                href="#services"
-                className="px-7 py-4 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-[#062A1D]/80 hover:bg-[#0A3B29] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group"
+                href="#launch-reel"
+                className="px-6 py-4 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-[#062A1D]/80 hover:bg-[#0A3B29] border border-[#E5B842]/40 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group shadow-lg"
               >
-                <span>EXPLORE MENU</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#E5B842] group-hover:translate-x-1 transition-transform" />
+                <Play className="w-3.5 h-3.5 text-[#E5B842] fill-[#E5B842]/30 group-hover:scale-110 transition-transform" />
+                <span>WATCH FILM</span>
               </a>
             </motion.div>
           </div>
