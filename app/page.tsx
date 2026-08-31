@@ -22,7 +22,6 @@ import ColomboFooter from '@/components/colombo/ColomboFooter';
 import NegomboNavbar from '@/components/negombo/NegomboNavbar';
 import NegomboHero from '@/components/negombo/NegomboHero';
 import NegomboIntro from '@/components/negombo/NegomboIntro';
-import NegomboVideoShowcase from '@/components/negombo/NegomboVideoShowcase';
 import NegomboServices from '@/components/negombo/NegomboServices';
 import NegomboExperience from '@/components/negombo/NegomboExperience';
 import NegomboGallery from '@/components/negombo/NegomboGallery';
@@ -77,7 +76,6 @@ export default function HomePage() {
           <NegomboNavbar onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
           <NegomboHero />
           <NegomboIntro />
-          <NegomboVideoShowcase />
           <NegomboServices onSelectService={handleSelectService} />
           <NegomboExperience />
           <NegomboGallery />
