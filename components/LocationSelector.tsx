@@ -132,18 +132,19 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           className="relative flex-1 min-h-[46svh] lg:min-h-0 cursor-pointer overflow-hidden group flex flex-col justify-end p-6 sm:p-10 lg:p-16 transition-all duration-300"
         >
-          {/* Background Visual */}
-          <div className="absolute inset-0 z-0">
-            <motion.div
-              animate={{ scale: hovered === 'negombo' ? 1.08 : 1 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1600&q=85')`,
-              }}
-            />
+          {/* Background Video Visual */}
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+            >
+              <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+            </video>
             {/* Official Deep Green (#062A1D) Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#062A1D]/90 to-[#062A1D]/55 group-hover:via-[#062A1D]/75 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#031D14]/85 to-[#02180F]/60 group-hover:via-[#031D14]/70 transition-colors duration-500" />
             <div className="absolute inset-0 film-grain pointer-events-none" />
           </div>
 
