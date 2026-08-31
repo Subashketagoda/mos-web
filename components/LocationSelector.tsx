@@ -132,7 +132,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           className="relative flex-1 min-h-[46svh] lg:min-h-0 cursor-pointer overflow-hidden group flex flex-col justify-end p-6 sm:p-10 lg:p-16 transition-all duration-300"
         >
-          {/* Background Video Visual */}
+          {/* Background Video Visual - Crystal Clear & Vivid */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
               autoPlay
@@ -143,9 +143,9 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
             >
               <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
             </video>
-            {/* Official Deep Green (#062A1D) Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#031D14]/85 to-[#02180F]/60 group-hover:via-[#031D14]/70 transition-colors duration-500" />
-            <div className="absolute inset-0 film-grain pointer-events-none" />
+            {/* Subtle Luxury Gradient Overlay (Keeps video bright & vibrant) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/15 group-hover:via-black/10 transition-colors duration-500" />
+            <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
           </div>
 
           {/* Negombo Info Card */}

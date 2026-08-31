@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles, Calendar, ArrowRight, ArrowDown, Volume2, VolumeX } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Calendar, ArrowRight, ArrowDown, Volume2, VolumeX, Maximize2, X, Play } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 
 export default function NegomboHero() {
   const [isMuted, setIsMuted] = useState(true);
+  const [isCinemaOpen, setIsCinemaOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const toggleSound = () => {
@@ -19,9 +20,9 @@ export default function NegomboHero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-28 pb-12 sm:pb-16 px-6 sm:px-12 bg-[#062A1D]"
+      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-28 pb-12 sm:pb-16 px-6 sm:px-12 bg-black"
     >
-      {/* Background Video with Deep Pine/Emerald Luxury Overlay */}
+      {/* Background Video - 100% Crystal Clear & Vivid */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           ref={videoRef}
@@ -29,26 +30,36 @@ export default function NegomboHero() {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover scale-105"
+          className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
         </video>
 
-        {/* Layered Deep Emerald & Satin Gold Gradients for High Contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#031D14]/80 to-[#02180F]/65" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#02180F]/60 to-[#02180F]" />
-        <div className="absolute inset-0 film-grain pointer-events-none" />
+        {/* Minimal Luxury Vignette (Keeps Video Ultra-Bright & Clear) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/35 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-black/40 pointer-events-none" />
       </div>
 
-      {/* Sound Toggle Button (Bottom Right) */}
-      <button
-        onClick={toggleSound}
-        className="absolute bottom-6 right-6 z-20 p-3 rounded-full bg-black/60 hover:bg-black/90 text-[#E5B842] border border-[#E5B842]/40 backdrop-blur-md transition-all shadow-lg hover:scale-105"
-        title={isMuted ? 'Unmute video sound' : 'Mute video sound'}
-        aria-label="Toggle Hero Video Sound"
-      >
-        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-      </button>
+      {/* Floating Video Controls Pill (Bottom Right) */}
+      <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2.5">
+        <button
+          onClick={() => setIsCinemaOpen(true)}
+          className="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-black/75 hover:bg-black/95 text-[#E5B842] border border-[#E5B842]/50 backdrop-blur-md transition-all shadow-xl hover:scale-105 text-xs font-mono tracking-wider uppercase"
+          title="Watch in Cinema Fullscreen"
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">FULLSCREEN VIDEO</span>
+        </button>
+
+        <button
+          onClick={toggleSound}
+          className="p-2.5 rounded-full bg-black/75 hover:bg-black/95 text-[#E5B842] border border-[#E5B842]/50 backdrop-blur-md transition-all shadow-xl hover:scale-105"
+          title={isMuted ? 'Unmute video sound' : 'Mute video sound'}
+          aria-label="Toggle Hero Video Sound"
+        >
+          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        </button>
+      </div>
 
       {/* Top Editorial Eyebrow Tag */}
       <div className="relative z-10 max-w-7xl w-full mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-b border-[#E5B842]/25 pb-4">
@@ -185,6 +196,49 @@ export default function NegomboHero() {
           <ArrowDown className="w-3.5 h-3.5 text-[#E5B842] animate-bounce" />
         </a>
       </div>
+
+      {/* Fullscreen Theater Modal */}
+      <AnimatePresence>
+        {isCinemaOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-8"
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsCinemaOpen(false)}
+              className="absolute top-6 right-6 z-30 p-3 rounded-full bg-white/10 hover:bg-white/25 text-white transition-all hover:scale-110"
+              aria-label="Close cinema view"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Title Header */}
+            <div className="text-center mb-4 sm:mb-6">
+              <span className="text-xs font-mono text-[#E5B842] uppercase tracking-[0.3em]">
+                MOSPHERE CINEMATIC EXPERIENCE
+              </span>
+              <h3 className="text-xl sm:text-2xl font-serif text-white mt-1">
+                Now Open in Negombo
+              </h3>
+            </div>
+
+            {/* Video Container */}
+            <div className="relative max-w-5xl w-full aspect-video rounded-2xl overflow-hidden border border-[#E5B842]/40 shadow-[0_0_50px_rgba(229,184,66,0.3)] bg-black">
+              <video
+                autoPlay
+                controls
+                playsInline
+                className="w-full h-full object-contain"
+              >
+                <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
