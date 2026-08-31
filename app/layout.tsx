@@ -104,14 +104,17 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${playfair.variable} ${plusJakarta.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${plusJakarta.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-mosphere-black text-mosphere-cream font-sans antialiased selection:bg-mosphere-gold selection:text-mosphere-black">
+      <body
+        suppressHydrationWarning
+        className="bg-mosphere-black text-mosphere-cream font-sans antialiased selection:bg-mosphere-gold selection:text-mosphere-black"
+      >
         {children}
       </body>
     </html>

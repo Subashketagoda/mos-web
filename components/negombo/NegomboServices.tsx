@@ -12,22 +12,22 @@ const negomboServices = [
   {
     id: 'srv-neg-hair-botox',
     number: '01',
-    name: 'Hair Botox Deep Hydration & Repair Treatment',
+    name: 'Hair Botox Deep Hydration & Repair',
     category: 'Restorative Hair Lab',
     duration: '90 MIN',
-    price: 'LKR 14,500',
-    description: 'Signature restorative ritual infusing amino acids, marine collagen, and caviar oil to seal open cuticles, banish humidity frizz, and create luminous glass-like shine.',
+    price: 'Starting LKR 14,500',
+    description: 'Intense amino-collagen infusion to eliminate humidity frizz and deliver luminous glass shine.',
     image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
     tag: 'Negombo Signature',
   },
   {
     id: 'srv-neg-keratin-silk',
     number: '02',
-    name: 'Keratin Silk Protein Smoothing Therapy',
+    name: 'Keratin Silk Protein Smoothing',
     category: 'Restorative Hair Lab',
     duration: '120 MIN',
-    price: 'LKR 18,500',
-    description: 'Structural bio-smoothing protein therapy that reinforces the cortex, controls volume, and provides mirror-smooth, silky manageability for months.',
+    price: 'Starting LKR 18,500',
+    description: 'Structural bio-smoothing protein therapy for mirror-smooth manageability and silkiness.',
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
     tag: 'Long Lasting',
   },
@@ -37,8 +37,8 @@ const negomboServices = [
     name: 'Gents Master Cut & Beard Architecture',
     category: 'Gents Bespoke Grooming',
     duration: '45 MIN',
-    price: 'LKR 3,500',
-    description: 'Facial-structure consultation, precision gradient taper or skin fade, eucalyptus hot towel steam prep, crisp straight razor edging, and botanical conditioning oil.',
+    price: 'Starting LKR 3,500',
+    description: 'Precision fade consultation, eucalyptus hot towel steam prep, and sharp straight-razor detailing.',
     image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Master Barber',
   },
@@ -48,8 +48,8 @@ const negomboServices = [
     name: 'Ladies Couture Cut & Signature Blowout',
     category: 'Ladies Hair & Styling',
     duration: '60 MIN',
-    price: 'LKR 4,500',
-    description: 'Custom layered architectural haircut tailored to hair density, scalp massage cleanse ritual, and runway-level blowout finish for maximum volume and bounce.',
+    price: 'Starting LKR 4,500',
+    description: 'Architectural haircut tailored to your density, finished with a high-volume runway blowout.',
     image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=80',
     tag: 'Couture Styling',
   },
@@ -59,8 +59,8 @@ const negomboServices = [
     name: 'Dimensional Balayage & Gloss Tone Melt',
     category: 'Color & Highlights',
     duration: '120 MIN',
-    price: 'LKR 15,500',
-    description: 'Bespoke hand-painted freehand highlights, seamless blonde/caramel transitions, and pH-balancing gloss glaze for rich multi-tonal brilliance.',
+    price: 'Starting LKR 15,500',
+    description: 'Bespoke hand-painted highlights with seamless blonde/caramel transitions and gloss shine.',
     image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Bespoke Color',
   },
@@ -70,8 +70,8 @@ const negomboServices = [
     name: 'Deep Scalp Detox & High-Frequency Therapy',
     category: 'Scalp & Hair Wellness',
     duration: '45 MIN',
-    price: 'LKR 5,500',
-    description: 'Purifying scalp exfoliation, ozone follicular stimulation, essential botanical oil infusion, and therapeutic acupressure to promote strong hair growth.',
+    price: 'Starting LKR 5,500',
+    description: 'Exfoliating scalp cleanse, ozone stimulation, and botanical nourishment for strong hair health.',
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
     tag: 'Scalp Health',
   },
@@ -103,7 +103,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex items-center justify-between border-b border-[#E5B842]/25 pb-4 mb-16"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5B842]/25 pb-4 mb-6"
         >
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-[#E5B842] font-semibold">02</span>
@@ -116,6 +116,12 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
             NEGOMBO • RESTORATIVE & PRECISION MENU
           </span>
         </motion.div>
+
+        {/* Pricing Transparency Note */}
+        <div className="mb-10 flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#062A1D] border border-[#E5B842]/25 text-[11px] font-mono text-emerald-100/70">
+          <span className="text-[#E5B842] font-semibold">✦ STARTING RATES:</span>
+          <span>Prices vary per individual depending on hair length, texture, and personalized stylist consultation.</span>
+        </div>
 
         {/* Dual Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">

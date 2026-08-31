@@ -12,22 +12,22 @@ const colomboServices = [
   {
     id: 'srv-col-hair-botox',
     number: '01',
-    name: 'Hair Botox Deep Hydration & Repair Treatment',
+    name: 'Hair Botox Deep Hydration & Repair',
     category: 'Restorative Hair Lab',
     duration: '90 MIN',
-    price: 'LKR 14,500',
-    description: 'Signature restorative ritual infusing amino acids, marine collagen, and caviar oil to seal open cuticles, banish humidity frizz, and create luminous glass-like shine.',
+    price: 'Starting LKR 14,500',
+    description: 'Intense amino-collagen infusion to seal cuticles, eliminate humidity frizz, and restore glass-like shine.',
     image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
     tag: 'Signature Ritual',
   },
   {
     id: 'srv-col-keratin-silk',
     number: '02',
-    name: 'Keratin Silk Protein Smoothing Therapy',
+    name: 'Keratin Silk Protein Smoothing',
     category: 'Restorative Hair Lab',
     duration: '120 MIN',
-    price: 'LKR 18,500',
-    description: 'Structural bio-smoothing protein therapy that reinforces the cortex, controls volume, and provides mirror-smooth, silky manageability for months.',
+    price: 'Starting LKR 18,500',
+    description: 'Structural bio-smoothing protein therapy for mirror-smooth manageability and long-lasting silkiness.',
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
     tag: 'Long Lasting',
   },
@@ -37,8 +37,8 @@ const colomboServices = [
     name: 'Gents Master Cut & Beard Architecture',
     category: 'Gents Bespoke Grooming',
     duration: '45 MIN',
-    price: 'LKR 3,500',
-    description: 'Facial-structure consultation, precision gradient taper or skin fade, eucalyptus hot towel steam prep, crisp straight razor edging, and botanical conditioning oil.',
+    price: 'Starting LKR 3,500',
+    description: 'Precision taper or fade consultation, eucalyptus hot towel prep, and sharp straight-razor detailing.',
     image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Master Barber',
   },
@@ -48,8 +48,8 @@ const colomboServices = [
     name: 'Ladies Couture Cut & Signature Blowout',
     category: 'Ladies Hair & Styling',
     duration: '60 MIN',
-    price: 'LKR 4,500',
-    description: 'Custom layered architectural haircut tailored to hair density, scalp massage cleanse ritual, and runway-level blowout finish for maximum volume and bounce.',
+    price: 'Starting LKR 4,500',
+    description: 'Architectural haircut tailored to your facial geometry, finished with a high-volume runway blowout.',
     image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=80',
     tag: 'Couture Styling',
   },
@@ -59,19 +59,19 @@ const colomboServices = [
     name: 'Dimensional Balayage & Gloss Tone Melt',
     category: 'Color & Highlights',
     duration: '120 MIN',
-    price: 'LKR 15,500',
-    description: 'Bespoke hand-painted freehand highlights, seamless blonde/caramel transitions, and pH-balancing gloss glaze for rich multi-tonal brilliance.',
+    price: 'Starting LKR 15,500',
+    description: 'Bespoke hand-painted highlights with seamless transitions and a radiant pH-balancing gloss tone.',
     image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Bespoke Color',
   },
   {
     id: 'srv-col-beard-sculpt',
     number: '06',
-    name: 'Beard Sculpture & Hot Towel Shave Ritual',
+    name: 'Beard Sculpture & Hot Towel Shave',
     category: 'Gents Bespoke Grooming',
     duration: '30 MIN',
-    price: 'LKR 2,200',
-    description: 'Sharp silhouette beard contouring, dual hot & cold aromatic towel compress, and soothing post-shave sandalwood balm application.',
+    price: 'Starting LKR 2,200',
+    description: 'Crisp beard contouring, dual aromatic hot towel compresses, and soothing sandalwood balm finish.',
     image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
     tag: 'Classic Shave',
   },
@@ -81,8 +81,8 @@ const colomboServices = [
     name: 'Deep Scalp Detox & High-Frequency Therapy',
     category: 'Scalp & Hair Wellness',
     duration: '45 MIN',
-    price: 'LKR 5,500',
-    description: 'Purifying scalp exfoliation, ozone follicular stimulation, essential botanical oil infusion, and therapeutic acupressure to promote strong hair growth.',
+    price: 'Starting LKR 5,500',
+    description: 'Exfoliating scalp cleanse, ozone stimulation, and botanical nourishment for healthy follicle growth.',
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
     tag: 'Scalp Health',
   },
@@ -92,8 +92,8 @@ const colomboServices = [
     name: 'Hydro-Radiance Deep Cleanse Facial',
     category: 'Skin & Aesthetics',
     duration: '60 MIN',
-    price: 'LKR 7,500',
-    description: 'Enzyme deep cleanse, gentle pore refinement, concentrated antioxidant serum infusion, and cryo-jade stone lymphatic drainage for immediate skin luminosity.',
+    price: 'Starting LKR 7,500',
+    description: 'Enzyme pore purification, antioxidant hydration infusion, and jade-stone lymphatic sculpting.',
     image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
     tag: 'Skin Glow',
   },
@@ -123,7 +123,7 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex items-center justify-between border-b border-white/10 pb-4 mb-16"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4 mb-6"
         >
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-mosphere-gold font-semibold">02</span>
@@ -136,6 +136,12 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
             NAWALA • BESPOKE URBAN MENU
           </span>
         </motion.div>
+
+        {/* Pricing Transparency Note */}
+        <div className="mb-10 flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] font-mono text-white/60">
+          <span className="text-mosphere-gold font-semibold">✦ STARTING RATES:</span>
+          <span>Prices vary per individual depending on hair length, density, and in-salon consultation.</span>
+        </div>
 
         {/* Horizontal Editorial Service Blocks (Distinct Grid Layout) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">

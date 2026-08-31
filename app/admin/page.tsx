@@ -28,6 +28,7 @@ import {
   Home
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
+import { subscribeToBookings, subscribeToGallery } from '@/lib/firebaseService';
 
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -48,6 +49,7 @@ export default function AdminPage() {
   const [blockedDates, setBlockedDates] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
   const [gcalStatus, setGcalStatus] = useState<any>(null);
+  const [isFirebaseLive, setIsFirebaseLive] = useState(true);
 
   // Filters
   const [filterDate, setFilterDate] = useState('');
@@ -100,6 +102,46 @@ export default function AdminPage() {
       verifySession(savedToken);
     }
   }, []);
+
+  // Real-time live synchronization and periodic background sync for admin data
+  useEffect(() => {
+    if (!token) return;
+
+    // 1. Initial Load
+    loadAllData(token);
+
+    // 2. Continuous 3-second live sync interval for all mobile & remote bookings
+    const interval = setInterval(() => {
+      loadAllData(token);
+    }, 3000);
+
+    // 3. Cloud Firestore Real-time push listeners
+    const unsubBookings = subscribeToBookings((liveBookings) => {
+      if (liveBookings && liveBookings.length > 0) {
+        setBookings((prev) => {
+          const liveIds = new Set(liveBookings.map((b) => b.id));
+          const remaining = prev.filter((p) => !liveIds.has(p.id));
+          return [...liveBookings, ...remaining];
+        });
+      }
+    });
+
+    const unsubGallery = subscribeToGallery((livePhotos) => {
+      if (livePhotos && livePhotos.length > 0) {
+        setGallery((prev) => {
+          const liveIds = new Set(livePhotos.map((p) => p.id));
+          const remaining = prev.filter((p) => !liveIds.has(p.id));
+          return [...livePhotos, ...remaining];
+        });
+      }
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubBookings();
+      unsubGallery();
+    };
+  }, [token]);
 
   async function verifySession(tok: string) {
     try {
@@ -537,11 +579,15 @@ export default function AdminPage() {
             <span className="text-xs uppercase tracking-widest text-mosphere-gold font-medium">
               Staff Portal • {salonConfig.address}
             </span>
+            <span className="text-[11px] px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 flex items-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <span>Firebase Realtime Sync: Live</span>
+            </span>
             {gcalStatus && (
               <span className={`text-[11px] px-3 py-1 rounded-full border flex items-center gap-1.5 ${
                 gcalStatus.status === 'connected'
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                  : 'bg-white/5 border-white/10 text-white/50'
               }`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 <span>Google Calendar: {gcalStatus.status === 'connected' ? 'Connected' : 'Simulation Mode'}</span>
@@ -549,7 +595,18 @@ export default function AdminPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                if (token) loadAllData(token);
+              }}
+              title="Refresh Bookings & Data"
+              className="px-3.5 py-2 rounded-full text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center gap-1.5"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-mosphere-gold" />
+              <span>Refresh</span>
+            </button>
+
             <button
               onClick={() => {
                 if (services.length > 0) setWalkinService(services[0].id);

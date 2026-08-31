@@ -60,7 +60,7 @@ export default function NegomboFinalCTA() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-sm sm:text-base text-emerald-100/80 font-light max-w-lg mb-10 leading-relaxed"
         >
-          Reserve your bespoke appointment at Mosphere Negombo for master haircuts, signature hair botox, and rejuvenating beauty rituals.
+          Reserve your bespoke appointment for master haircuts and certified hair botox rituals.
         </motion.p>
 
         {/* Action Buttons */}

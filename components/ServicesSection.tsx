@@ -15,7 +15,7 @@ const verifiedServices = [
     name: 'Hair Botox Deep Hydration & Repair Treatment',
     category: 'Restorative Hair Lab',
     duration: '90 MIN',
-    price: 'LKR 14,500',
+    price: 'Starting LKR 14,500',
     description: 'Signature restorative ritual infusing amino acids, marine collagen, and caviar oil to seal open cuticles, banish humidity frizz, and create luminous glass-like shine.',
     image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
     tag: 'Signature Ritual',
@@ -26,7 +26,7 @@ const verifiedServices = [
     name: 'Keratin Silk Protein Smoothing Therapy',
     category: 'Restorative Hair Lab',
     duration: '120 MIN',
-    price: 'LKR 18,500',
+    price: 'Starting LKR 18,500',
     description: 'Structural bio-smoothing protein therapy that reinforces the cortex, controls volume, and provides mirror-smooth, silky manageability for months.',
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
     tag: 'Long Lasting',
@@ -37,7 +37,7 @@ const verifiedServices = [
     name: 'Gents Master Cut & Beard Architecture',
     category: 'Gents Bespoke Grooming',
     duration: '45 MIN',
-    price: 'LKR 3,500',
+    price: 'Starting LKR 3,500',
     description: 'Facial-structure consultation, precision gradient taper or skin fade, eucalyptus hot towel steam prep, crisp straight razor edging, and botanical conditioning oil.',
     image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Master Barber',
@@ -48,7 +48,7 @@ const verifiedServices = [
     name: 'Ladies Couture Cut & Signature Blowout',
     category: 'Ladies Hair & Styling',
     duration: '60 MIN',
-    price: 'LKR 4,500',
+    price: 'Starting LKR 4,500',
     description: 'Custom layered architectural haircut tailored to hair density, scalp massage cleanse ritual, and runway-level blowout finish for maximum volume and bounce.',
     image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=80',
     tag: 'Couture Styling',
@@ -59,7 +59,7 @@ const verifiedServices = [
     name: 'Dimensional Balayage & Gloss Tone Melt',
     category: 'Color & Highlights',
     duration: '120 MIN',
-    price: 'LKR 15,500',
+    price: 'Starting LKR 15,500',
     description: 'Bespoke hand-painted freehand highlights, seamless blonde/caramel transitions, and pH-balancing gloss glaze for rich multi-tonal brilliance.',
     image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Bespoke Color',
@@ -70,7 +70,7 @@ const verifiedServices = [
     name: 'Beard Sculpture & Hot Towel Shave Ritual',
     category: 'Gents Bespoke Grooming',
     duration: '30 MIN',
-    price: 'LKR 2,200',
+    price: 'Starting LKR 2,200',
     description: 'Sharp silhouette beard contouring, dual hot & cold aromatic towel compress, and soothing post-shave sandalwood balm application.',
     image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
     tag: 'Classic Shave',
@@ -81,7 +81,7 @@ const verifiedServices = [
     name: 'Deep Scalp Detox & High-Frequency Therapy',
     category: 'Scalp & Hair Wellness',
     duration: '45 MIN',
-    price: 'LKR 5,500',
+    price: 'Starting LKR 5,500',
     description: 'Purifying scalp exfoliation, ozone follicular stimulation, essential botanical oil infusion, and therapeutic acupressure to promote strong hair growth.',
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
     tag: 'Scalp Health',
@@ -92,7 +92,7 @@ const verifiedServices = [
     name: 'Hydro-Radiance Deep Cleanse Facial',
     category: 'Skin & Aesthetics',
     duration: '60 MIN',
-    price: 'LKR 7,500',
+    price: 'Starting LKR 7,500',
     description: 'Enzyme deep cleanse, gentle pore refinement, concentrated antioxidant serum infusion, and cryo-jade stone lymphatic drainage for immediate skin luminosity.',
     image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
     tag: 'Skin Glow',
@@ -125,19 +125,25 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex items-center justify-between border-b border-white/10 pb-4 mb-16"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4 mb-6"
         >
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-mosphere-gold font-semibold">02</span>
             <span className="text-white/20">/</span>
             <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
-              WHAT WE DO
+              SERVICES & OFFERINGS
             </span>
           </div>
           <span className="text-xs font-mono text-white/40 tracking-widest hidden sm:inline uppercase">
-            HAIR BOTOX • KERATIN • GROOMING • AESTHETICS
+            SANCTUARY CURATION • COLOMBO & NEGOMBO
           </span>
         </motion.div>
+
+        {/* Pricing Transparency Note */}
+        <div className="mb-10 flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] font-mono text-white/60">
+          <span className="text-mosphere-gold font-semibold">✦ STARTING RATES:</span>
+          <span>Prices vary per individual depending on hair length, texture, and personalized stylist consultation.</span>
+        </div>
 
         {/* Dual Layout: Interactive Vertical List on Left + Floating Dynamic Preview on Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">

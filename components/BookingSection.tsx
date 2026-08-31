@@ -21,6 +21,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
+import { syncBookingToFirestore } from '@/lib/firebaseService';
 
 interface Service {
   id: string;
@@ -185,6 +186,23 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
       if (res.status === 201 && data.success) {
         setConfirmedBooking(data.booking);
+        // Sync to Cloud Firestore in real-time
+        syncBookingToFirestore({
+          bookingRef: data.booking.bookingRef,
+          customerName: data.booking.customerName,
+          phone: data.booking.phone,
+          email: data.booking.email,
+          serviceId: data.booking.serviceId,
+          serviceName: data.booking.serviceName,
+          date: data.booking.date,
+          startTime: data.booking.startTime,
+          endTime: data.booking.endTime,
+          duration: data.booking.duration,
+          price: data.booking.price,
+          status: 'confirmed',
+          location: activeLocation,
+          notes: data.booking.notes,
+        });
         setStep(5);
       } else {
         // Race condition / double booking
@@ -417,8 +435,8 @@ export default function BookingSection({ initialSelectedService, initialLocation
                           <p className="text-xs text-white/60 font-light leading-relaxed mb-4">{s.description}</p>
                         </div>
                         <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-                          <span className="text-sm font-serif font-semibold text-mosphere-cream">
-                            LKR {s.price.toLocaleString()}
+                          <span className="text-xs font-serif font-medium text-mosphere-cream">
+                            Starting LKR {s.price.toLocaleString()}
                           </span>
                           <span className={`text-xs font-semibold uppercase ${isSelected ? 'text-mosphere-gold' : 'text-white/40'}`}>
                             {isSelected ? '✓ Selected' : 'Select'}
@@ -427,6 +445,11 @@ export default function BookingSection({ initialSelectedService, initialLocation
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Transparency Note */}
+                <div className="mb-8 p-3 rounded-xl bg-white/[0.02] border border-white/10 text-[11px] font-mono text-white/60 text-center">
+                  ✦ Starting rates shown. Final price depends on hair length, density, and customized stylist consultation.
                 </div>
 
                 <div className="flex justify-end">
@@ -454,7 +477,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
                   {selectedService && (
                     <div className="text-right hidden sm:block">
                       <span className="text-xs text-mosphere-gold block">{selectedService.name}</span>
-                      <span className="text-xs text-white/50">{selectedService.duration} min • LKR {selectedService.price.toLocaleString()}</span>
+                      <span className="text-xs text-white/50">{selectedService.duration} min • Starting LKR {selectedService.price.toLocaleString()}</span>
                     </div>
                   )}
                 </div>
@@ -724,10 +747,15 @@ export default function BookingSection({ initialSelectedService, initialLocation
                           <span className="font-medium text-white text-right">422A Nawala Rd, Colombo</span>
                         </div>
 
-                        <div className="pt-4 mt-4 border-t border-white/10 flex justify-between items-baseline">
-                          <span className="text-sm uppercase tracking-wider text-white font-semibold">Total (Pay at Salon)</span>
-                          <span className="text-xl font-serif font-bold text-mosphere-cream">
-                            LKR {selectedService?.price.toLocaleString()}
+                        <div className="pt-4 mt-4 border-t border-white/10 flex flex-col gap-1.5">
+                          <div className="flex justify-between items-baseline">
+                            <span className="text-xs uppercase tracking-wider text-mosphere-gold font-semibold">Pricing Guide</span>
+                            <span className="text-sm font-serif font-bold text-mosphere-cream">
+                              Starting from LKR {selectedService?.price.toLocaleString()}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-white/50 leading-tight">
+                            ✦ Prices vary individually based on hair length, density, and personalized stylist consultation. (Pay at salon)
                           </span>
                         </div>
                       </div>
@@ -818,10 +846,10 @@ export default function BookingSection({ initialSelectedService, initialLocation
                         : '422A Nawala Rd, Rajagiriya'}
                     </span>
                   </div>
-                  <div className="flex justify-between pt-1">
-                    <span className="text-white/40">Total Amount</span>
-                    <span className="text-base font-serif font-bold text-mosphere-cream">
-                      LKR {confirmedBooking.price.toLocaleString()}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 gap-1">
+                    <span className="text-white/40">Pricing Guide</span>
+                    <span className="text-xs text-mosphere-gold font-medium text-right">
+                      Starting from LKR {confirmedBooking.price.toLocaleString()} (Tailored consultation at salon)
                     </span>
                   </div>
                 </div>

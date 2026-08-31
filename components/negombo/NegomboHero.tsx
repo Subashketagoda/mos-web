@@ -114,7 +114,7 @@ export default function NegomboHero() {
                 className="max-h-36 sm:max-h-44 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(229,184,66,0.6)]"
               />
               <p className="text-xs text-emerald-100/80 font-light mt-3 leading-relaxed">
-                Specializing in signature Hair Botox, Keratin Protein smoothing, and precision grooming in Negombo.
+                Bespoke haircuts, certified hair botox, and coastal salon luxury.
               </p>
             </motion.div>
 

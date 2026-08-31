@@ -36,7 +36,7 @@ export default function BrandStatement() {
         </motion.div>
 
         {/* Editorial Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           
           {/* Left Column: Oversized Monumental Statement */}
           <motion.div
@@ -51,18 +51,18 @@ export default function BrandStatement() {
               <span className="font-normal italic text-mosphere-goldLight">AN EXPERIENCE.</span>
             </h2>
 
-            <div className="mt-10 flex flex-wrap items-center gap-6 text-xs text-white/50 font-light uppercase tracking-widest">
+            <div className="mt-8 flex flex-wrap items-center gap-5 text-xs text-white/50 font-light uppercase tracking-widest">
               <span className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold" />
-                Private Gents Suite
+                Gents Suite
               </span>
               <span className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold" />
-                Ladies Haute Studio
+                Ladies Haute Lounge
               </span>
               <span className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold" />
-                Keratin & Botox Lab
+                Hair Botox & Keratin Lab
               </span>
             </div>
           </motion.div>
@@ -73,22 +73,19 @@ export default function BrandStatement() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="lg:col-span-5 flex flex-col gap-6 lg:pt-3 text-white/70 font-light leading-relaxed text-sm sm:text-base"
+            className="lg:col-span-5 flex flex-col gap-6 text-white/70 font-light leading-relaxed text-sm sm:text-base border-l border-white/10 pl-6"
           >
             <p>
-              Located at 422A Nawala Road, Mosphere redefines luxury grooming and salon care in Sri Lanka. We reject rushed cuts and generic treatments in favor of meticulous consultation, international artistry, and restorative scalp and hair rituals.
-            </p>
-            <p className="text-white/50 text-xs sm:text-sm">
-              Every detail—from ambient soundscapes and private styling chairs to premium bio-active formulations—is calibrated to elevate your presence.
+              Located at 422A Nawala Road, Mosphere redefines luxury salon care through bespoke hair architecture, certified restorative treatments, and private suites.
             </p>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <a
                 href="#services"
-                className="group inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-medium text-mosphere-gold hover:text-mosphere-goldLight transition-colors"
+                className="group inline-flex items-center gap-2.5 text-xs uppercase tracking-[0.2em] font-medium text-mosphere-gold hover:text-mosphere-goldLight transition-colors"
               >
-                <span>EXPLORE THE OFFERINGS</span>
-                <ArrowRight className="w-4 h-4 text-mosphere-gold group-hover:translate-x-2 transition-transform duration-300" />
+                <span>EXPLORE SERVICES</span>
+                <ArrowRight className="w-4 h-4 text-mosphere-gold group-hover:translate-x-1.5 transition-transform duration-300" />
               </a>
             </div>
           </motion.div>

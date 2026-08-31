@@ -20,7 +20,7 @@ export default function LocationSection() {
           className="flex items-center justify-between border-b border-white/10 pb-4 mb-16"
         >
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-mosphere-gold font-semibold">08</span>
+            <span className="text-xs font-mono text-mosphere-gold font-semibold">05</span>
             <span className="text-white/20">/</span>
             <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
               FIND US

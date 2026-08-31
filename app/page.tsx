@@ -12,8 +12,6 @@ import ColomboHero from '@/components/colombo/ColomboHero';
 import BrandStatement from '@/components/BrandStatement';
 import ColomboServices from '@/components/colombo/ColomboServices';
 import FeaturedVisual from '@/components/FeaturedVisual';
-import AboutSection from '@/components/AboutSection';
-import BrandExperience from '@/components/BrandExperience';
 import GallerySection from '@/components/GallerySection';
 import ReviewsSection from '@/components/ReviewsSection';
 import ColomboLocation from '@/components/LocationSection';
@@ -103,8 +101,6 @@ export default function HomePage() {
           <BrandStatement />
           <ColomboServices onSelectService={handleSelectService} />
           <FeaturedVisual />
-          <AboutSection />
-          <BrandExperience />
           <GallerySection />
           <ReviewsSection />
           <BookingSection

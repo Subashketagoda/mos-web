@@ -67,14 +67,11 @@ export default function ColomboFooter({ onOpenLocationSwitcher }: ColomboFooterP
             <Link href="#services" className="text-xs text-white/70 hover:text-mosphere-gold transition-colors">
               02 / Services & Menu
             </Link>
-            <Link href="#story" className="text-xs text-white/70 hover:text-mosphere-gold transition-colors">
-              03 / The Story
-            </Link>
             <Link href="#gallery" className="text-xs text-white/70 hover:text-mosphere-gold transition-colors">
-              05 / Studio Gallery
+              03 / Studio Gallery
             </Link>
             <Link href="#reviews" className="text-xs text-white/70 hover:text-mosphere-gold transition-colors">
-              06 / Client Reviews
+              04 / Client Reviews
             </Link>
             <Link href="#booking" className="text-xs text-white/70 hover:text-mosphere-gold transition-colors">
               Reserve Colombo Visit

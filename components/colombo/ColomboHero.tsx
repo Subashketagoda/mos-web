@@ -103,7 +103,7 @@ export default function ColomboHero() {
               transition={{ duration: 0.8, delay: 0.5 }}
               className="text-sm sm:text-base text-white/70 font-light leading-relaxed border-l-2 border-mosphere-gold/40 pl-5"
             >
-              A sanctuary of bespoke hair architecture, restorative Keratin rituals, and precision aesthetics crafted for individuals who demand perfection.
+              A sanctuary of bespoke hair architecture and restorative care crafted for individuals who demand perfection.
             </motion.p>
 
             <motion.div

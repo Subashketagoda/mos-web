@@ -19,7 +19,7 @@ export default function ColomboNavbar({ onOpenLocationSwitcher }: ColomboNavbarP
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
-      const sections = ['hero', 'about', 'services', 'story', 'experience', 'gallery', 'reviews', 'contact'];
+      const sections = ['hero', 'about', 'services', 'gallery', 'reviews', 'contact'];
       const scrollPosition = window.scrollY + 200;
 
       for (const sectionId of sections) {
@@ -43,8 +43,6 @@ export default function ColomboNavbar({ onOpenLocationSwitcher }: ColomboNavbarP
     { name: 'HOME', href: '#hero', id: 'hero' },
     { name: 'ABOUT', href: '#about', id: 'about' },
     { name: 'SERVICES', href: '#services', id: 'services' },
-    { name: 'STORY', href: '#story', id: 'story' },
-    { name: 'EXPERIENCE', href: '#experience', id: 'experience' },
     { name: 'GALLERY', href: '#gallery', id: 'gallery' },
     { name: 'REVIEWS', href: '#reviews', id: 'reviews' },
     { name: 'LOCATION', href: '#contact', id: 'contact' },

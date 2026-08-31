@@ -1,41 +1,84 @@
 import { NextResponse } from 'next/server';
 import { query, initDatabase } from '@/lib/db';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function GET() {
   await initDatabase();
   try {
     const reviews = await query.all('SELECT * FROM reviews WHERE active = 1 ORDER BY createdAt DESC');
+    
+    // Calculate average rating
+    const avgRating = reviews.length > 0
+      ? (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1)
+      : '5.0';
+
     return NextResponse.json({
       success: true,
-      rating: 4.7,
-      totalCount: 128,
-      source: 'Google Reviews',
+      rating: parseFloat(avgRating),
+      totalCount: reviews.length,
+      source: 'Google & Verified Reviews',
       reviews: reviews.length > 0 ? reviews : [
         {
           id: 'rev-1',
-          authorName: 'Sashini D.',
+          authorName: 'Dinuka Senanayake',
           rating: 5,
-          comment: 'The most refined salon experience in Colombo. The personalized attention to detail and atmosphere is unmatched.',
-          source: 'Google Review',
+          comment: 'Without doubt the most refined salon experience in Colombo. The attention to detail and bespoke hair architecture are unmatched.',
+          source: 'Verified Client',
           createdAt: new Date().toISOString()
         },
         {
           id: 'rev-2',
-          authorName: 'Dinuka P.',
+          authorName: 'Anuki Perera',
           rating: 5,
-          comment: 'Exceptional precision cut and styling. Easy online booking that synchronized straight to my calendar.',
-          source: 'Google Review',
+          comment: 'Found my holy grail salon on Nawala Road. Gorgeous aesthetics, calm private suites, and my balayage turned out so smooth and glossy!',
+          source: 'Verified Client',
           createdAt: new Date().toISOString()
         },
         {
           id: 'rev-3',
-          authorName: 'Ananya R.',
+          authorName: 'Tharindu Wickrama',
           rating: 5,
-          comment: 'Hydro-radiance facial gave my skin an unbelievable glow. Truly luxury beauty care in Nawala.',
-          source: 'Google Review',
+          comment: 'Seamless online calendar booking with instant confirmation. Master stylist was attentive, highly skilled, and delivered exactly what I asked for.',
+          source: 'Verified Client',
           createdAt: new Date().toISOString()
         }
       ]
+    });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  await initDatabase();
+  try {
+    const body = await req.json();
+    const { authorName, rating, comment, source, branch } = body;
+
+    if (!authorName || !comment) {
+      return NextResponse.json(
+        { success: false, error: 'Name and review comment are required' },
+        { status: 400 }
+      );
+    }
+
+    const reviewId = 'rev-' + uuidv4().slice(0, 8);
+    const starRating = Math.max(1, Math.min(5, parseInt(rating, 10) || 5));
+    const reviewSource = source || (branch ? `${branch} Client Review` : 'Verified Client');
+    const now = new Date().toISOString();
+
+    await query.run(
+      `INSERT INTO reviews (id, authorName, rating, comment, source, active, createdAt)
+       VALUES (?, ?, ?, ?, ?, 1, ?)`,
+      [reviewId, authorName.trim(), starRating, comment.trim(), reviewSource, now]
+    );
+
+    const newReview = await query.get('SELECT * FROM reviews WHERE id = ?', [reviewId]);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Review submitted successfully',
+      review: newReview
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

@@ -60,7 +60,7 @@ export default function FinalCTA() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-sm sm:text-base text-white/60 font-light max-w-lg mb-10 leading-relaxed"
         >
-          Elevate your daily presence with bespoke haircuts, certified hair botox, and rejuvenating hair rituals at Mosphere.
+          Elevate your daily presence with bespoke grooming and restorative hair rituals.
         </motion.p>
 
         {/* Dual Actions */}
