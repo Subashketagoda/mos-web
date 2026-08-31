@@ -69,12 +69,16 @@ const galleryItems = [
 import {
   subscribeToGallery,
   addGalleryPhotoToFirestore,
+  uploadImageFile,
   FirebaseGalleryItem
 } from '@/lib/firebaseService';
 
 export default function GallerySection() {
   const [activeLightbox, setActiveLightbox] = useState<any | null>(null);
   const [isAddPhotoOpen, setIsAddPhotoOpen] = useState(false);
+  const [uploadMode, setUploadMode] = useState<'device' | 'url'>('device');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
   const [newPhotoUrl, setNewPhotoUrl] = useState('');
   const [newPhotoTitle, setNewPhotoTitle] = useState('');
   const [newPhotoCategory, setNewPhotoCategory] = useState('Hair Botox');
@@ -105,23 +109,37 @@ export default function GallerySection() {
 
   const handleAddPhotoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPhotoUrl.trim()) return;
+    if (!photoFile && !newPhotoUrl.trim()) {
+      alert('Please select a photo from your device or enter an image link.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
+      let finalImageUrl = newPhotoUrl.trim();
+      if (photoFile) {
+        finalImageUrl = await uploadImageFile(photoFile);
+      }
+
+      if (!finalImageUrl) {
+        throw new Error('Could not upload image. Please try again.');
+      }
+
       await addGalleryPhotoToFirestore({
-        imageUrl: newPhotoUrl.trim(),
+        imageUrl: finalImageUrl,
         title: newPhotoTitle.trim() || 'Mosphere Hair Artistry',
         category: newPhotoCategory,
         aspectRatio: 'portrait',
       });
-      setToastMessage('Photo added & synced live in real-time!');
+      setToastMessage('Photo uploaded & synced live in real-time!');
       setIsAddPhotoOpen(false);
       setNewPhotoUrl('');
       setNewPhotoTitle('');
+      setPhotoFile(null);
+      setPhotoPreview('');
       setTimeout(() => setToastMessage(null), 4000);
-    } catch (err) {
-      alert('Error submitting photo');
+    } catch (err: any) {
+      alert('Error uploading photo: ' + (err.message || 'Please try again'));
     } finally {
       setIsSubmitting(false);
     }
@@ -357,19 +375,131 @@ export default function GallerySection() {
               </div>
 
               <form onSubmit={handleAddPhotoSubmit} className="flex flex-col gap-4">
-                <div>
-                  <label className="text-xs font-mono uppercase tracking-wider text-mosphere-gold block mb-1.5">
-                    Image URL *
-                  </label>
-                  <input
-                    type="url"
-                    required
-                    placeholder="https://images.unsplash.com/... or direct image link"
-                    value={newPhotoUrl}
-                    onChange={(e) => setNewPhotoUrl(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white text-xs placeholder:text-white/30 focus:border-mosphere-gold focus:outline-none"
-                  />
+                
+                {/* Upload Mode Selector: Device or URL */}
+                <div className="flex items-center gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode('device')}
+                    className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${
+                      uploadMode === 'device'
+                        ? 'bg-mosphere-gold text-black font-bold shadow-md'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Choose from Device</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode('url')}
+                    className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 ${
+                      uploadMode === 'url'
+                        ? 'bg-mosphere-gold text-black font-bold shadow-md'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Image Link (URL)</span>
+                  </button>
                 </div>
+
+                {/* Mode 1: Device File Upload */}
+                {uploadMode === 'device' ? (
+                  <div>
+                    <label className="text-xs font-mono uppercase tracking-wider text-mosphere-gold block mb-1.5">
+                      Select Photo from Device *
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="home-gallery-file-input"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setPhotoFile(file);
+                          setPhotoPreview(URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                    
+                    {!photoPreview ? (
+                      <label
+                        htmlFor="home-gallery-file-input"
+                        className="cursor-pointer border-2 border-dashed border-mosphere-gold/40 hover:border-mosphere-gold bg-black/40 hover:bg-mosphere-gold/5 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all group"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-mosphere-gold/10 border border-mosphere-gold/30 flex items-center justify-center text-mosphere-gold group-hover:scale-110 transition-transform">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <div className="text-center">
+                          <span className="text-xs font-semibold text-white block mb-0.5">Click to choose photo</span>
+                          <span className="text-[11px] text-white/40 block font-mono">JPG, PNG, WEBP, HEIC from phone/PC</span>
+                        </div>
+                      </label>
+                    ) : (
+                      <div className="relative rounded-2xl overflow-hidden border border-mosphere-gold/40 bg-black aspect-video flex items-center justify-center group">
+                        <img
+                          src={photoPreview}
+                          alt="Selected preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                          <label
+                            htmlFor="home-gallery-file-input"
+                            className="cursor-pointer px-4 py-2 rounded-full bg-white text-black text-xs font-bold font-mono uppercase shadow-lg hover:bg-white/90"
+                          >
+                            Change Photo
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPhotoFile(null);
+                              setPhotoPreview('');
+                            }}
+                            className="px-4 py-2 rounded-full bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold font-mono uppercase shadow-lg"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        {photoFile && (
+                          <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-mono text-white/80 border border-white/10">
+                            {photoFile.name} ({(photoFile.size / 1024).toFixed(0)} KB)
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Mode 2: Direct Image URL */
+                  <div>
+                    <label className="text-xs font-mono uppercase tracking-wider text-mosphere-gold block mb-1.5">
+                      Image URL *
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://images.unsplash.com/... or direct image link"
+                      value={newPhotoUrl}
+                      onChange={(e) => {
+                        setNewPhotoUrl(e.target.value);
+                        setPhotoPreview(e.target.value);
+                      }}
+                      className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white text-xs placeholder:text-white/30 focus:border-mosphere-gold focus:outline-none"
+                    />
+                    {newPhotoUrl && (
+                      <div className="mt-2 rounded-xl overflow-hidden aspect-video border border-white/10 bg-black">
+                        <img
+                          src={newPhotoUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as any).src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="text-xs font-mono uppercase tracking-wider text-mosphere-gold block mb-1.5">
@@ -402,19 +532,6 @@ export default function GallerySection() {
                     <option value="Studio Interior">Studio Interior</option>
                   </select>
                 </div>
-
-                {newPhotoUrl && (
-                  <div className="mt-2 rounded-xl overflow-hidden aspect-video border border-white/10 bg-black">
-                    <img
-                      src={newPhotoUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as any).src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                  </div>
-                )}
 
                 <div className="pt-4 flex items-center justify-end gap-3">
                   <button

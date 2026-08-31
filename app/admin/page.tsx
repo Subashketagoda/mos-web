@@ -25,10 +25,11 @@ import {
   RefreshCw,
   AlertCircle,
   Shield,
-  Home
+  Home,
+  Upload
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
-import { subscribeToBookings, subscribeToGallery } from '@/lib/firebaseService';
+import { subscribeToBookings, subscribeToGallery, uploadImageFile } from '@/lib/firebaseService';
 
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -89,6 +90,9 @@ export default function AdminPage() {
   const [blkReason, setBlkReason] = useState('');
 
   // Gallery form
+  const [galUploadMode, setGalUploadMode] = useState<'device' | 'url'>('device');
+  const [galFile, setGalFile] = useState<File | null>(null);
+  const [galPreview, setGalPreview] = useState<string>('');
   const [galUrl, setGalUrl] = useState('');
   const [galTitle, setGalTitle] = useState('');
   const [galCat, setGalCat] = useState('Hair');
@@ -410,24 +414,42 @@ export default function AdminPage() {
     loadAllData();
   }
 
-  // Add Gallery Image
+  // Add Gallery Image with Device Upload & Firebase Storage Support
   async function submitGallery(e: React.FormEvent) {
     e.preventDefault();
-    if (!token || !galUrl) return;
-    await fetch('/api/admin/gallery', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        imageUrl: galUrl,
-        title: galTitle,
-        category: galCat,
-        aspectRatio: galRatio,
-      }),
-    });
-    setGalleryModal(false);
-    setGalUrl('');
-    setGalTitle('');
-    loadAllData();
+    if (!token || (!galUrl.trim() && !galFile)) return;
+
+    try {
+      let finalImageUrl = galUrl.trim();
+      if (galFile) {
+        finalImageUrl = await uploadImageFile(galFile);
+      }
+
+      if (!finalImageUrl) {
+        alert('Could not upload image. Please try again.');
+        return;
+      }
+
+      await fetch('/api/admin/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          imageUrl: finalImageUrl,
+          title: galTitle.trim() || 'Mosphere Hair Artistry',
+          category: galCat,
+          aspectRatio: galRatio,
+        }),
+      });
+
+      setGalleryModal(false);
+      setGalUrl('');
+      setGalTitle('');
+      setGalFile(null);
+      setGalPreview('');
+      loadAllData();
+    } catch (err: any) {
+      alert('Error adding gallery image: ' + (err.message || 'Please try again'));
+    }
   }
 
   async function deleteGallery(id: string) {
@@ -1489,18 +1511,113 @@ export default function AdminPage() {
           <div className="w-full max-w-md bg-[#0F0F14] border border-mosphere-gold/40 rounded-2xl p-6">
             <h3 className="font-serif text-xl text-white mb-4">Add Gallery Image</h3>
 
-            <form onSubmit={submitGallery} className="space-y-3">
-              <div>
-                <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1">Image URL</label>
-                <input
-                  type="url"
-                  required
-                  value={galUrl}
-                  onChange={(e) => setGalUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
-                />
+            <form onSubmit={submitGallery} className="space-y-4">
+              {/* Mode Selector */}
+              <div className="flex items-center gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setGalUploadMode('device')}
+                  className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    galUploadMode === 'device'
+                      ? 'bg-mosphere-gold text-black font-bold shadow-md'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Choose from Device</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGalUploadMode('url')}
+                  className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    galUploadMode === 'url'
+                      ? 'bg-mosphere-gold text-black font-bold shadow-md'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  <span>Image URL</span>
+                </button>
               </div>
+
+              {/* Mode 1: Device File Upload */}
+              {galUploadMode === 'device' ? (
+                <div>
+                  <label className="block text-[10px] uppercase tracking-wider text-mosphere-gold mb-1.5">
+                    Select Image File *
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="admin-gallery-file-input"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setGalFile(file);
+                        setGalPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                  {!galPreview ? (
+                    <label
+                      htmlFor="admin-gallery-file-input"
+                      className="cursor-pointer border-2 border-dashed border-mosphere-gold/40 hover:border-mosphere-gold bg-black/40 hover:bg-mosphere-gold/5 rounded-xl p-5 flex flex-col items-center justify-center gap-2 transition-all group"
+                    >
+                      <Upload className="w-6 h-6 text-mosphere-gold group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-semibold text-white">Click to choose image</span>
+                      <span className="text-[10px] text-white/40 font-mono">JPG, PNG, WEBP, HEIC</span>
+                    </label>
+                  ) : (
+                    <div className="relative rounded-xl overflow-hidden border border-mosphere-gold/40 bg-black aspect-video flex items-center justify-center group">
+                      <img src={galPreview} alt="Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <label
+                          htmlFor="admin-gallery-file-input"
+                          className="cursor-pointer px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-bold font-mono uppercase"
+                        >
+                          Change
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setGalFile(null);
+                            setGalPreview('');
+                          }}
+                          className="px-3 py-1.5 rounded-full bg-red-600 text-white text-[11px] font-bold font-mono uppercase"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      {galFile && (
+                        <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-white/80">
+                          {galFile.name} ({(galFile.size / 1024).toFixed(0)} KB)
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Mode 2: Direct URL */
+                <div>
+                  <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1">Image URL</label>
+                  <input
+                    type="url"
+                    value={galUrl}
+                    onChange={(e) => {
+                      setGalUrl(e.target.value);
+                      setGalPreview(e.target.value);
+                    }}
+                    placeholder="https://..."
+                    className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+                  />
+                  {galUrl && (
+                    <div className="mt-2 rounded-xl overflow-hidden aspect-video border border-white/10 bg-black">
+                      <img src={galUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1">Title</label>

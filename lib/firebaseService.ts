@@ -9,7 +9,53 @@ import {
   DocumentData,
   QuerySnapshot,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './firebase';
+
+/**
+ * Uploads an image file:
+ * 1. Tries Firebase Storage first (Cloud CDN)
+ * 2. Falls back to local API endpoint (/api/upload)
+ * 3. Falls back to Base64 Data URL for instant resilience
+ */
+export async function uploadImageFile(file: File): Promise<string> {
+  // 1. Try Firebase Storage
+  if (storage) {
+    try {
+      const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const storageRef = ref(storage, `gallery/${Date.now()}_${cleanName}`);
+      await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
+      if (downloadUrl) return downloadUrl;
+    } catch (firebaseErr) {
+      console.warn('Firebase Storage upload failed, trying local API upload:', firebaseErr);
+    }
+  }
+
+  // 2. Try Local API upload endpoint
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.success && data.url) {
+      return data.url;
+    }
+  } catch (apiErr) {
+    console.warn('Local API upload failed, falling back to base64:', apiErr);
+  }
+
+  // 3. Fallback to Base64 Data URL
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
 
 export interface FirebaseReview {
   id: string;
