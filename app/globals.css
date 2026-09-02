@@ -94,6 +94,7 @@ body {
 .gold-gradient-text {
   background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa820a 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }
@@ -101,6 +102,7 @@ body {
 .gold-gradient-text-light {
   background: linear-gradient(135deg, #ffffff 0%, #f3e5ab 50%, #d4af37 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }

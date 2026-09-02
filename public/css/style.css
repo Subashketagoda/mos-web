@@ -94,6 +94,7 @@ h1, h2, h3, h4, .font-serif {
 .gold-gradient-text {
   background: var(--gold-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }

@@ -55,7 +55,11 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: /mos-web
           GITHUB_PAGES: "true"
-        run: npx next build
+        run: |
+          mv app/api .api_backup
+          trap "mv .api_backup app/api" EXIT
+          npx next build
+          touch ./out/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

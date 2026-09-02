@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# mos-web
-=======
 # 💈 Mosphere — Haute Grooming & Luxury Appointment Booking Platform
 
 A complete, production-grade appointment booking system built for **Mosphere** with secure server-side **Google Calendar API v3** integration, a real-time availability engine, anti-double-booking protection, luxury client UI, and an administrative concierge portal.
