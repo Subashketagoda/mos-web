@@ -521,38 +521,38 @@ export default function GalleryAndReviewsPage() {
             </div>
 
             {/* Gallery Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
               {filteredGallery.map((item, idx) => (
                 <motion.div
                   key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: idx * 0.05 }}
+                  transition={{ duration: 0.4, delay: idx * 0.03 }}
                   onClick={() => setActiveLightbox(item)}
-                  className="group relative rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#0C0C12] shadow-xl aspect-[4/5] flex flex-col justify-end"
+                  className="group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#0C0C12] shadow-lg aspect-[4/5] sm:aspect-[3/4] flex flex-col justify-end"
                 >
                   <img
                     src={item.imageUrl}
                     alt={item.title}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-75 group-hover:opacity-95 transition-opacity duration-300" />
 
                   {/* Caption & Category Overlay */}
-                  <div className="relative z-10 p-6 flex items-end justify-between gap-4">
-                    <div className="flex flex-col gap-1 transform group-hover:-translate-y-1 transition-transform duration-300">
-                      <span className="text-[10px] font-mono tracking-widest uppercase text-mosphere-gold font-semibold">
+                  <div className="relative z-10 p-3 sm:p-4 flex items-end justify-between gap-2">
+                    <div className="flex flex-col gap-0.5 transform group-hover:-translate-y-0.5 transition-transform duration-300 overflow-hidden">
+                      <span className="text-[9px] font-mono tracking-wider uppercase text-mosphere-gold font-semibold truncate">
                         {item.category}
                       </span>
-                      <h3 className="font-serif text-lg sm:text-xl font-medium text-white leading-snug">
+                      <h3 className="font-serif text-xs sm:text-sm font-medium text-white line-clamp-1 leading-snug group-hover:text-mosphere-gold transition-colors">
                         {item.title}
                       </h3>
                     </div>
 
-                    <div className="w-10 h-10 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white group-hover:border-mosphere-gold group-hover:bg-mosphere-gold group-hover:text-black group-hover:scale-110 transition-all duration-300 shrink-0 shadow-lg">
-                      <ZoomIn className="w-4 h-4" />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/20 bg-black/60 backdrop-blur-md flex items-center justify-center text-white group-hover:border-mosphere-gold group-hover:bg-mosphere-gold group-hover:text-black group-hover:scale-105 transition-all duration-300 shrink-0 shadow-lg">
+                      <ZoomIn className="w-3.5 h-3.5" />
                     </div>
                   </div>
                 </motion.div>

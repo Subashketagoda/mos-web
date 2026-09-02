@@ -21,42 +21,36 @@ const negomboGalleryItems = [
     title: 'Coastal Suite & Styling Bar',
     category: 'Sanctuary Interior',
     src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
-    span: 'col-span-1 md:col-span-6 lg:col-span-7 row-span-2 aspect-[4/3] sm:aspect-[16/10]',
   },
   {
     id: 'neg-gal-2',
     title: 'Bespoke Hair Architecture',
     category: 'Haute Artistry',
     src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=80',
-    span: 'col-span-1 md:col-span-6 lg:col-span-5 aspect-[4/5]',
   },
   {
     id: 'neg-gal-3',
     title: 'Precision Razor & Steam Shave',
     category: 'Gents Grooming',
     src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1000&q=80',
-    span: 'col-span-1 md:col-span-6 lg:col-span-4 aspect-square',
   },
   {
     id: 'neg-gal-4',
     title: 'Hydro-Radiance Skincare Lounge',
     category: 'Facial Aesthetics',
     src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
-    span: 'col-span-1 md:col-span-6 lg:col-span-4 aspect-square',
   },
   {
     id: 'neg-gal-5',
     title: 'Sunlit Balayage & Glaze',
     category: 'Color Artistry',
     src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1000&q=80',
-    span: 'col-span-1 md:col-span-6 lg:col-span-4 aspect-square',
   },
   {
     id: 'neg-gal-6',
     title: 'Coastal Marine Scalp Therapy',
     category: 'Scalp Sanctuary',
     src: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
-    span: 'col-span-1 md:col-span-12 aspect-[16/9] sm:aspect-[21/9]',
   },
 ];
 
@@ -84,12 +78,11 @@ export default function NegomboGallery() {
     const unsub = subscribeToGallery((livePhotos) => {
       if (livePhotos && livePhotos.length > 0) {
         setItems((prev) => {
-          const liveFormatted = livePhotos.map((p, idx) => ({
+          const liveFormatted = livePhotos.map((p) => ({
             id: p.id,
             title: p.title,
             category: p.category,
             src: p.imageUrl,
-            span: idx === 0 ? 'col-span-1 md:col-span-6 lg:col-span-7 row-span-2 aspect-[4/3] sm:aspect-[16/10]' : 'col-span-1 md:col-span-6 lg:col-span-4 aspect-[4/3]',
           }));
           const liveIds = new Set(liveFormatted.map((l) => l.id));
           const remaining = negomboGalleryItems.filter((item) => !liveIds.has(item.id));
@@ -226,39 +219,39 @@ export default function NegomboGallery() {
           </div>
         </motion.div>
 
-        {/* Artistic Masonry Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
+        {/* Refined Coastal Sanctuary Compact Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
           {items.map((item, idx) => (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.7, delay: idx * 0.08 }}
+              viewport={{ once: true, margin: '-20px' }}
+              transition={{ duration: 0.5, delay: idx * 0.04 }}
               data-cursor="view"
               onClick={() => setActiveLightbox(item)}
-              className={`group relative rounded-2xl overflow-hidden cursor-pointer border border-emerald-500/20 hover:border-[#D4AF37]/60 bg-[#041c14] shadow-xl ${item.span}`}
+              className="group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border border-emerald-500/20 hover:border-[#D4AF37]/60 bg-[#041c14] shadow-lg aspect-[4/5] sm:aspect-[3/4]"
             >
               <img
                 src={item.src}
                 alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-[#03150F]/90 via-[#03150F]/30 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#03150F]/90 via-[#03150F]/30 to-transparent opacity-75 group-hover:opacity-95 transition-opacity duration-300" />
 
-              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 flex items-end justify-between gap-4">
-                <div className="flex flex-col gap-1 transform group-hover:-translate-y-1 transition-transform duration-300">
-                  <span className="text-[10px] font-mono tracking-widest uppercase text-[#D4AF37]">
+              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 flex items-end justify-between gap-2">
+                <div className="flex flex-col gap-0.5 transform group-hover:-translate-y-0.5 transition-transform duration-300 overflow-hidden">
+                  <span className="text-[9px] font-mono tracking-wider uppercase text-[#D4AF37] font-medium truncate">
                     {item.category}
                   </span>
-                  <h3 className="font-serif text-lg sm:text-2xl font-medium text-white">
+                  <h3 className="font-serif text-xs sm:text-sm font-medium text-white line-clamp-1 group-hover:text-[#D4AF37] transition-colors">
                     {item.title}
                   </h3>
                 </div>
 
-                <div className="w-10 h-10 rounded-full border border-[#D4AF37]/40 bg-[#03150F]/80 backdrop-blur-md flex items-center justify-center text-[#D4AF37] group-hover:bg-[#D4AF37] group-hover:text-black group-hover:scale-110 transition-all duration-300 shrink-0">
-                  <ZoomIn className="w-4 h-4" />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#D4AF37]/40 bg-[#03150F]/80 backdrop-blur-md flex items-center justify-center text-[#D4AF37] group-hover:bg-[#D4AF37] group-hover:text-black group-hover:scale-105 transition-all duration-300 shrink-0">
+                  <ZoomIn className="w-3.5 h-3.5" />
                 </div>
               </div>
             </motion.div>
