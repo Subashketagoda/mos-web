@@ -208,10 +208,9 @@ export function subscribeToGallery(
 
   try {
     const galleryRef = collection(db, 'gallery');
-    const q = query(galleryRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(
-      q,
+      galleryRef,
       (snapshot: QuerySnapshot<DocumentData>) => {
         const items: FirebaseGalleryItem[] = [];
         snapshot.forEach((doc) => {
@@ -226,10 +225,14 @@ export function subscribeToGallery(
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
           });
         });
+
+        // In-memory sort by createdAt DESC
+        items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
         onUpdate(items);
       },
       (error) => {
-        console.warn('Firestore gallery snapshot subscription error:', error);
+        console.warn('Firestore gallery snapshot subscription notice:', error);
         if (onError) onError(error);
       }
     );
@@ -238,6 +241,36 @@ export function subscribeToGallery(
   } catch (err) {
     console.warn('Error setting up gallery listener:', err);
     return () => {};
+  }
+}
+
+/**
+ * Fetches all gallery photos from Cloud Firestore.
+ */
+export async function getGalleryFromFirestore(): Promise<FirebaseGalleryItem[]> {
+  if (!db) return [];
+
+  try {
+    const snapshot = await getDocs(collection(db, 'gallery'));
+    const items: FirebaseGalleryItem[] = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      items.push({
+        id: doc.id,
+        imageUrl: data.imageUrl,
+        title: data.title || 'Mosphere Transformation',
+        category: data.category || 'Hair Styling',
+        aspectRatio: data.aspectRatio || 'portrait',
+        active: data.active !== undefined ? data.active : true,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
+      });
+    });
+
+    items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    return items;
+  } catch (err) {
+    console.warn('Could not fetch gallery from Firestore:', err);
+    return [];
   }
 }
 

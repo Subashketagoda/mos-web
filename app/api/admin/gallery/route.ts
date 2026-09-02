@@ -2,16 +2,44 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query, initDatabase } from '@/lib/db';
 import { verifyAdminAuth } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
+import { getGalleryFromFirestore } from '@/lib/firebaseService';
 
 // GET /api/admin/gallery - All images
 export async function GET(req: NextRequest) {
   const auth = await verifyAdminAuth(req);
   if (!auth.authorized) return auth.response!;
 
-  await initDatabase();
   try {
-    const images = await query.all('SELECT * FROM gallery ORDER BY sortOrder ASC, createdAt DESC');
-    return NextResponse.json({ success: true, images });
+    await initDatabase();
+  } catch (e) {
+    console.warn('DB init deferred in gallery GET:', e);
+  }
+
+  try {
+    let localImages: any[] = [];
+    try {
+      localImages = await query.all('SELECT * FROM gallery ORDER BY sortOrder ASC, createdAt DESC');
+    } catch (e) {
+      console.warn('Local DB gallery query notice:', e);
+    }
+
+    let firestoreImages: any[] = [];
+    try {
+      firestoreImages = await getGalleryFromFirestore();
+    } catch (e) {
+      console.warn('Firestore gallery query notice:', e);
+    }
+
+    const map = new Map<string, any>();
+    for (const img of localImages) {
+      map.set(img.imageUrl || img.id, img);
+    }
+    for (const img of firestoreImages) {
+      const key = img.imageUrl || img.id;
+      map.set(key, { ...(map.get(key) || {}), ...img });
+    }
+
+    return NextResponse.json({ success: true, images: Array.from(map.values()) });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -22,7 +50,12 @@ export async function POST(req: NextRequest) {
   const auth = await verifyAdminAuth(req);
   if (!auth.authorized) return auth.response!;
 
-  await initDatabase();
+  try {
+    await initDatabase();
+  } catch (e) {
+    console.warn('DB init deferred in gallery POST:', e);
+  }
+
   try {
     const { imageUrl, title, category, aspectRatio, sortOrder } = await req.json();
     if (!imageUrl) {
@@ -32,14 +65,30 @@ export async function POST(req: NextRequest) {
     const id = `gal-${uuidv4().substring(0, 8)}`;
     const now = new Date().toISOString();
 
-    await query.run(
-      `INSERT INTO gallery (id, imageUrl, title, category, aspectRatio, active, sortOrder, createdAt)
-       VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
-      [id, imageUrl.trim(), title || '', category || 'Salon', aspectRatio || 'portrait', parseInt(sortOrder || 0, 10), now]
-    );
+    try {
+      await query.run(
+        `INSERT INTO gallery (id, imageUrl, title, category, aspectRatio, active, sortOrder, createdAt)
+         VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
+        [id, imageUrl.trim(), title || '', category || 'Salon', aspectRatio || 'portrait', parseInt(sortOrder || 0, 10), now]
+      );
+    } catch (dbErr) {
+      console.warn('Local DB gallery insert notice:', dbErr);
+    }
 
-    const created = await query.get('SELECT * FROM gallery WHERE id = ?', [id]);
-    return NextResponse.json({ success: true, image: created }, { status: 201 });
+    // Dual-persist to Cloud Firestore
+    try {
+      const { addGalleryPhotoToFirestore } = await import('@/lib/firebaseService');
+      await addGalleryPhotoToFirestore({
+        imageUrl: imageUrl.trim(),
+        title: title || 'Mosphere Hair Artistry',
+        category: category || 'Hair Styling',
+        aspectRatio: aspectRatio || 'portrait',
+      });
+    } catch (fsErr) {
+      console.warn('Notice: Firestore sync in admin gallery POST:', fsErr);
+    }
+
+    return NextResponse.json({ success: true, image: { id, imageUrl, title, category, aspectRatio } }, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -50,7 +99,12 @@ export async function DELETE(req: NextRequest) {
   const auth = await verifyAdminAuth(req);
   if (!auth.authorized) return auth.response!;
 
-  await initDatabase();
+  try {
+    await initDatabase();
+  } catch (e) {
+    console.warn('DB init deferred in gallery DELETE:', e);
+  }
+
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
 
