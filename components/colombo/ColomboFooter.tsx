@@ -118,8 +118,17 @@ export default function ColomboFooter({ onOpenLocationSwitcher }: ColomboFooterP
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-white/40 font-mono">
-          <div>
-            © 2026 MOSPHERE COLOMBO. ALL RIGHTS RESERVED. &ldquo;GRAB LIFE&rdquo;
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+            <span>© 2026 MOSPHERE COLOMBO. ALL RIGHTS RESERVED. &ldquo;GRAB LIFE&rdquo;</span>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <a
+              href="https://69studiobysubash.online/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-mosphere-gold/80 hover:text-mosphere-gold transition-colors tracking-wider uppercase text-[10px] hover:underline"
+            >
+              DESIGNED & DEVELOPED BY 69 STUDIO
+            </a>
           </div>
           <div className="flex items-center gap-6">
             <span>422A NAWALA RD, RAJAGIRIYA</span>

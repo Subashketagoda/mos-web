@@ -118,8 +118,17 @@ export default function NegomboFooter({ onOpenLocationSwitcher }: NegomboFooterP
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-emerald-200/50 font-mono">
-          <div>
-            © 2026 MOSPHERE NEGOMBO. ALL RIGHTS RESERVED. &ldquo;GRAB LIFE&rdquo;
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+            <span>© 2026 MOSPHERE NEGOMBO. ALL RIGHTS RESERVED. &ldquo;GRAB LIFE&rdquo;</span>
+            <span className="hidden sm:inline text-emerald-300/20">•</span>
+            <a
+              href="https://69studiobysubash.online/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#E5B842]/80 hover:text-[#E5B842] transition-colors tracking-wider uppercase text-[10px] hover:underline"
+            >
+              DESIGNED & DEVELOPED BY 69 STUDIO
+            </a>
           </div>
           <div className="flex items-center gap-6">
             <span>51 GALISON MAWATHA, NEGOMBO</span>
