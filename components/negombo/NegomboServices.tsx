@@ -259,7 +259,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
                       {activeService.price}
                     </span>
                     <button
-                      onClick={() => handleBooking(activeService)}
+                      onClick={(e) => handleProceedToBooking(e, activeService)}
                       className="px-4 py-2 rounded-full text-xs font-bold tracking-wider text-black bg-[#E5B842] hover:bg-[#F3CC68] transition-colors uppercase flex items-center gap-1.5 shadow-md"
                     >
                       <span>BOOK THIS</span>

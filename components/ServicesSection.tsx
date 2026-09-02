@@ -288,7 +288,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                       {activeService.price}
                     </span>
                     <button
-                      onClick={() => handleBooking(activeService)}
+                      onClick={(e) => handleProceedToBooking(e, activeService)}
                       className="px-4 py-2 rounded-full text-xs font-bold tracking-wider text-black bg-mosphere-gold hover:bg-mosphere-goldLight transition-colors uppercase flex items-center gap-1.5"
                     >
                       <span>BOOK THIS</span>
