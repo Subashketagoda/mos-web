@@ -302,10 +302,9 @@ export function subscribeToBookings(
 
   try {
     const bookingsRef = collection(db, 'bookings');
-    const q = query(bookingsRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(
-      q,
+      bookingsRef,
       (snapshot: QuerySnapshot<DocumentData>) => {
         const items: FirebaseBooking[] = [];
         snapshot.forEach((doc) => {
@@ -328,10 +327,18 @@ export function subscribeToBookings(
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
           });
         });
+
+        // In-memory sort by date DESC, startTime DESC
+        items.sort((a, b) => {
+          const cmp = (b.date || '').localeCompare(a.date || '');
+          if (cmp !== 0) return cmp;
+          return (b.startTime || '').localeCompare(a.startTime || '');
+        });
+
         onUpdate(items);
       },
       (error) => {
-        console.warn('Firestore bookings snapshot error:', error);
+        console.warn('Realtime bookings listener notice:', error);
         if (onError) onError(error);
       }
     );
@@ -368,8 +375,7 @@ export async function getBookingsFromFirestore(): Promise<FirebaseBooking[]> {
   if (!db) return [];
 
   try {
-    const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(collection(db, 'bookings'));
     const items: FirebaseBooking[] = [];
     snapshot.forEach((doc) => {
       const data = doc.data();
@@ -391,6 +397,13 @@ export async function getBookingsFromFirestore(): Promise<FirebaseBooking[]> {
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
       });
     });
+
+    items.sort((a, b) => {
+      const cmp = (b.date || '').localeCompare(a.date || '');
+      if (cmp !== 0) return cmp;
+      return (b.startTime || '').localeCompare(a.startTime || '');
+    });
+
     return items;
   } catch (err) {
     console.warn('Could not fetch bookings from Firestore:', err);
