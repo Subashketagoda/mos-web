@@ -116,10 +116,10 @@ export class BookingService {
       const bookingRef = generateBookingReference(date);
       const now = new Date().toISOString();
 
-      // 5. Create Google Calendar Event (Server-Side)
+      // 5. Create Google Calendar Event (Server-Side with 2s timeout safeguard)
       let googleCalendarEventId = null;
       try {
-        const gcalResult = await googleCalendarService.createEvent({
+        const gcalPromise = googleCalendarService.createEvent({
           customerName: trimmedName,
           phone: trimmedPhone,
           email: trimmedEmail,
@@ -132,6 +132,8 @@ export class BookingService {
           notes: trimmedNotes,
           bookingRef
         });
+        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 2000));
+        const gcalResult: any = await Promise.race([gcalPromise, timeoutPromise]);
         if (gcalResult) {
           googleCalendarEventId = gcalResult.eventId;
         }
@@ -186,26 +188,27 @@ export class BookingService {
         console.warn('Local database booking save notice:', dbSaveErr);
       }
 
-      // 7. Dual-persist to Cloud Firestore for serverless persistence
+      // 7. Dual-persist to Cloud Firestore in background (non-blocking for instant client response)
       try {
-        const { syncBookingToFirestore } = await import('./firebaseService');
-        await syncBookingToFirestore({
-          id: bookingId,
-          bookingRef,
-          customerName: trimmedName,
-          phone: trimmedPhone,
-          email: trimmedEmail,
-          serviceId,
-          serviceName,
-          date,
-          startTime,
-          endTime,
-          duration,
-          price,
-          status: 'confirmed',
-          notes: trimmedNotes,
-          googleCalendarEventId,
-        });
+        import('./firebaseService').then(({ syncBookingToFirestore }) => {
+          syncBookingToFirestore({
+            id: bookingId,
+            bookingRef,
+            customerName: trimmedName,
+            phone: trimmedPhone,
+            email: trimmedEmail || '',
+            serviceId,
+            serviceName,
+            date,
+            startTime,
+            endTime,
+            duration,
+            price,
+            status: 'confirmed',
+            notes: trimmedNotes || '',
+            googleCalendarEventId,
+          }).catch((e: any) => console.warn('Firestore server sync notice:', e));
+        }).catch((e: any) => console.warn('Dynamic import notice in createBooking:', e));
       } catch (fsSyncErr) {
         console.warn('Notice: Firestore cloud sync in createBooking:', fsSyncErr);
       }

@@ -287,35 +287,60 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
       const data = await res.json();
 
-      if (res.status === 201 && data.success) {
-        setConfirmedBooking(data.booking);
-        // Sync to Cloud Firestore in real-time
-        syncBookingToFirestore({
-          bookingRef: data.booking.bookingRef,
-          customerName: data.booking.customerName,
-          phone: data.booking.phone,
-          email: data.booking.email,
-          serviceId: data.booking.serviceId,
-          serviceName: data.booking.serviceName,
-          date: data.booking.date,
-          startTime: data.booking.startTime,
-          endTime: data.booking.endTime,
-          duration: data.booking.duration,
-          price: data.booking.price,
+      if ((res.status === 201 || res.status === 200 || res.ok) && data.success) {
+        const confirmed = data.booking || {
+          bookingRef: `MOS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
+          customerName,
+          phone,
+          email: email || '',
+          serviceId: selectedService.id,
+          serviceName: selectedService.name,
+          date: selectedDate,
+          startTime: selectedSlot.time,
+          endTime: selectedSlot.endTime || '',
+          duration: selectedService.duration,
+          price: selectedService.price,
           status: 'confirmed',
           location: activeLocation,
-          notes: data.booking.notes,
-        });
+          notes: notes || '',
+        };
+
+        setConfirmedBooking(confirmed);
+        setSubmitting(false);
         setStep(5);
+
+        // Background sync to Cloud Firestore (non-blocking, safe from undefined values)
+        try {
+          syncBookingToFirestore({
+            bookingRef: confirmed.bookingRef || '',
+            customerName: confirmed.customerName || customerName || '',
+            phone: confirmed.phone || phone || '',
+            email: confirmed.email || email || '',
+            serviceId: confirmed.serviceId || selectedService.id || '',
+            serviceName: confirmed.serviceName || selectedService.name || '',
+            date: confirmed.date || selectedDate || '',
+            startTime: confirmed.startTime || selectedSlot.time || '',
+            endTime: confirmed.endTime || selectedSlot.endTime || '',
+            duration: Number(confirmed.duration || selectedService.duration) || 60,
+            price: Number(confirmed.price || selectedService.price) || 0,
+            status: 'confirmed',
+            location: activeLocation || 'colombo',
+            notes: confirmed.notes || notes || '',
+          });
+        } catch (syncErr) {
+          console.warn('Background Firestore sync notice:', syncErr);
+        }
+        return;
       } else {
         // Race condition / double booking
+        setSubmitting(false);
         setBookingError(data.error || 'This time slot was just booked. Please select another time.');
         if (res.status === 409) {
           setStep(3); // return to slot selection
         }
       }
     } catch (err: any) {
-      console.warn('API booking network issue, using direct Cloud Firestore reservation:', err);
+      console.warn('API booking notice, using direct Cloud Firestore reservation:', err);
       try {
         const fallbackRef = `MOS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
         const fallbackBooking = {
@@ -335,10 +360,17 @@ export default function BookingSection({ initialSelectedService, initialLocation
           location: activeLocation,
           notes: notes || '',
         };
-        syncBookingToFirestore(fallbackBooking);
         setConfirmedBooking(fallbackBooking);
+        setSubmitting(false);
         setStep(5);
+
+        try {
+          syncBookingToFirestore(fallbackBooking);
+        } catch (fsErr) {
+          console.warn('Firestore fallback sync notice:', fsErr);
+        }
       } catch (fallbackErr) {
+        setSubmitting(false);
         setBookingError('Something went wrong. Please try again or message via WhatsApp.');
       }
     } finally {
