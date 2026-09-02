@@ -228,11 +228,22 @@ export default function AdminPage() {
     if (filterStatus && filterStatus !== 'all') p.append('status', filterStatus);
     if (filterSearch) p.append('search', filterSearch);
 
-    const res = await fetch(`/api/admin/bookings?${p.toString()}`, {
-      headers: { Authorization: `Bearer ${tok}` },
-    });
-    const data = await res.json();
-    if (data.success) setBookings(data.bookings);
+    try {
+      const res = await fetch(`/api/admin/bookings?${p.toString()}`, {
+        headers: { Authorization: `Bearer ${tok}` },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.bookings)) {
+        setBookings((prev) => {
+          const apiList = data.bookings;
+          const apiIds = new Set(apiList.map((b: any) => b.id || b.bookingRef));
+          const nonDuplicatePrev = prev.filter((p: any) => !apiIds.has(p.id) && !apiIds.has(p.bookingRef));
+          return [...apiList, ...nonDuplicatePrev];
+        });
+      }
+    } catch (fetchErr) {
+      console.warn('Notice: Background booking fetch notice:', fetchErr);
+    }
   }
 
   // Appointment Actions
