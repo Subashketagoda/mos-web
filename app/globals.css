@@ -38,6 +38,9 @@ html.lenis body {
 html {
   color-scheme: dark;
   text-rendering: optimizeLegibility;
+  scroll-behavior: auto !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -54,13 +57,11 @@ body {
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   perspective: 1000px;
-  will-change: transform;
 }
 
-/* Section Rendering Performance Optimization */
+/* Section Rendering Performance Optimization - Eliminates layout thrashing & scroll jumps */
 .section-optimize {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 800px;
+  contain: paint;
 }
 
 /* Custom Selection */

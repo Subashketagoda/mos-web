@@ -13,13 +13,15 @@ export default function SmoothScroll({ children }: { children?: React.ReactNode 
     if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Luxurious exponential decay
+      lerp: 0.085, // Butter-smooth linear momentum
+      wheelMultiplier: 1.12, // Natural, effortless wheel response
+      smoothWheel: true,
+      syncTouch: true, // Buttery momentum on mobile & tablet touch screens
+      syncTouchLerp: 0.08,
+      touchInertiaExponent: 1.7,
       orientation: 'vertical',
       gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
+      autoResize: true,
       infinite: false,
     });
 
