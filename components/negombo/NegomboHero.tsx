@@ -50,7 +50,8 @@ export default function NegomboHero() {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="none"
+          poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#02180F]"
         >
           <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />

@@ -19,7 +19,7 @@ export default function Hero() {
           transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75')`,
           }}
         />
         {/* Layered cinematic gradients */}

@@ -14,7 +14,7 @@ export default function LoadingScreen() {
       const timer = setTimeout(() => {
         setLoading(false);
         sessionStorage.setItem('mosphere_loader_seen', 'true');
-      }, 550);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, []);

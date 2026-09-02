@@ -26,7 +26,7 @@ export default function FeaturedVisual() {
         style={{
           scale,
           y,
-          backgroundImage: `url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=2400&q=85')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75')`,
         }}
       />
 
