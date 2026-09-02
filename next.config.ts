@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   output: process.env.GITHUB_PAGES === 'true' ? 'export' : undefined,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  serverExternalPackages: ['sqlite3', 'bcryptjs', 'googleapis'],
   images: {
     unoptimized: true,
     remotePatterns: [

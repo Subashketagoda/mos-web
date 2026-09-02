@@ -4,9 +4,15 @@ import fs from 'fs';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
-const dataDir = path.join(process.cwd(), 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const dataDir = isServerless ? path.join('/tmp', 'data') : path.join(process.cwd(), 'data');
+
+try {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+} catch (fsErr) {
+  console.warn('⚠️ Notice: Could not create data directory:', fsErr);
 }
 
 const dbPath = path.join(dataDir, 'mosphere.db');
@@ -16,9 +22,13 @@ export const db = new sqlite.Database(dbPath, (err) => {
   if (err) {
     console.error('❌ SQLite connection error:', err.message);
   } else {
-    // Enable WAL mode for performance and concurrency
-    db.run('PRAGMA journal_mode = WAL;');
-    db.run('PRAGMA foreign_keys = ON;');
+    try {
+      // Enable WAL mode for performance and concurrency
+      db.run('PRAGMA journal_mode = WAL;');
+      db.run('PRAGMA foreign_keys = ON;');
+    } catch (pragmaErr) {
+      console.warn('SQLite pragma notice:', pragmaErr);
+    }
   }
 });
 

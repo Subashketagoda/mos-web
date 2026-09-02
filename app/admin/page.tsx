@@ -174,17 +174,22 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        // Non-JSON response (e.g. 500 HTML from platform)
+      }
+      if (res.ok && data?.success) {
         setToken(data.token);
         setUser(data.user);
         localStorage.setItem('mosphere_admin_token', data.token);
         loadAllData(data.token);
       } else {
-        setLoginError(data.error || 'Invalid credentials');
+        setLoginError(data?.error || `Authentication failed (Status ${res.status})`);
       }
     } catch {
-      setLoginError('Server connection error');
+      setLoginError('Server connection error. Please ensure the backend is active.');
     } finally {
       setLoginLoading(false);
     }
