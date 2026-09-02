@@ -215,7 +215,7 @@ export default function AdminPage() {
     // Bookings
     fetchBookings(tok);
     // Services
-    fetch('/api/services?all=true', { headers: h }).then(r => r.json()).then(d => d.success && setServices(d.services));
+    fetch('/api/services?all=true&t=' + Date.now(), { headers: h }).then(r => r.json()).then(d => d.success && setServices(d.services));
     // Business Hours
     fetch('/api/admin/business-hours', { headers: h }).then(r => r.json()).then(d => d.success && setBusinessHours(d.hours));
     // Blocked Dates
@@ -365,21 +365,40 @@ export default function AdminPage() {
     const url = isEdit ? `/api/services/${serviceModal.id}` : '/api/services';
     const method = isEdit ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        name: srvName,
-        duration: srvDuration,
-        price: srvPrice,
-        category: srvCategory,
-        description: srvDesc,
-      }),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          name: srvName,
+          duration: srvDuration,
+          price: srvPrice,
+          category: srvCategory,
+          description: srvDesc,
+        }),
+      });
 
-    if (res.ok) {
-      setServiceModal(null);
-      loadAllData();
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setServiceModal(null);
+        // Immediately update local state so changes reflect instantly in UI
+        if (isEdit && serviceModal?.id) {
+          setServices((prev) =>
+            prev.map((s) =>
+              s.id === serviceModal.id
+                ? { ...s, name: srvName, duration: srvDuration, price: srvPrice, category: srvCategory, description: srvDesc }
+                : s
+            )
+          );
+        } else if (data.service) {
+          setServices((prev) => [...prev, data.service]);
+        }
+        loadAllData();
+      } else {
+        alert(data.error || 'Failed to save service.');
+      }
+    } catch (err: any) {
+      alert('Network error saving service: ' + err.message);
     }
   }
 

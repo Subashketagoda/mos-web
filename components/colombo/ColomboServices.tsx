@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -67,7 +67,7 @@ const colomboServices = [
   {
     id: 'srv-col-beard-sculpt',
     number: '06',
-    name: 'Beard Sculpture & Hot Towel Shave',
+    name: 'Beard Sculpture & Hot Towel Shave Ritual',
     category: 'Gents Bespoke Grooming',
     duration: '30 MIN',
     price: 'Starting LKR 2,200',
@@ -102,6 +102,45 @@ const colomboServices = [
 export default function ColomboServices({ onSelectService }: ColomboServicesProps) {
   const [hoveredService, setHoveredService] = useState<any | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [servicesList, setServicesList] = useState(colomboServices);
+
+  // Dynamic live pricing synchronization
+  useEffect(() => {
+    async function fetchLiveServices() {
+      try {
+        const res = await fetch('/api/services?t=' + Date.now());
+        const data = await res.json();
+        if (data.success && data.services && data.services.length > 0) {
+          setServicesList((prev) =>
+            prev.map((item) => {
+              const live = data.services.find(
+                (s: any) =>
+                  s.id === item.id ||
+                  s.id === item.id.replace('srv-col-', 'srv-') ||
+                  s.name.toLowerCase().includes(item.name.toLowerCase().substring(0, 10)) ||
+                  item.name.toLowerCase().includes(s.name.toLowerCase().substring(0, 10))
+              );
+              if (live && live.price !== undefined) {
+                return {
+                  ...item,
+                  price: `Starting LKR ${Number(live.price).toLocaleString()}`,
+                  duration: `${live.duration} MIN`,
+                  name: live.name || item.name,
+                  description: live.description || item.description,
+                  rawPrice: live.price,
+                };
+              }
+              return item;
+            })
+          );
+        }
+      } catch (err) {
+        console.warn('Notice: Using default services pricing:', err);
+      }
+    }
+
+    fetchLiveServices();
+  }, []);
 
   const handleSelectCard = (service: any) => {
     setSelectedServiceId(service.id);
@@ -155,7 +194,7 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
 
         {/* Horizontal Editorial Service Blocks (Distinct Grid Layout) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          {colomboServices.map((service, idx) => {
+          {servicesList.map((service, idx) => {
             const isSelected = selectedServiceId === service.id;
             return (
               <motion.div

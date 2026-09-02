@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -60,18 +60,29 @@ const negomboServices = [
     category: 'Color & Highlights',
     duration: '120 MIN',
     price: 'Starting LKR 15,500',
-    description: 'Bespoke hand-painted highlights with seamless blonde/caramel transitions and gloss shine.',
+    description: 'Sun-kissed coastal tones and organic placement with restorative gloss melt.',
     image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
-    tag: 'Bespoke Color',
+    tag: 'Coastal Tone',
+  },
+  {
+    id: 'srv-neg-beard-sculpt',
+    number: '06',
+    name: 'Beard Architecture & Steam Razor Shave',
+    category: 'Gents Bespoke Grooming',
+    duration: '30 MIN',
+    price: 'Starting LKR 2,200',
+    description: 'Crisp beard sculpting, warm aromatic towel compress, and soothing balm treatment.',
+    image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
+    tag: 'Gents Ritual',
   },
   {
     id: 'srv-neg-scalp-detox',
-    number: '06',
+    number: '07',
     name: 'Deep Scalp Detox & High-Frequency Therapy',
     category: 'Scalp & Hair Wellness',
     duration: '45 MIN',
     price: 'Starting LKR 5,500',
-    description: 'Exfoliating scalp cleanse, ozone stimulation, and botanical nourishment for strong hair health.',
+    description: 'Purifying scalp exfoliation, high-frequency stimulation, and botanical oil infusion.',
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
     tag: 'Scalp Health',
   },
@@ -79,6 +90,45 @@ const negomboServices = [
 
 export default function NegomboServices({ onSelectService }: NegomboServicesProps) {
   const [activeServiceIndex, setActiveServiceIndex] = useState(0);
+  const [servicesList, setServicesList] = useState(negomboServices);
+
+  // Dynamic live pricing synchronization
+  useEffect(() => {
+    async function fetchLiveServices() {
+      try {
+        const res = await fetch('/api/services?t=' + Date.now());
+        const data = await res.json();
+        if (data.success && data.services && data.services.length > 0) {
+          setServicesList((prev) =>
+            prev.map((item) => {
+              const live = data.services.find(
+                (s: any) =>
+                  s.id === item.id ||
+                  s.id === item.id.replace('srv-neg-', 'srv-') ||
+                  s.name.toLowerCase().includes(item.name.toLowerCase().substring(0, 10)) ||
+                  item.name.toLowerCase().includes(s.name.toLowerCase().substring(0, 10))
+              );
+              if (live && live.price !== undefined) {
+                return {
+                  ...item,
+                  price: `Starting LKR ${Number(live.price).toLocaleString()}`,
+                  duration: `${live.duration} MIN`,
+                  name: live.name || item.name,
+                  description: live.description || item.description,
+                  rawPrice: live.price,
+                };
+              }
+              return item;
+            })
+          );
+        }
+      } catch (err) {
+        console.warn('Notice: Using default services pricing:', err);
+      }
+    }
+
+    fetchLiveServices();
+  }, []);
 
   const handleSelectItem = (index: number, service: any) => {
     setActiveServiceIndex(index);
@@ -98,7 +148,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
     }
   };
 
-  const activeService = negomboServices[activeServiceIndex];
+  const activeService = servicesList[activeServiceIndex] || servicesList[0];
 
   return (
     <section id="services" className="py-28 sm:py-36 relative bg-[#042217] border-t border-[#E5B842]/20 overflow-hidden">
@@ -136,7 +186,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
           
           {/* Vertical Editorial List */}
           <div className="lg:col-span-7 flex flex-col divide-y divide-[#E5B842]/15">
-            {negomboServices.map((service, index) => {
+            {servicesList.map((service, index) => {
               const isHovered = activeServiceIndex === index;
               return (
                 <div

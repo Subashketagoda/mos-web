@@ -6,6 +6,9 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
+  doc,
+  setDoc,
+  deleteDoc,
   DocumentData,
   QuerySnapshot,
 } from 'firebase/firestore';
@@ -486,4 +489,148 @@ export async function getBookingsFromFirestore(): Promise<FirebaseBooking[]> {
     return [];
   }
 }
+
+/**
+ * Interface for Services stored in Firestore
+ */
+export interface FirebaseServiceItem {
+  id: string;
+  name: string;
+  description: string;
+  duration: number;
+  price: number;
+  category: string;
+  active?: boolean | number;
+  sortOrder?: number;
+  updatedAt?: string;
+}
+
+/**
+ * Fetches all services from Cloud Firestore.
+ */
+export async function getServicesFromFirestore(): Promise<FirebaseServiceItem[]> {
+  if (!db) return [];
+
+  try {
+    const snapshot = await getDocs(collection(db, 'services'));
+    const items: FirebaseServiceItem[] = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      items.push({
+        id: docSnap.id,
+        name: data.name || 'Service',
+        description: data.description || '',
+        duration: Number(data.duration) || 60,
+        price: Number(data.price) || 0,
+        category: data.category || 'Hair',
+        active: data.active !== undefined ? Boolean(data.active) : true,
+        sortOrder: Number(data.sortOrder) || 0,
+        updatedAt: data.updatedAt || new Date().toISOString(),
+      });
+    });
+
+    items.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+    return items;
+  } catch (err) {
+    console.warn('Could not fetch services from Firestore:', err);
+    return [];
+  }
+}
+
+/**
+ * Saves or updates a service in Cloud Firestore.
+ */
+export async function saveServiceToFirestore(service: {
+  id: string;
+  name: string;
+  description?: string;
+  duration: number;
+  price: number;
+  category?: string;
+  active?: boolean | number;
+  sortOrder?: number;
+  updatedAt?: string;
+}): Promise<void> {
+  if (!db) return;
+
+  try {
+    const serviceRef = doc(db, 'services', service.id);
+    await setDoc(
+      serviceRef,
+      {
+        id: service.id,
+        name: service.name.trim(),
+        description: (service.description || '').trim(),
+        duration: Number(service.duration),
+        price: Number(service.price),
+        category: service.category || 'Hair',
+        active: service.active !== false && service.active !== 0,
+        sortOrder: Number(service.sortOrder) || 0,
+        updatedAt: service.updatedAt || new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn('Could not save service to Firestore:', err);
+  }
+}
+
+/**
+ * Deletes a service from Cloud Firestore.
+ */
+export async function deleteServiceFromFirestore(id: string): Promise<void> {
+  if (!db) return;
+
+  try {
+    await deleteDoc(doc(db, 'services', id));
+  } catch (err) {
+    console.warn('Could not delete service from Firestore:', err);
+  }
+}
+
+/**
+ * Subscribes to real-time service updates from Firestore.
+ */
+export function subscribeToServices(
+  callback: (services: FirebaseServiceItem[]) => void
+): () => void {
+  if (!db) {
+    callback([]);
+    return () => {};
+  }
+
+  try {
+    const unsubscribe = onSnapshot(
+      collection(db, 'services'),
+      (snapshot) => {
+        const items: FirebaseServiceItem[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          items.push({
+            id: docSnap.id,
+            name: data.name || 'Service',
+            description: data.description || '',
+            duration: Number(data.duration) || 60,
+            price: Number(data.price) || 0,
+            category: data.category || 'Hair',
+            active: data.active !== undefined ? Boolean(data.active) : true,
+            sortOrder: Number(data.sortOrder) || 0,
+            updatedAt: data.updatedAt || new Date().toISOString(),
+          });
+        });
+        items.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+        callback(items);
+      },
+      (error) => {
+        console.warn('Firestore services subscription notice:', error);
+      }
+    );
+
+    return unsubscribe;
+  } catch (err) {
+    console.warn('Error setting up services listener:', err);
+    return () => {};
+  }
+}
+
 
