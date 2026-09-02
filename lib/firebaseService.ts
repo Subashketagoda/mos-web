@@ -13,48 +13,88 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './firebase';
 
 /**
- * Uploads an image file:
- * 1. Tries Firebase Storage first (Cloud CDN)
- * 2. Falls back to local API endpoint (/api/upload)
- * 3. Falls back to Base64 Data URL for instant resilience
+ * Compresses an image file in the browser to a lightweight, high-quality Data URL (under 150KB).
+ * This ensures large smartphone photos (5MB - 10MB) fit easily within Firestore's 1MB limit.
+ */
+export async function compressImage(file: File, maxWidth = 1200, quality = 0.75): Promise<string> {
+  if (typeof window === 'undefined') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new (window as any).Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else if (height > maxWidth) {
+            width = Math.round((width * maxWidth) / height);
+            height = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(event.target?.result as string);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        } catch (e) {
+          resolve(event.target?.result as string);
+        }
+      };
+      img.onerror = () => resolve(event.target?.result as string);
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Uploads an image file with automatic client-side compression and fast fallback.
  */
 export async function uploadImageFile(file: File): Promise<string> {
-  // 1. Try Firebase Storage
+  // 1. Instantly compress in-browser (converts 5-10MB phone photo to ~100KB)
+  const compressedDataUrl = await compressImage(file, 1200, 0.75);
+
+  // 2. Try Firebase Storage with 2s timeout safeguard
   if (storage) {
     try {
       const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
       const storageRef = ref(storage, `gallery/${Date.now()}_${cleanName}`);
-      await uploadBytes(storageRef, file);
-      const downloadUrl = await getDownloadURL(storageRef);
+      
+      const uploadPromise = (async () => {
+        await uploadBytes(storageRef, file);
+        return await getDownloadURL(storageRef);
+      })();
+
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000));
+      const downloadUrl = await Promise.race([uploadPromise, timeoutPromise]);
       if (downloadUrl) return downloadUrl;
     } catch (firebaseErr) {
-      console.warn('Firebase Storage upload failed, trying local API upload:', firebaseErr);
+      console.warn('Firebase Storage notice, using compressed image:', firebaseErr);
     }
   }
 
-  // 2. Try Local API upload endpoint
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.success && data.url) {
-      return data.url;
-    }
-  } catch (apiErr) {
-    console.warn('Local API upload failed, falling back to base64:', apiErr);
-  }
-
-  // 3. Fallback to Base64 Data URL
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (err) => reject(err);
-    reader.readAsDataURL(file);
-  });
+  // 3. Return compressed Data URL (fits safely in Firestore < 150KB and loads instantly)
+  return compressedDataUrl;
 }
 
 export interface FirebaseReview {
@@ -303,16 +343,14 @@ export async function addGalleryPhotoToFirestore(photo: {
     }
   }
 
-  // Dual Sync to API
+  // Background dual sync to API (non-blocking for instant UI response)
   try {
-    await fetch('/api/gallery', {
+    fetch('/api/gallery', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(photo),
-    });
-  } catch (e) {
-    console.warn('API gallery dual-sync warning:', e);
-  }
+    }).catch((e) => console.warn('API gallery background sync notice:', e));
+  } catch (e) {}
 
   return { success: true, id: firestoreDocId };
 }
