@@ -117,7 +117,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
   return (
     <section id="services" className="py-28 sm:py-36 relative bg-[#070709] border-t border-white/5 overflow-hidden">
       
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header */}
         <motion.div
@@ -130,7 +130,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-mosphere-gold font-semibold">02</span>
             <span className="text-white/20">/</span>
-            <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
+            <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/60 font-medium">
               SERVICES & OFFERINGS
             </span>
           </div>
@@ -140,8 +140,8 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
         </motion.div>
 
         {/* Pricing Transparency Note */}
-        <div className="mb-10 flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] font-mono text-white/60">
-          <span className="text-mosphere-gold font-semibold">✦ STARTING RATES:</span>
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] font-mono text-white/60">
+          <span className="text-mosphere-gold font-semibold shrink-0">✦ STARTING RATES:</span>
           <span>Prices vary per individual depending on hair length, texture, and personalized stylist consultation.</span>
         </div>
 

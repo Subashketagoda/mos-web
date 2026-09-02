@@ -9,7 +9,7 @@ export default function ColomboHero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-6 sm:px-12 lg:px-16 bg-[#070709]"
+      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-4 sm:px-8 lg:px-16 bg-[#070709]"
     >
       {/* Background Urban Noir Visual */}
       <div className="absolute inset-0 z-0">
@@ -67,7 +67,7 @@ export default function ColomboHero() {
               <div className="w-5 h-5 rounded-full border border-mosphere-gold/60 flex items-center justify-center bg-black p-0.5 shadow-[0_0_8px_rgba(212,175,55,0.6)]">
                 <img src={salonConfig.emblem} alt="Mosphere" className="w-full h-full object-contain" />
               </div>
-              <span className="text-[10px] sm:text-xs font-sans tracking-[0.3em] text-mosphere-gold uppercase font-semibold">
+              <span className="text-[9px] sm:text-xs font-sans tracking-[0.16em] sm:tracking-[0.3em] text-mosphere-gold uppercase font-semibold">
                 HAUTE BEAUTY & PRECISION GROOMING
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold animate-pulse" />
@@ -77,7 +77,7 @@ export default function ColomboHero() {
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-[4.75rem] font-light text-white leading-[1.14] tracking-tight"
+              className="font-serif text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-[4.75rem] font-light text-white leading-[1.14] tracking-tight"
             >
               <span className="block text-white">A MODERN</span>
               <span className="italic font-normal gold-gradient-text-light pb-1 block">

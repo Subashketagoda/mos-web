@@ -9,7 +9,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-28 pb-12 sm:pb-16 px-6 sm:px-12"
+      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-28 pb-12 sm:pb-16 px-4 sm:px-8 lg:px-12"
     >
       {/* Background Cinematic Visual with Film Grain Overlay */}
       <div className="absolute inset-0 z-0">
@@ -67,7 +67,7 @@ export default function Hero() {
               <div className="w-8 h-8 rounded-full border border-mosphere-gold/50 flex items-center justify-center bg-black/60 p-1.5 shadow-goldGlow">
                 <img src={salonConfig.emblem} alt="Mosphere" className="w-full h-full object-contain" />
               </div>
-              <span className="text-[11px] font-sans tracking-[0.35em] text-mosphere-gold uppercase font-semibold">
+              <span className="text-[10px] sm:text-[11px] font-sans tracking-[0.16em] sm:tracking-[0.35em] text-mosphere-gold uppercase font-semibold">
                 HAUTE BEAUTY & PRECISION GROOMING
               </span>
             </motion.div>
@@ -76,7 +76,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-light text-white leading-none tracking-tight -ml-1 sm:-ml-2"
+              className="font-serif text-[3.25rem] xs:text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-light text-white leading-none tracking-tight ml-0 sm:-ml-2"
             >
               MOSPHERE
             </motion.h1>

@@ -37,7 +37,7 @@ export default function BrandExperience() {
       {/* Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-mosphere-gold/[0.02] blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Eyebrow */}
         <motion.div
@@ -77,7 +77,7 @@ export default function BrandExperience() {
 
               {/* Massive Oversized Typographic Word */}
               <div className="lg:col-span-6">
-                <h3 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-white/85 group-hover:text-white group-hover:translate-x-2 transition-all duration-300">
+                <h3 className="font-serif text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-white/85 group-hover:text-white group-hover:translate-x-2 transition-all duration-300">
                   {pillar.word}
                 </h3>
               </div>

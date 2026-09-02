@@ -95,7 +95,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
   return (
     <section id="services" className="py-28 sm:py-36 relative bg-[#042217] border-t border-[#E5B842]/20 overflow-hidden">
       
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header */}
         <motion.div
@@ -108,7 +108,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-[#E5B842] font-semibold">02</span>
             <span className="text-emerald-300/30">/</span>
-            <span className="text-xs uppercase tracking-[0.3em] text-emerald-100/70 font-medium">
+            <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-emerald-100/70 font-medium">
               OUR SERVICES
             </span>
           </div>
@@ -118,8 +118,8 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
         </motion.div>
 
         {/* Pricing Transparency Note */}
-        <div className="mb-10 flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#062A1D] border border-[#E5B842]/25 text-[11px] font-mono text-emerald-100/70">
-          <span className="text-[#E5B842] font-semibold">✦ STARTING RATES:</span>
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4 px-4 py-2.5 rounded-xl bg-[#062A1D] border border-[#E5B842]/25 text-[11px] font-mono text-emerald-100/70">
+          <span className="text-[#E5B842] font-semibold shrink-0">✦ STARTING RATES:</span>
           <span>Prices vary per individual depending on hair length, texture, and personalized stylist consultation.</span>
         </div>
 

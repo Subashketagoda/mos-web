@@ -40,7 +40,7 @@ export default function NegomboHero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-6 sm:px-12 lg:px-16 bg-black"
+      className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-4 sm:px-8 lg:px-16 bg-black"
     >
       {/* Background Video - 100% Crystal Clear & Vivid */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -105,7 +105,7 @@ export default function NegomboHero() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-[10px] sm:text-xs font-sans tracking-[0.3em] text-[#E5B842] uppercase font-semibold">
+              <span className="text-[9px] sm:text-xs font-sans tracking-[0.16em] sm:tracking-[0.3em] text-[#E5B842] uppercase font-semibold">
                 HAUTE BEAUTY & COASTAL GROOMING
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842] animate-pulse" />
@@ -115,7 +115,7 @@ export default function NegomboHero() {
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-[4.75rem] font-light text-white leading-[1.14] tracking-tight"
+              className="font-serif text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-[4.75rem] font-light text-white leading-[1.14] tracking-tight"
             >
               <span className="block text-white">YOUR BEAUTY.</span>
               <span className="italic font-normal gold-gradient-text pb-1 block">

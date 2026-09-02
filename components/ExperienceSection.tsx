@@ -19,7 +19,7 @@ export default function ExperienceSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-[#070709]" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -28,7 +28,7 @@ export default function ExperienceSection() {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-mosphere-gold/30 backdrop-blur-md mb-8"
         >
           <Sparkles className="w-3.5 h-3.5 text-mosphere-gold" />
-          <span className="text-[11px] uppercase tracking-[0.25em] text-mosphere-gold font-medium">
+          <span className="text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.25em] text-mosphere-gold font-medium">
             FEATURED SANCTUARY
           </span>
         </motion.div>
@@ -38,7 +38,7 @@ export default function ExperienceSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="font-serif text-4xl sm:text-6xl md:text-7xl font-light text-white tracking-tight mb-6"
+          className="font-serif text-3xl sm:text-6xl md:text-7xl font-light text-white tracking-tight mb-6"
         >
           THE MOSPHERE <br />
           <span className="italic font-normal text-mosphere-goldLight">EXPERIENCE</span>

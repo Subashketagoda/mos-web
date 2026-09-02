@@ -41,15 +41,27 @@ html {
   scroll-behavior: auto !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   background-color: var(--bg-primary);
   color: #f7f4ee;
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
+  position: relative;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global text containment to prevent mobile edge clipping */
+h1, h2, h3, h4, h5, h6, p, span, a {
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 /* Hardware GPU Acceleration Helpers */

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { salonConfig } from '@/lib/config';
@@ -63,6 +63,13 @@ export const metadata: Metadata = {
       { url: '/apple-touch-icon.png' },
     ],
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#070709',
 };
 
 import SmoothScroll from '@/components/SmoothScroll';

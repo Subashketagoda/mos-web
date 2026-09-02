@@ -36,7 +36,7 @@ export default function NegomboFinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-xs font-mono tracking-[0.35em] text-[#E5B842] uppercase font-semibold mb-3"
+          className="text-xs font-mono tracking-[0.16em] sm:tracking-[0.35em] text-[#E5B842] uppercase font-semibold mb-3"
         >
           NEGOMBO • COASTAL SANCTUARY
         </motion.span>
@@ -47,7 +47,7 @@ export default function NegomboFinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-serif text-4xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-[1.08] mb-6"
+          className="font-serif text-3xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-[1.08] mb-6"
         >
           BEGIN YOUR <br />
           <span className="italic font-normal text-[#F3CC68]">ELEVATION.</span>

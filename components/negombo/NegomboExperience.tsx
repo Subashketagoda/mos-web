@@ -38,13 +38,13 @@ export default function NegomboExperience() {
       {/* Minimalist Overlay Typography */}
       <motion.div
         style={{ opacity }}
-        className="relative z-10 text-center px-6 max-w-5xl mx-auto flex flex-col items-center gap-4"
+        className="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center gap-4"
       >
-        <span className="text-xs sm:text-sm font-mono tracking-[0.4em] text-[#D4AF37] uppercase font-semibold">
+        <span className="text-xs sm:text-sm font-mono tracking-[0.16em] sm:tracking-[0.4em] text-[#D4AF37] uppercase font-semibold">
           ✦ TROPICAL SANCTUARY • NEGOMBO ✦
         </span>
 
-        <h2 className="font-serif text-4xl sm:text-7xl md:text-8xl font-light text-white tracking-tight uppercase leading-none">
+        <h2 className="font-serif text-3xl sm:text-7xl md:text-8xl font-light text-white tracking-tight uppercase leading-none">
           THE MOSPHERE <br />
           <span className="italic font-normal text-[#F3E5AB]">EXPERIENCE</span>
         </h2>

@@ -36,7 +36,7 @@ export default function FinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-xs font-mono tracking-[0.35em] text-mosphere-gold uppercase font-medium mb-3"
+          className="text-xs font-mono tracking-[0.16em] sm:tracking-[0.35em] text-mosphere-gold uppercase font-medium mb-3"
         >
           NAWALA • RAJAGIRIYA
         </motion.span>
@@ -47,7 +47,7 @@ export default function FinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-serif text-4xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-[1.08] mb-6"
+          className="font-serif text-3xl sm:text-6xl md:text-7xl font-light text-white tracking-tight leading-[1.08] mb-6"
         >
           LET&apos;S CREATE THE <br />
           <span className="italic font-normal text-mosphere-goldLight">EXPERIENCE.</span>

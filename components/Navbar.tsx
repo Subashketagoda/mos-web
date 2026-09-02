@@ -55,7 +55,7 @@ export default function Navbar() {
             : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-5 sm:py-6 border-b border-white/5'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-8 flex items-center justify-between">
           
           {/* Brand Logo & Emblem */}
           <Link href="/" className="flex items-center gap-3.5 group">

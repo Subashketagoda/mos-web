@@ -424,7 +424,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
   return (
     <section id="booking" className="py-24 sm:py-32 relative bg-[#09090B] border-t border-white/10 overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 sm:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-white/10 pb-8">
@@ -432,7 +432,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
             <div className="flex items-center gap-3 mb-3">
               <span className="text-xs font-mono text-mosphere-gold font-semibold">07</span>
               <span className="text-white/20">/</span>
-              <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
+              <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/60 font-medium">
                 RESERVATIONS & CONCIERGE
               </span>
             </div>

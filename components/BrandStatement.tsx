@@ -13,7 +13,7 @@ export default function BrandStatement() {
         M
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Editorial Section Label */}
         <motion.div
@@ -26,7 +26,7 @@ export default function BrandStatement() {
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-mosphere-gold font-semibold">01</span>
             <span className="text-white/20">/</span>
-            <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
+            <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/60 font-medium">
               INTRODUCTION
             </span>
           </div>
@@ -46,7 +46,7 @@ export default function BrandStatement() {
             transition={{ duration: 0.8 }}
             className="lg:col-span-7"
           >
-            <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl font-light text-white leading-[1.08] tracking-tight">
+            <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
               MOSPHERE IS <br />
               <span className="font-normal italic text-mosphere-goldLight">AN EXPERIENCE.</span>
             </h2>

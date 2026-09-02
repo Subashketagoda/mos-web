@@ -11,7 +11,7 @@ export default function NegomboLocation() {
   return (
     <section id="contact" className="py-28 sm:py-36 relative bg-[#03150F] border-t border-emerald-500/20 overflow-hidden">
       
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header */}
         <motion.div
@@ -24,7 +24,7 @@ export default function NegomboLocation() {
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-[#D4AF37] font-semibold">05</span>
             <span className="text-emerald-300/30">/</span>
-            <span className="text-xs uppercase tracking-[0.3em] text-emerald-200/70 font-medium">
+            <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-emerald-200/70 font-medium">
               FIND US IN NEGOMBO
             </span>
           </div>
@@ -45,10 +45,10 @@ export default function NegomboLocation() {
             className="lg:col-span-6 flex flex-col justify-between gap-10"
           >
             <div>
-              <span className="text-xs font-mono tracking-[0.3em] text-[#D4AF37] uppercase">
+              <span className="text-xs font-mono tracking-[0.16em] sm:tracking-[0.3em] text-[#D4AF37] uppercase">
                 COASTAL SANCTUARY
               </span>
-              <h2 className="font-serif text-4xl sm:text-6xl font-light text-white tracking-tight leading-none mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-white tracking-tight leading-none mt-2">
                 MOSPHERE <br />
                 <span className="italic font-normal text-[#F3E5AB]">NEGOMBO</span>
               </h2>

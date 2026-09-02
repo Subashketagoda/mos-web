@@ -9,7 +9,7 @@ export default function LocationSection() {
   return (
     <section id="contact" className="py-28 sm:py-36 relative bg-[#070709] border-t border-white/5 overflow-hidden">
       
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header */}
         <motion.div
@@ -22,7 +22,7 @@ export default function LocationSection() {
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-mosphere-gold font-semibold">05</span>
             <span className="text-white/20">/</span>
-            <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
+            <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/60 font-medium">
               FIND US
             </span>
           </div>
@@ -43,10 +43,10 @@ export default function LocationSection() {
             className="lg:col-span-6 flex flex-col justify-between gap-10"
           >
             <div>
-              <span className="text-xs font-mono tracking-[0.3em] text-mosphere-gold uppercase">
+              <span className="text-xs font-mono tracking-[0.16em] sm:tracking-[0.3em] text-mosphere-gold uppercase">
                 STUDIO SANCTUARY
               </span>
-              <h2 className="font-serif text-4xl sm:text-6xl font-light text-white tracking-tight leading-none mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-white tracking-tight leading-none mt-2">
                 MOSPHERE <br />
                 <span className="italic font-normal text-mosphere-goldLight">NAWALA</span>
               </h2>
