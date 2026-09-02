@@ -97,6 +97,7 @@ export default function AdminPage() {
   const [galTitle, setGalTitle] = useState('');
   const [galCat, setGalCat] = useState('Hair');
   const [galRatio, setGalRatio] = useState('portrait');
+  const [galLocation, setGalLocation] = useState<'colombo' | 'negombo' | 'all'>('colombo');
 
   // Check existing token on mount
   useEffect(() => {
@@ -454,6 +455,7 @@ export default function AdminPage() {
           title: galTitle.trim() || 'Mosphere Hair Artistry',
           category: galCat,
           aspectRatio: galRatio,
+          location: galLocation,
         }),
       });
 
@@ -1126,7 +1128,13 @@ export default function AdminPage() {
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-between">
                       <div>
                         <div className="text-xs font-medium text-white">{g.title}</div>
-                        <div className="text-[10px] text-mosphere-gold">{g.category}</div>
+                        <div className="text-[10px] text-mosphere-gold flex items-center gap-1.5 mt-0.5 font-mono uppercase">
+                          <span>{g.category}</span>
+                          <span className="text-white/30">•</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${g.location === 'negombo' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-mosphere-gold/20 text-mosphere-gold border border-mosphere-gold/30'}`}>
+                            {g.location === 'negombo' ? 'Negombo' : g.location === 'all' ? 'All' : 'Colombo'}
+                          </span>
+                        </div>
                       </div>
                       <button
                         onClick={() => deleteGallery(g.id)}
@@ -1668,6 +1676,21 @@ export default function AdminPage() {
                     <option value="square">Square</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase tracking-wider text-mosphere-gold mb-1 font-semibold">
+                  Show In Salon Location / Page *
+                </label>
+                <select
+                  value={galLocation}
+                  onChange={(e) => setGalLocation(e.target.value as any)}
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:border-mosphere-gold focus:outline-none"
+                >
+                  <option value="colombo">Colombo Studio (Nawala) Only</option>
+                  <option value="negombo">Negombo Coastal Sanctuary Only</option>
+                  <option value="all">Both Salons (All Locations)</option>
+                </select>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">

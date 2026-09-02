@@ -113,6 +113,7 @@ export interface FirebaseGalleryItem {
   title: string;
   category: string;
   aspectRatio: string;
+  location?: 'colombo' | 'negombo' | 'all' | string;
   active: boolean;
   createdAt: any;
 }
@@ -261,6 +262,7 @@ export function subscribeToGallery(
             title: data.title || 'Mosphere Transformation',
             category: data.category || 'Hair Styling',
             aspectRatio: data.aspectRatio || 'portrait',
+            location: data.location || 'colombo',
             active: data.active !== undefined ? data.active : true,
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
           });
@@ -301,6 +303,7 @@ export async function getGalleryFromFirestore(): Promise<FirebaseGalleryItem[]> 
         title: data.title || 'Mosphere Transformation',
         category: data.category || 'Hair Styling',
         aspectRatio: data.aspectRatio || 'portrait',
+        location: data.location || 'colombo',
         active: data.active !== undefined ? data.active : true,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
       });
@@ -322,12 +325,14 @@ export async function addGalleryPhotoToFirestore(photo: {
   title: string;
   category: string;
   aspectRatio?: string;
+  location?: 'colombo' | 'negombo' | 'all' | string;
 }) {
   const payload = {
     imageUrl: photo.imageUrl.trim(),
     title: photo.title.trim(),
     category: photo.category || 'Hair Botox',
     aspectRatio: photo.aspectRatio || 'portrait',
+    location: photo.location || 'colombo',
     active: true,
     createdAt: serverTimestamp(),
   };

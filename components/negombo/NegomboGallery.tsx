@@ -73,12 +73,14 @@ export default function NegomboGallery() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [items, setItems] = useState<any[]>(negomboGalleryItems);
 
-  // Live Firestore subscription
+  // Live Firestore subscription - ONLY Show Negombo photos
   React.useEffect(() => {
     const unsub = subscribeToGallery((livePhotos) => {
       if (livePhotos && livePhotos.length > 0) {
+        // Strict Location Filter: only photos uploaded for Negombo
+        const negomboPhotos = livePhotos.filter((p) => p.location === 'negombo');
         setItems((prev) => {
-          const liveFormatted = livePhotos.map((p) => ({
+          const liveFormatted = negomboPhotos.map((p) => ({
             id: p.id,
             title: p.title,
             category: p.category,
@@ -116,6 +118,7 @@ export default function NegomboGallery() {
         title: newPhotoTitle.trim() || 'Mosphere Negombo Hair Artistry',
         category: newPhotoCategory,
         aspectRatio: 'portrait',
+        location: 'negombo', // Explicitly lock to Negombo gallery only!
       });
       setToastMessage('Photo uploaded & synced to coastal gallery in real-time!');
       setIsAddPhotoOpen(false);

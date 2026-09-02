@@ -57,22 +57,30 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { imageUrl, title, category, aspectRatio, sortOrder } = await req.json();
+    const { imageUrl, title, category, aspectRatio, sortOrder, location } = await req.json();
     if (!imageUrl) {
       return NextResponse.json({ success: false, error: 'Image URL is required.' }, { status: 400 });
     }
 
     const id = `gal-${uuidv4().substring(0, 8)}`;
     const now = new Date().toISOString();
+    const photoLocation = location || 'colombo';
 
     try {
       await query.run(
-        `INSERT INTO gallery (id, imageUrl, title, category, aspectRatio, active, sortOrder, createdAt)
-         VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
-        [id, imageUrl.trim(), title || '', category || 'Salon', aspectRatio || 'portrait', parseInt(sortOrder || 0, 10), now]
+        `INSERT INTO gallery (id, imageUrl, title, category, aspectRatio, location, active, sortOrder, createdAt)
+         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+        [id, imageUrl.trim(), title || '', category || 'Salon', aspectRatio || 'portrait', photoLocation, parseInt(sortOrder || 0, 10), now]
       );
     } catch (dbErr) {
-      console.warn('Local DB gallery insert notice:', dbErr);
+      // Fallback if location column not yet in SQLite
+      try {
+        await query.run(
+          `INSERT INTO gallery (id, imageUrl, title, category, aspectRatio, active, sortOrder, createdAt)
+           VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
+          [id, imageUrl.trim(), title || '', category || 'Salon', aspectRatio || 'portrait', parseInt(sortOrder || 0, 10), now]
+        );
+      } catch (e) {}
     }
 
     // Dual-persist to Cloud Firestore
@@ -83,12 +91,13 @@ export async function POST(req: NextRequest) {
         title: title || 'Mosphere Hair Artistry',
         category: category || 'Hair Styling',
         aspectRatio: aspectRatio || 'portrait',
+        location: photoLocation,
       });
     } catch (fsErr) {
       console.warn('Notice: Firestore sync in admin gallery POST:', fsErr);
     }
 
-    return NextResponse.json({ success: true, image: { id, imageUrl, title, category, aspectRatio } }, { status: 201 });
+    return NextResponse.json({ success: true, image: { id, imageUrl, title, category, aspectRatio, location: photoLocation } }, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

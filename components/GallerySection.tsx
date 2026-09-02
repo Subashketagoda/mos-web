@@ -82,11 +82,14 @@ export default function GallerySection() {
   const [items, setItems] = useState<any[]>(galleryItems);
 
   // Live Firestore subscription
+  // Live Firestore subscription - ONLY Show Colombo Studio photos
   React.useEffect(() => {
     const unsub = subscribeToGallery((livePhotos) => {
       if (livePhotos && livePhotos.length > 0) {
+        // Strict Location Filter: only photos uploaded for Colombo or general
+        const colomboPhotos = livePhotos.filter((p) => !p.location || p.location === 'colombo' || p.location === 'all');
         setItems((prev) => {
-          const liveFormatted = livePhotos.map((p) => ({
+          const liveFormatted = colomboPhotos.map((p) => ({
             id: p.id,
             title: p.title,
             category: p.category,
@@ -121,9 +124,10 @@ export default function GallerySection() {
 
       await addGalleryPhotoToFirestore({
         imageUrl: finalImageUrl,
-        title: newPhotoTitle.trim() || 'Mosphere Hair Artistry',
+        title: newPhotoTitle.trim() || 'Mosphere Colombo Hair Artistry',
         category: newPhotoCategory,
         aspectRatio: 'portrait',
+        location: 'colombo', // Explicitly lock to Colombo gallery only!
       });
       setToastMessage('Photo uploaded & synced live in real-time!');
       setIsAddPhotoOpen(false);
