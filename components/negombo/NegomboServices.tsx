@@ -80,7 +80,15 @@ const negomboServices = [
 export default function NegomboServices({ onSelectService }: NegomboServicesProps) {
   const [activeServiceIndex, setActiveServiceIndex] = useState(0);
 
-  const handleBooking = (service: any) => {
+  const handleSelectItem = (index: number, service: any) => {
+    setActiveServiceIndex(index);
+    if (onSelectService) {
+      onSelectService(service);
+    }
+  };
+
+  const handleProceedToBooking = (e: React.MouseEvent, service: any) => {
+    e.stopPropagation();
     if (onSelectService) {
       onSelectService(service);
     }
@@ -135,7 +143,7 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
                   key={service.id}
                   data-cursor="explore"
                   onMouseEnter={() => setActiveServiceIndex(index)}
-                  onClick={() => handleBooking(service)}
+                  onClick={() => handleSelectItem(index, service)}
                   className={`group relative py-7 sm:py-8 cursor-pointer transition-all duration-300 ${
                     isHovered ? 'pl-3 sm:pl-4 bg-[#062A1D]' : 'hover:pl-2'
                   }`}
@@ -172,6 +180,19 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
                         <p className="text-xs sm:text-sm text-emerald-100/60 font-light leading-relaxed max-w-lg mt-1 line-clamp-2">
                           {service.description}
                         </p>
+
+                        {isHovered && (
+                          <div className="pt-2 flex sm:hidden">
+                            <button
+                              type="button"
+                              onClick={(e) => handleProceedToBooking(e, service)}
+                              className="px-3.5 py-1.5 rounded-full text-[11px] font-mono tracking-wider text-black bg-[#E5B842] font-semibold flex items-center gap-1.5 shadow-md"
+                            >
+                              <span>BOOK THIS SERVICE</span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -180,15 +201,18 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
                         {service.price}
                       </span>
 
-                      <div
-                        className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 mt-4 ${
+                      <button
+                        type="button"
+                        onClick={(e) => handleProceedToBooking(e, service)}
+                        aria-label={`Book ${service.name}`}
+                        className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 mt-4 cursor-pointer ${
                           isHovered
                             ? 'border-[#E5B842] bg-[#E5B842] text-black shadow-[0_0_15px_rgba(229,184,66,0.6)] translate-x-1'
-                            : 'border-emerald-700/40 text-emerald-300/60 bg-[#062A1D]'
+                            : 'border-emerald-700/40 text-emerald-300/60 bg-[#062A1D] hover:border-[#E5B842] hover:text-[#E5B842]'
                         }`}
                       >
                         <ArrowUpRight className="w-4 h-4" />
-                      </div>
+                      </button>
                     </div>
 
                   </div>

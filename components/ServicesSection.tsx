@@ -102,7 +102,15 @@ const verifiedServices = [
 export default function ServicesSection({ onSelectService }: ServicesSectionProps) {
   const [activeServiceIndex, setActiveServiceIndex] = useState(0);
 
-  const handleBooking = (service: any) => {
+  const handleSelectItem = (index: number, service: any) => {
+    setActiveServiceIndex(index);
+    if (onSelectService) {
+      onSelectService(service);
+    }
+  };
+
+  const handleProceedToBooking = (e: React.MouseEvent, service: any) => {
+    e.stopPropagation();
     if (onSelectService) {
       onSelectService(service);
     }
@@ -157,7 +165,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                   key={service.id}
                   data-cursor="explore"
                   onMouseEnter={() => setActiveServiceIndex(index)}
-                  onClick={() => handleBooking(service)}
+                  onClick={() => handleSelectItem(index, service)}
                   className={`group relative py-7 sm:py-8 cursor-pointer transition-all duration-300 ${
                     isHovered ? 'pl-3 sm:pl-4 bg-white/[0.02]' : 'hover:pl-2'
                   }`}
@@ -196,6 +204,19 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                         <p className="text-xs sm:text-sm text-white/50 font-light leading-relaxed max-w-lg mt-1 line-clamp-2">
                           {service.description}
                         </p>
+
+                        {isHovered && (
+                          <div className="pt-2 flex sm:hidden">
+                            <button
+                              type="button"
+                              onClick={(e) => handleProceedToBooking(e, service)}
+                              className="px-3.5 py-1.5 rounded-full text-[11px] font-mono tracking-wider text-black bg-mosphere-gold font-semibold flex items-center gap-1.5 shadow-goldGlow"
+                            >
+                              <span>BOOK THIS SERVICE</span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -205,15 +226,18 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                         {service.price}
                       </span>
 
-                      <div
-                        className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 mt-4 ${
+                      <button
+                        type="button"
+                        onClick={(e) => handleProceedToBooking(e, service)}
+                        aria-label={`Book ${service.name}`}
+                        className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 mt-4 cursor-pointer ${
                           isHovered
                             ? 'border-mosphere-gold bg-mosphere-gold text-black shadow-goldGlow translate-x-1'
-                            : 'border-white/15 text-white/50 bg-white/5'
+                            : 'border-white/15 text-white/50 bg-white/5 hover:border-mosphere-gold hover:text-mosphere-gold'
                         }`}
                       >
                         <ArrowUpRight className="w-4 h-4" />
-                      </div>
+                      </button>
                     </div>
 
                   </div>

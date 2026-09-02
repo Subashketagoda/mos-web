@@ -101,8 +101,18 @@ const colomboServices = [
 
 export default function ColomboServices({ onSelectService }: ColomboServicesProps) {
   const [hoveredService, setHoveredService] = useState<any | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
-  const handleBooking = (service: any) => {
+  const handleSelectCard = (service: any) => {
+    setSelectedServiceId(service.id);
+    if (onSelectService) {
+      onSelectService(service);
+    }
+  };
+
+  const handleProceedToBooking = (e: React.MouseEvent, service: any) => {
+    e.stopPropagation();
+    setSelectedServiceId(service.id);
     if (onSelectService) {
       onSelectService(service);
     }
@@ -138,74 +148,87 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
         </motion.div>
 
         {/* Pricing Transparency Note */}
-        <div className="mb-10 flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] font-mono text-white/60">
-          <span className="text-mosphere-gold font-semibold">✦ STARTING RATES:</span>
-          <span>Prices vary per individual depending on hair length, density, and in-salon consultation.</span>
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] font-mono text-white/60">
+          <span className="text-mosphere-gold font-semibold shrink-0">✦ BESPOKE PRICING:</span>
+          <span>Starting rates shown. Exact investment confirmed during your personalized stylist consultation.</span>
         </div>
 
         {/* Horizontal Editorial Service Blocks (Distinct Grid Layout) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          {colomboServices.map((service, idx) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ duration: 0.6, delay: idx * 0.06 }}
-              data-cursor="explore"
-              onMouseEnter={() => setHoveredService(service)}
-              onMouseLeave={() => setHoveredService(null)}
-              onClick={() => handleBooking(service)}
-              className="group relative p-7 sm:p-9 rounded-2xl bg-[#0C0C12] border border-white/10 hover:border-mosphere-gold/50 shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden"
-            >
-              {/* Subtle background image reveal on hover */}
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-15 transition-opacity duration-500 scale-105 group-hover:scale-100"
-                style={{ backgroundImage: `url('${service.image}')` }}
-              />
+          {colomboServices.map((service, idx) => {
+            const isSelected = selectedServiceId === service.id;
+            return (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{ duration: 0.6, delay: idx * 0.06 }}
+                data-cursor="explore"
+                onMouseEnter={() => setHoveredService(service)}
+                onMouseLeave={() => setHoveredService(null)}
+                onClick={() => handleSelectCard(service)}
+                className={`group relative p-7 sm:p-9 rounded-2xl bg-[#0C0C12] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+                  isSelected
+                    ? 'border-mosphere-gold ring-1 ring-mosphere-gold/40'
+                    : 'border-white/10 hover:border-mosphere-gold/50'
+                }`}
+              >
+                {/* Subtle background image reveal on hover */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-15 transition-opacity duration-500 scale-105 group-hover:scale-100"
+                  style={{ backgroundImage: `url('${service.image}')` }}
+                />
 
-              <div>
-                {/* Header Meta */}
-                <div className="flex items-center justify-between gap-4 mb-4">
-                  <span className="text-xs font-mono text-mosphere-gold font-semibold">
-                    {service.number}
+                <div>
+                  {/* Header Meta */}
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <span className="text-xs font-mono text-mosphere-gold font-semibold">
+                      {service.number}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-mono tracking-widest text-white/40">
+                        {service.category}
+                      </span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-mono">
+                        {service.duration}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Service Name */}
+                  <h3 className="font-serif text-xl sm:text-2xl text-white font-medium group-hover:text-mosphere-goldLight transition-colors duration-300">
+                    {service.name}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-xs sm:text-sm text-white/50 font-light leading-relaxed mt-2.5">
+                    {service.description}
+                  </p>
+                </div>
+
+                {/* Bottom Price and Book Action */}
+                <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
+                  <span className="font-serif text-lg font-medium text-mosphere-goldLight">
+                    {service.price}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-white/40">
-                      {service.category}
-                    </span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-mono">
-                      {service.duration}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Service Name */}
-                <h3 className="font-serif text-xl sm:text-2xl text-white font-medium group-hover:text-mosphere-goldLight transition-colors duration-300">
-                  {service.name}
-                </h3>
-
-                {/* Description */}
-                <p className="text-xs sm:text-sm text-white/50 font-light leading-relaxed mt-2.5">
-                  {service.description}
-                </p>
-              </div>
-
-              {/* Bottom Price and Book Action */}
-              <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-                <span className="font-serif text-lg font-medium text-mosphere-goldLight">
-                  {service.price}
-                </span>
-
-                <div className="flex items-center gap-2 text-xs font-mono tracking-wider text-mosphere-gold uppercase group-hover:translate-x-1 transition-transform">
-                  <span>SELECT</span>
-                  <div className="w-7 h-7 rounded-full border border-white/20 group-hover:border-mosphere-gold group-hover:bg-mosphere-gold group-hover:text-black flex items-center justify-center transition-all">
+                  <button
+                    type="button"
+                    onClick={(e) => handleProceedToBooking(e, service)}
+                    className={`flex items-center gap-2 text-xs font-mono tracking-wider uppercase px-4 py-2 rounded-full transition-all duration-300 ${
+                      isSelected
+                        ? 'bg-mosphere-gold text-black font-semibold shadow-goldGlow'
+                        : 'text-mosphere-gold hover:text-black hover:bg-mosphere-gold border border-mosphere-gold/40'
+                    }`}
+                  >
+                    <span>{isSelected ? 'BOOK NOW' : 'BOOK NOW'}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
-                  </div>
+                  </button>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
 
       </div>
