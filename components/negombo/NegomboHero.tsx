@@ -116,10 +116,10 @@ export default function NegomboHero() {
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-[4.75rem] font-light text-white leading-[1.14] tracking-tight"
+              className="font-serif text-[2.45rem] xs:text-[2.85rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.75rem] font-light text-white leading-[1.08] tracking-tight"
             >
               <span className="block text-white">YOUR BEAUTY.</span>
-              <span className="italic font-normal gold-gradient-text pb-1 block">
+              <span className="italic font-normal gold-gradient-text pb-1 block drop-shadow-[0_2px_20px_rgba(229,184,66,0.45)]">
                 YOUR EXPERIENCE.
               </span>
             </motion.h1>
@@ -143,8 +143,10 @@ export default function NegomboHero() {
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.45 }}
-              className="rounded-2xl border border-[#E5B842]/30 bg-[#031c13]/75 backdrop-blur-xl p-5 sm:p-6 shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex flex-col gap-4 sm:gap-5"
+              className="relative overflow-hidden rounded-2xl border border-[#E5B842]/35 bg-[#031c13]/85 backdrop-blur-2xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-4 sm:gap-5"
             >
+              <div className="absolute -top-10 -right-10 w-36 h-36 bg-[#E5B842]/15 rounded-full blur-2xl pointer-events-none" />
+
               <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.25em] text-[#E5B842]">
                 <Sparkles className="w-3.5 h-3.5 text-[#E5B842]" />
                 <span>COASTAL SANCTUARY</span>
@@ -168,7 +170,7 @@ export default function NegomboHero() {
 
                 <a
                   href="#services"
-                  className="px-6 py-3.5 rounded-full text-xs font-medium tracking-[0.18em] text-emerald-100 bg-white/5 hover:bg-white/10 border border-[#E5B842]/35 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group hover:scale-[1.02]"
+                  className="px-6 py-3.5 rounded-full text-xs font-semibold tracking-[0.18em] text-emerald-100 bg-white/5 hover:bg-white/10 border border-[#E5B842]/35 hover:border-[#E5B842] transition-all uppercase flex items-center justify-center gap-2 group hover:scale-[1.02]"
                 >
                   <span>SERVICES MENU</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#E5B842] group-hover:translate-x-1 transition-transform" />

@@ -168,7 +168,7 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
                 onMouseEnter={() => setHoveredService(service)}
                 onMouseLeave={() => setHoveredService(null)}
                 onClick={() => handleSelectCard(service)}
-                className={`group relative p-7 sm:p-9 rounded-2xl bg-[#0C0C12] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+                className={`group relative p-5 sm:p-8 rounded-2xl bg-[#0C0C12] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
                   isSelected
                     ? 'border-mosphere-gold ring-1 ring-mosphere-gold/40'
                     : 'border-white/10 hover:border-mosphere-gold/50'

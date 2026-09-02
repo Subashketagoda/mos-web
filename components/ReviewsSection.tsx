@@ -100,7 +100,7 @@ export default function ReviewsSection() {
   };
 
   return (
-    <section id="reviews" className="py-28 sm:py-36 relative bg-[#060608] border-t border-white/5 overflow-hidden section-optimize">
+    <section id="reviews" className="py-28 sm:py-36 relative bg-[#060608] border-t border-white/5 overflow-hidden">
       
       {/* Toast Notification */}
       <AnimatePresence>
@@ -117,7 +117,7 @@ export default function ReviewsSection() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header with Action Buttons */}
         <motion.div

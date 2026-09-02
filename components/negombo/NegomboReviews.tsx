@@ -96,7 +96,7 @@ export default function NegomboReviews() {
   };
 
   return (
-    <section id="reviews" className="py-28 sm:py-36 relative bg-[#041c14] border-t border-emerald-500/20 overflow-hidden section-optimize">
+    <section id="reviews" className="py-28 sm:py-36 relative bg-[#041c14] border-t border-emerald-500/20 overflow-hidden">
       
       {/* Toast Notification */}
       <AnimatePresence>
@@ -113,7 +113,7 @@ export default function NegomboReviews() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header with Action Buttons */}
         <motion.div

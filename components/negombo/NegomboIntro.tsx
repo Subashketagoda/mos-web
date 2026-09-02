@@ -47,22 +47,22 @@ export default function NegomboIntro() {
             transition={{ duration: 0.8 }}
             className="lg:col-span-7"
           >
-            <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
+            <h2 className="font-serif text-[2.25rem] xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
               TROPICAL LUXURY <br />
               <span className="font-normal italic text-[#F3CC68]">MEETS BESPOKE ARTISTRY.</span>
             </h2>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5 text-xs text-emerald-100/70 font-light uppercase tracking-widest">
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842]" />
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-emerald-100/80 font-light uppercase tracking-wider">
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#062A1D] border border-emerald-500/30 text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842] animate-pulse" />
                 Negombo Gents Suite
               </span>
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842]" />
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#062A1D] border border-emerald-500/30 text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842] animate-pulse" />
                 Ladies Haute Lounge
               </span>
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842]" />
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#062A1D] border border-emerald-500/30 text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E5B842] animate-pulse" />
                 Hair Botox Lab
               </span>
             </div>

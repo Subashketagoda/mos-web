@@ -46,23 +46,23 @@ export default function BrandStatement() {
             transition={{ duration: 0.8 }}
             className="lg:col-span-7"
           >
-            <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
+            <h2 className="font-serif text-[2.25rem] xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
               MOSPHERE IS <br />
               <span className="font-normal italic text-mosphere-goldLight">AN EXPERIENCE.</span>
             </h2>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5 text-xs text-white/50 font-light uppercase tracking-widest">
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold" />
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-white/70 font-light uppercase tracking-wider">
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold animate-pulse" />
                 Gents Suite
               </span>
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold" />
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold animate-pulse" />
                 Ladies Haute Lounge
               </span>
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold" />
-                Hair Botox & Keratin Lab
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold animate-pulse" />
+                Hair Botox Lab
               </span>
             </div>
           </motion.div>

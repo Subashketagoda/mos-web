@@ -178,24 +178,39 @@ export default function ColomboNavbar({ onOpenLocationSwitcher }: ColomboNavbarP
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#070709]/98 backdrop-blur-2xl pt-24 px-6 pb-8 flex flex-col justify-between lg:hidden"
+            className="fixed inset-0 z-40 bg-[#070709]/98 backdrop-blur-2xl pt-24 px-6 pb-8 flex flex-col justify-between lg:hidden overflow-y-auto"
           >
-            <div className="flex flex-col gap-3">
-              {navLinks.map((link) => (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-2">
+                <span className="text-[10px] font-mono tracking-widest text-mosphere-gold uppercase">COLLECTION</span>
+                <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">COLOMBO SANCTUARY</span>
+              </div>
+              {navLinks.map((link, idx) => (
                 <Link
                   key={link.id}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-lg font-serif tracking-wider py-2 border-b border-white/10 ${
-                    activeSection === link.id ? 'text-mosphere-gold font-medium' : 'text-white/70'
+                  className={`flex items-center justify-between text-lg font-serif tracking-wider py-2.5 border-b border-white/5 transition-colors ${
+                    activeSection === link.id ? 'text-mosphere-gold font-medium' : 'text-white/80 hover:text-white'
                   }`}
                 >
-                  {link.name}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-mosphere-gold/60">0{idx + 1}</span>
+                    <span>{link.name}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/20" />
                 </Link>
               ))}
             </div>
 
-            <div className="flex flex-col gap-3 pt-4">
+            <div className="flex flex-col gap-3 pt-6">
+              <div className="flex items-center justify-between text-xs text-white/60 font-mono py-2 border-t border-white/10">
+                <span>HOTLINE:</span>
+                <a href={`tel:${salonConfig.phone.replace(/[^0-9]/g, '')}`} className="text-mosphere-goldLight">
+                  {salonConfig.phone}
+                </a>
+              </div>
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

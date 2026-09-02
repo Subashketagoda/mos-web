@@ -135,7 +135,7 @@ export default function NegomboGallery() {
   };
 
   return (
-    <section id="gallery" className="py-28 sm:py-36 relative bg-[#03150F] border-t border-emerald-500/20 overflow-hidden section-optimize">
+    <section id="gallery" className="py-28 sm:py-36 relative bg-[#03150F] border-t border-emerald-500/20 overflow-hidden">
       
       {/* Toast Notification */}
       <AnimatePresence>

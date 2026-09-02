@@ -182,24 +182,39 @@ export default function NegomboNavbar({ onOpenLocationSwitcher }: NegomboNavbarP
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#02180F]/98 backdrop-blur-2xl pt-24 px-6 pb-8 flex flex-col justify-between lg:hidden"
+            className="fixed inset-0 z-40 bg-[#02180F]/98 backdrop-blur-2xl pt-24 px-6 pb-8 flex flex-col justify-between lg:hidden overflow-y-auto"
           >
-            <div className="flex flex-col gap-3">
-              {navLinks.map((link) => (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between pb-3 border-b border-emerald-500/20 mb-2">
+                <span className="text-[10px] font-mono tracking-widest text-[#E5B842] uppercase">COASTAL ATELIER</span>
+                <span className="text-[10px] font-mono tracking-widest text-emerald-300/60 uppercase">NEGOMBO SANCTUARY</span>
+              </div>
+              {navLinks.map((link, idx) => (
                 <Link
                   key={link.id}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-lg font-serif tracking-wider py-2 border-b border-emerald-800/30 ${
-                    activeSection === link.id ? 'text-[#E5B842] font-medium' : 'text-emerald-100/80'
+                  className={`flex items-center justify-between text-lg font-serif tracking-wider py-2.5 border-b border-emerald-800/20 transition-colors ${
+                    activeSection === link.id ? 'text-[#E5B842] font-medium' : 'text-emerald-100/80 hover:text-white'
                   }`}
                 >
-                  {link.name}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-[#E5B842]/70">0{idx + 1}</span>
+                    <span>{link.name}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-emerald-500/30" />
                 </Link>
               ))}
             </div>
 
-            <div className="flex flex-col gap-3 pt-4">
+            <div className="flex flex-col gap-3 pt-6">
+              <div className="flex items-center justify-between text-xs text-emerald-200/60 font-mono py-2 border-t border-emerald-500/20">
+                <span>HOTLINE:</span>
+                <a href={`tel:${salonConfig.phone.replace(/[^0-9]/g, '')}`} className="text-[#F3CC68]">
+                  {salonConfig.phone}
+                </a>
+              </div>
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

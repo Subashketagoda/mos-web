@@ -43,11 +43,11 @@ export default function InstagramSection({ location = 'colombo' }: InstagramSect
   const instagramHandle = branchConfig?.instagramHandle || salonConfig.instagramHandle;
 
   return (
-    <section className={`py-24 sm:py-32 relative border-t overflow-hidden section-optimize ${
+    <section className={`py-24 sm:py-32 relative border-t overflow-hidden ${
       isNegombo ? 'bg-[#03150F] border-emerald-500/20' : 'bg-[#060608] border-white/5'
     }`}>
       
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Section Header */}
         <div className={`flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-6 border-b pb-6 ${

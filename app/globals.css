@@ -35,6 +35,10 @@ html.lenis body {
   pointer-events: none;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html {
   color-scheme: dark;
   text-rendering: optimizeLegibility;

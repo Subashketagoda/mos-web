@@ -33,6 +33,7 @@ import NegomboFooter from '@/components/negombo/NegomboFooter';
 // Shared Components
 import BookingSection from '@/components/BookingSection';
 import InstagramSection from '@/components/InstagramSection';
+import MobileBottomDock from '@/components/MobileBottomDock';
 
 export default function HomePage() {
   const [selectedLocation, setSelectedLocation] = useState<'colombo' | 'negombo' | null>(null);
@@ -88,6 +89,10 @@ export default function HomePage() {
           <InstagramSection location="negombo" />
           <NegomboFinalCTA />
           <NegomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
+          <MobileBottomDock
+            location="negombo"
+            onOpenLocationSwitcher={() => setIsSwitcherOpen(true)}
+          />
         </div>
       )}
 
@@ -111,6 +116,10 @@ export default function HomePage() {
           <InstagramSection location="colombo" />
           <FinalCTA />
           <ColomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
+          <MobileBottomDock
+            location="colombo"
+            onOpenLocationSwitcher={() => setIsSwitcherOpen(true)}
+          />
         </div>
       )}
     </main>

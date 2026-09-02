@@ -77,10 +77,10 @@ export default function ColomboHero() {
               initial={{ opacity: 0, y: 35 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-[4.75rem] font-light text-white leading-[1.14] tracking-tight"
+              className="font-serif text-[2.45rem] xs:text-[2.85rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.75rem] font-light text-white leading-[1.08] tracking-tight"
             >
               <span className="block text-white">A MODERN</span>
-              <span className="italic font-normal gold-gradient-text-light pb-1 block">
+              <span className="italic font-normal gold-gradient-text-light pb-1 block drop-shadow-[0_2px_20px_rgba(212,175,55,0.4)]">
                 BEAUTY EXPERIENCE.
               </span>
             </motion.h1>
@@ -104,21 +104,23 @@ export default function ColomboHero() {
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.45 }}
-              className="rounded-2xl border border-mosphere-gold/25 bg-[#121218]/75 backdrop-blur-xl p-5 sm:p-6 shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex flex-col gap-4 sm:gap-5"
+              className="relative overflow-hidden rounded-2xl border border-mosphere-gold/30 bg-[#121218]/85 backdrop-blur-2xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-4 sm:gap-5"
             >
+              <div className="absolute -top-10 -right-10 w-36 h-36 bg-mosphere-gold/15 rounded-full blur-2xl pointer-events-none" />
+
               <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.25em] text-mosphere-gold">
                 <Sparkles className="w-3.5 h-3.5 text-mosphere-gold" />
                 <span>NAWALA SANCTUARY</span>
               </div>
 
-              <p className="text-xs sm:text-sm text-white/80 font-light leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/85 font-light leading-relaxed">
                 A sanctuary of bespoke hair architecture, precision grooming, and restorative aesthetic rituals crafted for individuals who demand perfection.
               </p>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
                 <a
                   href="#booking"
-                  className="group relative overflow-hidden px-7 py-3.5 rounded-full text-xs font-bold tracking-[0.18em] text-black uppercase transition-all duration-300 shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:shadow-[0_0_40px_rgba(212,175,55,0.8)] hover:scale-[1.02] flex items-center justify-center gap-2"
+                  className="group relative overflow-hidden px-7 py-3.5 rounded-full text-xs font-bold tracking-[0.18em] text-black uppercase transition-all duration-300 shadow-goldGlow hover:shadow-[0_0_40px_rgba(212,175,55,0.8)] hover:scale-[1.02] flex items-center justify-center gap-2"
                   style={{
                     background: 'linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #B8860B 100%)',
                   }}
@@ -129,7 +131,7 @@ export default function ColomboHero() {
 
                 <a
                   href="#services"
-                  className="px-6 py-3.5 rounded-full text-xs font-medium tracking-[0.18em] text-white/90 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-mosphere-gold/50 transition-all uppercase flex items-center justify-center gap-2 group hover:scale-[1.02]"
+                  className="px-6 py-3.5 rounded-full text-xs font-semibold tracking-[0.18em] text-white/90 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-mosphere-gold/50 transition-all uppercase flex items-center justify-center gap-2 group hover:scale-[1.02]"
                 >
                   <span>SERVICES MENU</span>
                   <ArrowRight className="w-3.5 h-3.5 text-mosphere-gold group-hover:translate-x-1 transition-transform" />
