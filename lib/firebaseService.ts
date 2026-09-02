@@ -360,3 +360,41 @@ export async function syncBookingToFirestore(booking: any) {
     return null;
   }
 }
+
+/**
+ * Fetches all bookings from Cloud Firestore.
+ */
+export async function getBookingsFromFirestore(): Promise<FirebaseBooking[]> {
+  if (!db) return [];
+
+  try {
+    const q = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    const items: FirebaseBooking[] = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      items.push({
+        id: doc.id,
+        bookingRef: data.bookingRef || doc.id.substring(0, 8).toUpperCase(),
+        customerName: data.customerName || 'Guest',
+        phone: data.phone || '',
+        email: data.email || '',
+        serviceId: data.serviceId || '',
+        serviceName: data.serviceName || '',
+        date: data.date || '',
+        startTime: data.startTime || '',
+        endTime: data.endTime || '',
+        duration: data.duration || 60,
+        price: data.price || 0,
+        status: data.status || 'confirmed',
+        notes: data.notes || '',
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
+      });
+    });
+    return items;
+  } catch (err) {
+    console.warn('Could not fetch bookings from Firestore:', err);
+    return [];
+  }
+}
+

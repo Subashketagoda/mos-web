@@ -186,6 +186,30 @@ export class BookingService {
         console.warn('Local database booking save notice:', dbSaveErr);
       }
 
+      // 7. Dual-persist to Cloud Firestore for serverless persistence
+      try {
+        const { syncBookingToFirestore } = await import('./firebaseService');
+        await syncBookingToFirestore({
+          id: bookingId,
+          bookingRef,
+          customerName: trimmedName,
+          phone: trimmedPhone,
+          email: trimmedEmail,
+          serviceId,
+          serviceName,
+          date,
+          startTime,
+          endTime,
+          duration,
+          price,
+          status: 'confirmed',
+          notes: trimmedNotes,
+          googleCalendarEventId,
+        });
+      } catch (fsSyncErr) {
+        console.warn('Notice: Firestore cloud sync in createBooking:', fsSyncErr);
+      }
+
       // 9. Generate Customer Links
       const addToGoogleCalendarUrl = this.generateGoogleCalendarLink({
         customerName: trimmedName,

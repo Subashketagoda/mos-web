@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query, initDatabase } from '@/lib/db';
 import { verifyAdminAuth } from '@/lib/auth';
 import { bookingService } from '@/lib/bookingService';
+import { getBookingsFromFirestore } from '@/lib/firebaseService';
 
 // GET /api/admin/bookings - List appointments with filters
 export async function GET(req: NextRequest) {
   const auth = await verifyAdminAuth(req);
   if (!auth.authorized) return auth.response!;
 
-  await initDatabase();
+  try {
+    await initDatabase();
+  } catch (e) {
+    console.warn('Notice: DB init deferred in admin bookings GET:', e);
+  }
+
   const { searchParams } = new URL(req.url);
   const date = searchParams.get('date');
   const status = searchParams.get('status');
@@ -16,31 +22,67 @@ export async function GET(req: NextRequest) {
   const serviceId = searchParams.get('serviceId');
 
   try {
-    let sql = 'SELECT * FROM bookings WHERE 1=1';
-    const params: any[] = [];
+    let localBookings: any[] = [];
+    try {
+      let sql = 'SELECT * FROM bookings WHERE 1=1';
+      const params: any[] = [];
+      sql += ' ORDER BY date DESC, startTime DESC';
+      localBookings = await query.all(sql, params);
+    } catch (dbErr) {
+      console.warn('Local DB query notice:', dbErr);
+    }
 
+    let firestoreBookings: any[] = [];
+    try {
+      firestoreBookings = await getBookingsFromFirestore();
+    } catch (fsErr) {
+      console.warn('Firestore query notice in admin bookings:', fsErr);
+    }
+
+    // Merge without duplicates (keyed by bookingRef or id)
+    const map = new Map<string, any>();
+    for (const b of localBookings) {
+      const key = b.bookingRef || b.id;
+      if (key) map.set(key, b);
+    }
+    for (const b of firestoreBookings) {
+      const key = b.bookingRef || b.id;
+      if (key) {
+        // Firestore takes precedence for real-time status or adds missing items
+        map.set(key, { ...(map.get(key) || {}), ...b });
+      }
+    }
+
+    let allBookings = Array.from(map.values());
+
+    // Apply filters
     if (date) {
-      sql += ' AND date = ?';
-      params.push(date);
+      allBookings = allBookings.filter((b) => b.date === date);
     }
     if (status && status !== 'all') {
-      sql += ' AND status = ?';
-      params.push(status);
+      allBookings = allBookings.filter((b) => b.status === status);
     }
     if (serviceId) {
-      sql += ' AND serviceId = ?';
-      params.push(serviceId);
+      allBookings = allBookings.filter((b) => b.serviceId === serviceId);
     }
     if (search) {
-      sql += ' AND (customerName LIKE ? OR phone LIKE ? OR bookingRef LIKE ? OR serviceName LIKE ?)';
-      const term = `%${search}%`;
-      params.push(term, term, term, term);
+      const lower = search.toLowerCase();
+      allBookings = allBookings.filter((b) =>
+        (b.customerName && b.customerName.toLowerCase().includes(lower)) ||
+        (b.phone && b.phone.includes(lower)) ||
+        (b.bookingRef && b.bookingRef.toLowerCase().includes(lower)) ||
+        (b.serviceName && b.serviceName.toLowerCase().includes(lower))
+      );
     }
 
-    sql += ' ORDER BY date DESC, startTime DESC';
-    const bookings = await query.all(sql, params);
+    // Sort by date DESC, startTime DESC
+    allBookings.sort((a, b) => {
+      const cmp = (b.date || '').localeCompare(a.date || '');
+      if (cmp !== 0) return cmp;
+      return (b.startTime || '').localeCompare(a.startTime || '');
+    });
 
-    return NextResponse.json({ success: true, bookings });
+    return NextResponse.json({ success: true, bookings: allBookings });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
