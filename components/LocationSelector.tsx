@@ -12,7 +12,15 @@ interface LocationSelectorProps {
 export default function LocationSelector({ onSelectLocation }: LocationSelectorProps) {
   const [hovered, setHovered] = useState<'colombo' | 'negombo' | null>(null);
   const [selected, setSelected] = useState<'colombo' | 'negombo' | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.play().catch(() => {});
+  }, []);
 
   const handleSelect = (loc: 'colombo' | 'negombo') => {
     setSelected(loc);
@@ -133,18 +141,23 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           className="relative flex-1 min-h-[42svh] lg:min-h-0 cursor-pointer overflow-hidden group flex flex-col justify-end p-4 sm:p-8 lg:p-16 transition-all duration-300"
         >
-          {/* Background Visual - Fast & Elegant Progressive Visual */}
+          {/* Background Video Visual - Crystal Clear & Vivid */}
           <div className="absolute inset-0 z-0 overflow-hidden">
-            <motion.div
-              animate={{ scale: hovered === 'negombo' ? 1.08 : 1 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75')`,
-              }}
-            />
-            {/* Subtle Luxury Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-[#02180F]/50 to-[#02180F]/30 group-hover:via-[#02180F]/40 transition-colors duration-500" />
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75"
+              className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#02180F]"
+            >
+              <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+              <source src="/api/video" type="video/mp4" />
+            </video>
+            {/* Subtle Luxury Gradient Overlay (Keeps video bright & vibrant) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/15 group-hover:via-black/10 transition-colors duration-500" />
             <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
           </div>
 
