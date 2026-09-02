@@ -13,12 +13,10 @@ export default function SmoothScroll({ children }: { children?: React.ReactNode 
     if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
-      lerp: 0.085, // Butter-smooth linear momentum
-      wheelMultiplier: 1.12, // Natural, effortless wheel response
+      lerp: 0.1, // Smooth linear momentum on desktop wheel
+      wheelMultiplier: 1.1, // Natural wheel response
       smoothWheel: true,
-      syncTouch: true, // Buttery momentum on mobile & tablet touch screens
-      syncTouchLerp: 0.08,
-      touchInertiaExponent: 1.7,
+      syncTouch: false, // Keep touch scrolling 100% native on mobile so it NEVER clips or jumps
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       autoResize: true,

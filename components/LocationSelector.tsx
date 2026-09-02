@@ -52,7 +52,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
   };
 
   return (
-    <div className="fixed inset-0 z-[9000] bg-[#070709] flex flex-col overflow-hidden select-none h-[100svh]">
+    <div className="fixed inset-0 z-[9000] bg-[#070709] flex flex-col overflow-y-auto select-none min-h-[100svh]">
       
       {/* Top Floating Brand Header (Responsive & Clean) */}
       <div className="relative lg:absolute top-0 lg:top-8 left-0 lg:left-1/2 lg:-translate-x-1/2 z-30 w-full lg:w-auto flex flex-col items-center justify-center text-center px-4 py-3 sm:py-4 lg:py-0 bg-[#070709]/90 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none border-b lg:border-b-0 border-white/10 shrink-0">
@@ -66,7 +66,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           </div>
           <div className="flex items-center gap-2">
             <span className="h-[1px] w-6 bg-mosphere-gold/40" />
-            <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.3em] text-mosphere-gold font-medium">
+            <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.16em] sm:tracking-[0.3em] text-mosphere-gold font-medium">
               CHOOSE YOUR LOCATION
             </span>
             <span className="h-[1px] w-6 bg-mosphere-gold/40" />
@@ -89,7 +89,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
             opacity: selected === 'negombo' ? 0 : 1,
           }}
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-          className="relative flex-1 min-h-[46svh] lg:min-h-0 cursor-pointer overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 group flex flex-col justify-end p-6 sm:p-10 lg:p-16 transition-all duration-300"
+          className="relative flex-1 min-h-[42svh] lg:min-h-0 cursor-pointer overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 group flex flex-col justify-end p-4 sm:p-8 lg:p-16 transition-all duration-300"
         >
           {/* Background Visual */}
           <div className="absolute inset-0 z-0">
@@ -161,7 +161,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
             opacity: selected === 'colombo' ? 0 : 1,
           }}
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-          className="relative flex-1 min-h-[46svh] lg:min-h-0 cursor-pointer overflow-hidden group flex flex-col justify-end p-6 sm:p-10 lg:p-16 transition-all duration-300"
+          className="relative flex-1 min-h-[42svh] lg:min-h-0 cursor-pointer overflow-hidden group flex flex-col justify-end p-4 sm:p-8 lg:p-16 transition-all duration-300"
         >
           {/* Background Video Visual - Crystal Clear & Vivid */}
           <div className="absolute inset-0 z-0 overflow-hidden">
