@@ -17,9 +17,41 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
     video.muted = true;
     video.defaultMuted = true;
-    video.play().catch(() => {});
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+
+    const tryPlay = () => {
+      video.muted = true;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          const unlock = () => {
+            video.muted = true;
+            video.play().catch(() => {});
+            window.removeEventListener('click', unlock);
+            window.removeEventListener('touchstart', unlock);
+            window.removeEventListener('pointerdown', unlock);
+            window.removeEventListener('scroll', unlock);
+          };
+          window.addEventListener('click', unlock, { once: true });
+          window.addEventListener('touchstart', unlock, { passive: true, once: true });
+          window.addEventListener('pointerdown', unlock, { passive: true, once: true });
+          window.addEventListener('scroll', unlock, { passive: true, once: true });
+        });
+      }
+    };
+
+    if (video.readyState >= 2) {
+      tryPlay();
+    } else {
+      video.addEventListener('loadeddata', tryPlay, { once: true });
+      video.addEventListener('canplay', tryPlay, { once: true });
+    }
+    tryPlay();
   }, []);
 
   const handleSelect = (loc: 'colombo' | 'negombo') => {
@@ -131,8 +163,20 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
              OPTION 02: NEGOMBO (Official Deep Pine Green & Satin Gold)
              ============================================================ */}
         <motion.div
-          onMouseEnter={() => setHovered('negombo')}
+          onMouseEnter={() => {
+            setHovered('negombo');
+            if (videoRef.current) {
+              videoRef.current.muted = true;
+              videoRef.current.play().catch(() => {});
+            }
+          }}
           onMouseLeave={() => setHovered(null)}
+          onTouchStart={() => {
+            if (videoRef.current) {
+              videoRef.current.muted = true;
+              videoRef.current.play().catch(() => {});
+            }
+          }}
           onClick={() => handleSelect('negombo')}
           animate={{
             flex: selected === 'negombo' ? 10 : selected === 'colombo' ? 0 : hovered === 'negombo' ? 1.25 : hovered === 'colombo' ? 0.75 : 1,
@@ -145,16 +189,16 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
               ref={videoRef}
+              src="/videos/negombo-hero-bg.mp4"
               autoPlay
               loop
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
               poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75"
               className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#02180F]"
             >
               <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
-              <source src="/api/video" type="video/mp4" />
             </video>
             {/* Subtle Luxury Gradient Overlay (Keeps video bright & vibrant) */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/15 group-hover:via-black/10 transition-colors duration-500" />

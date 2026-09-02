@@ -18,44 +18,60 @@ export default function NegomboHero() {
     video.setAttribute('webkit-playsinline', '');
 
     const tryPlay = () => {
+      video.muted = true;
       const p = video.play();
       if (p !== undefined) {
         p.catch(() => {
           const unlock = () => {
+            video.muted = true;
             video.play().catch(() => {});
             window.removeEventListener('click', unlock);
             window.removeEventListener('touchstart', unlock);
+            window.removeEventListener('pointerdown', unlock);
             window.removeEventListener('scroll', unlock);
           };
           window.addEventListener('click', unlock, { once: true });
-          window.addEventListener('touchstart', unlock, { once: true });
-          window.addEventListener('scroll', unlock, { once: true });
+          window.addEventListener('touchstart', unlock, { passive: true, once: true });
+          window.addEventListener('pointerdown', unlock, { passive: true, once: true });
+          window.addEventListener('scroll', unlock, { passive: true, once: true });
         });
       }
     };
 
+    if (video.readyState >= 2) {
+      tryPlay();
+    } else {
+      video.addEventListener('loadeddata', tryPlay, { once: true });
+      video.addEventListener('canplay', tryPlay, { once: true });
+    }
     tryPlay();
   }, []);
 
   return (
     <section
       id="hero"
+      onTouchStart={() => {
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          videoRef.current.play().catch(() => {});
+        }
+      }}
       className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-4 sm:px-8 lg:px-16 bg-black"
     >
       {/* Background Video - 100% Crystal Clear & Vivid */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           ref={videoRef}
+          src="/videos/negombo-hero-bg.mp4"
           autoPlay
           loop
           muted
           playsInline
-          preload="none"
+          preload="auto"
           poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#02180F]"
         >
           <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
-          <source src="/api/video" type="video/mp4" />
         </video>
 
         {/* Minimal Luxury Vignette (Keeps Video Ultra-Bright & Clear) */}
