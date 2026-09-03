@@ -228,10 +228,15 @@ export class BookingService {
 
       const whatsappUrl = this.generateWhatsAppUrl({
         customerName: trimmedName,
+        phone: trimmedPhone,
         serviceName,
         date,
         startTime,
-        bookingRef
+        duration,
+        price,
+        location,
+        bookingRef,
+        notes: trimmedNotes
       });
 
       return {
@@ -362,9 +367,27 @@ export class BookingService {
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${datesParam}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(salonConfig.address)}`;
   }
 
-  generateWhatsAppUrl({ customerName, serviceName, date, startTime, bookingRef }: any) {
-    const text = `Hello Mosphere, I have confirmed my appointment for *${serviceName}* on *${date}* at *${startTime}* (Reference: *${bookingRef}*). Guest: *${customerName}*. Looking forward to my visit!`;
-    return `https://wa.me/${salonConfig.whatsapp}?text=${encodeURIComponent(text)}`;
+  generateWhatsAppUrl({ customerName, phone, serviceName, date, startTime, duration, price, location, bookingRef, notes }: any) {
+    const loc = location === 'negombo' ? 'Negombo' : 'Colombo / Nawala';
+    const num = location === 'negombo' ? salonConfig.locations.negombo.whatsapp : salonConfig.locations.colombo.whatsapp;
+    const msg = [
+      `*NEW APPOINTMENT RESERVATION*`,
+      `----------------------------------`,
+      `*Ref:* ${bookingRef}`,
+      `*Guest:* ${customerName}`,
+      phone ? `*Phone:* ${phone}` : null,
+      `*Branch:* ${loc}`,
+      `*Service:* ${serviceName}`,
+      `*Date:* ${date}`,
+      `*Time:* ${startTime}`,
+      duration ? `*Duration:* ${duration} mins` : null,
+      price ? `*Estimated:* LKR ${Number(price).toLocaleString()}` : null,
+      notes ? `*Notes:* ${notes}` : null,
+      `----------------------------------`,
+      `_Sent automatically from Mosphere Online Concierge_`
+    ].filter(Boolean).join('\n');
+
+    return `https://wa.me/${num || salonConfig.whatsapp}?text=${encodeURIComponent(msg)}`;
   }
 }
 

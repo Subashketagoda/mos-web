@@ -379,8 +379,376 @@ body.admin-body {
 }
 
 /* =========================================================
-   MOBILE & TABLET RESPONSIVE ENHANCEMENTS
+   VISUAL CALENDAR & SCHEDULE COMPONENT STYLES
    ========================================================= */
+
+/* View Toggle Pill */
+.view-toggle-pill {
+  display: flex;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 3px;
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-toggle-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.view-toggle-btn.active {
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--gold-light);
+  font-weight: 600;
+  border: 1px solid var(--gold-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Calendar Nav Header */
+.cal-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-dark);
+  margin-bottom: 20px;
+}
+
+.cal-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cal-month-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  min-width: 170px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.legend-dot {
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot.confirmed { color: #10b981; }
+.legend-dot.rescheduled { color: #f59e0b; }
+.legend-dot.completed { color: #3b82f6; }
+.legend-dot.cancelled { color: #ef4444; }
+
+/* Calendar 2-Column Layout */
+.calendar-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Calendar Grid Container */
+.calendar-grid-container {
+  background: rgba(10, 10, 14, 0.6);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.calendar-weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: rgba(20, 20, 26, 0.9);
+  border-bottom: 1px solid var(--border-dark);
+  text-align: center;
+}
+
+.cal-weekday {
+  padding: 12px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.cal-weekday:first-child,
+.cal-weekday:last-child {
+  color: var(--gold-primary);
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--border-dark);
+  gap: 1px; /* Creates clean cell borders */
+}
+
+/* Individual Day Cell */
+.cal-day-cell {
+  background: #0d0d12;
+  min-height: 100px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.cal-day-cell:hover {
+  background: #14141c;
+}
+
+.cal-day-cell.is-other-month {
+  background: rgba(8, 8, 10, 0.6);
+  opacity: 0.4;
+}
+
+.cal-day-cell.is-today {
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.cal-day-cell.is-selected {
+  background: rgba(212, 175, 55, 0.12);
+  outline: 2px solid var(--gold-primary);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+.cal-day-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.cal-day-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.cal-day-cell.is-today .cal-day-num {
+  background: var(--gold-primary);
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.cal-count-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold-light);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+}
+
+/* Appointment Chip inside Calendar Cell */
+.cal-chips-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.cal-booking-chip {
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-left: 2.5px solid transparent;
+  transition: transform 0.1s ease;
+}
+
+.cal-booking-chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.15);
+}
+
+.cal-booking-chip.confirmed {
+  background: rgba(16, 185, 129, 0.16);
+  color: #6ee7b7;
+  border-left-color: #10b981;
+}
+
+.cal-booking-chip.rescheduled {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+  border-left-color: #f59e0b;
+}
+
+.cal-booking-chip.completed {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+  border-left-color: #3b82f6;
+}
+
+.cal-booking-chip.cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border-left-color: #ef4444;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.cal-chip-time {
+  font-weight: 700;
+  font-size: 9.5px;
+}
+
+.cal-chip-more {
+  font-size: 9.5px;
+  color: var(--gold-light);
+  font-weight: 600;
+  padding: 1px 4px;
+}
+
+/* Side Day Schedule Panel */
+.cal-day-schedule-panel {
+  background: rgba(14, 14, 18, 0.85);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 90px;
+}
+
+.day-schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-dark);
+  margin-bottom: 14px;
+}
+
+.day-schedule-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.day-schedule-card {
+  background: rgba(22, 22, 30, 0.7);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.day-schedule-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--gold-primary);
+}
+
+.day-schedule-card.confirmed::before { background: #10b981; }
+.day-schedule-card.rescheduled::before { background: #f59e0b; }
+.day-schedule-card.completed::before { background: #3b82f6; }
+.day-schedule-card.cancelled::before { background: #ef4444; }
+
+.day-schedule-card:hover {
+  background: rgba(28, 28, 38, 0.9);
+  border-color: var(--gold-border);
+}
+
+.day-card-time {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.day-card-customer {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.day-card-service {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.day-card-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUTS
+   ========================================================= */
+@media (max-width: 1100px) {
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .admin-layout {
     flex-direction: column;
@@ -472,6 +840,16 @@ body.admin-body {
   .login-modal-overlay {
     padding: 14px;
   }
+
+  .cal-day-cell {
+    min-height: 70px;
+    padding: 4px;
+  }
+
+  .cal-booking-chip {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -485,4 +863,5 @@ body.admin-body {
     font-size: 16px !important; /* Prevents iOS auto-zoom */
   }
 }
+
 

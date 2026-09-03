@@ -309,6 +309,38 @@ export default function BookingSection({ initialSelectedService, initialLocation
         setSubmitting(false);
         setStep(5);
 
+        // Auto-open WhatsApp with formatted booking details
+        try {
+          const locConfig = activeLocation === 'negombo' ? salonConfig.locations.negombo : salonConfig.locations.colombo;
+          const targetWhatsApp = locConfig?.whatsapp || salonConfig.whatsapp;
+          const branchName = activeLocation === 'negombo' ? 'Negombo Branch' : 'Colombo / Nawala Branch';
+          const msg = [
+            `*NEW APPOINTMENT RESERVATION*`,
+            `----------------------------------`,
+            `*Ref:* ${confirmed.bookingRef}`,
+            `*Guest:* ${confirmed.customerName}`,
+            `*Phone:* ${confirmed.phone}`,
+            confirmed.email ? `*Email:* ${confirmed.email}` : null,
+            `*Branch:* ${branchName}`,
+            `*Service:* ${confirmed.serviceName}`,
+            `*Date:* ${confirmed.date}`,
+            `*Time:* ${confirmed.startTime}`,
+            `*Duration:* ${confirmed.duration} mins`,
+            `*Estimated:* LKR ${confirmed.price?.toLocaleString?.() || confirmed.price}`,
+            confirmed.notes ? `*Notes:* ${confirmed.notes}` : null,
+            `----------------------------------`,
+            `_Sent automatically from Mosphere Online Concierge_`
+          ].filter(Boolean).join('\n');
+
+          const waUrl = `https://wa.me/${targetWhatsApp}?text=${encodeURIComponent(msg)}`;
+          // Open WhatsApp in a new tab/app immediately
+          if (typeof window !== 'undefined') {
+            window.open(waUrl, '_blank');
+          }
+        } catch (waErr) {
+          console.warn('WhatsApp auto-redirect notice:', waErr);
+        }
+
         // Background sync to Cloud Firestore (non-blocking, safe from undefined values)
         try {
           syncBookingToFirestore({
@@ -363,6 +395,37 @@ export default function BookingSection({ initialSelectedService, initialLocation
         setConfirmedBooking(fallbackBooking);
         setSubmitting(false);
         setStep(5);
+
+        // Auto-open WhatsApp with formatted fallback booking details
+        try {
+          const locConfig = activeLocation === 'negombo' ? salonConfig.locations.negombo : salonConfig.locations.colombo;
+          const targetWhatsApp = locConfig?.whatsapp || salonConfig.whatsapp;
+          const branchName = activeLocation === 'negombo' ? 'Negombo Branch' : 'Colombo / Nawala Branch';
+          const msg = [
+            `*NEW APPOINTMENT RESERVATION*`,
+            `----------------------------------`,
+            `*Ref:* ${fallbackBooking.bookingRef}`,
+            `*Guest:* ${fallbackBooking.customerName}`,
+            `*Phone:* ${fallbackBooking.phone}`,
+            fallbackBooking.email ? `*Email:* ${fallbackBooking.email}` : null,
+            `*Branch:* ${branchName}`,
+            `*Service:* ${fallbackBooking.serviceName}`,
+            `*Date:* ${fallbackBooking.date}`,
+            `*Time:* ${fallbackBooking.startTime}`,
+            `*Duration:* ${fallbackBooking.duration} mins`,
+            `*Estimated:* LKR ${fallbackBooking.price?.toLocaleString?.() || fallbackBooking.price}`,
+            fallbackBooking.notes ? `*Notes:* ${fallbackBooking.notes}` : null,
+            `----------------------------------`,
+            `_Sent automatically from Mosphere Online Concierge_`
+          ].filter(Boolean).join('\n');
+
+          const waUrl = `https://wa.me/${targetWhatsApp}?text=${encodeURIComponent(msg)}`;
+          if (typeof window !== 'undefined') {
+            window.open(waUrl, '_blank');
+          }
+        } catch (waErr) {
+          console.warn('WhatsApp auto-redirect notice:', waErr);
+        }
 
         try {
           syncBookingToFirestore(fallbackBooking);
@@ -1029,15 +1092,33 @@ export default function BookingSection({ initialSelectedService, initialLocation
                   )}
 
                   <a
-                    href={`https://wa.me/${salonConfig.whatsapp}?text=${encodeURIComponent(
-                      `Hello Mosphere, I have confirmed booking ${confirmedBooking.bookingRef} for ${confirmedBooking.serviceName} on ${confirmedBooking.date} at ${confirmedBooking.startTime}.`
+                    href={`https://wa.me/${
+                      (activeLocation === 'negombo' ? salonConfig.locations.negombo.whatsapp : salonConfig.locations.colombo.whatsapp) || salonConfig.whatsapp
+                    }?text=${encodeURIComponent(
+                      [
+                        `*CONFIRMED APPOINTMENT RESERVATION*`,
+                        `----------------------------------`,
+                        `*Ref:* ${confirmedBooking.bookingRef}`,
+                        `*Guest:* ${confirmedBooking.customerName}`,
+                        `*Phone:* ${confirmedBooking.phone}`,
+                        confirmedBooking.email ? `*Email:* ${confirmedBooking.email}` : null,
+                        `*Branch:* ${activeLocation === 'negombo' ? 'Negombo' : 'Colombo / Nawala'}`,
+                        `*Service:* ${confirmedBooking.serviceName}`,
+                        `*Date:* ${confirmedBooking.date}`,
+                        `*Time:* ${confirmedBooking.startTime}`,
+                        `*Duration:* ${confirmedBooking.duration} mins`,
+                        `*Estimated:* LKR ${confirmedBooking.price?.toLocaleString?.() || confirmedBooking.price}`,
+                        confirmedBooking.notes ? `*Notes:* ${confirmedBooking.notes}` : null,
+                        `----------------------------------`,
+                        `_Sent from Mosphere Online Concierge_`
+                      ].filter(Boolean).join('\n')
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-3 rounded-full text-xs font-semibold tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 shadow-md transition-all uppercase flex items-center gap-2"
+                    className="px-6 py-3 rounded-full text-xs font-bold tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.7)] transition-all uppercase flex items-center gap-2"
                   >
                     <MessageSquare className="w-4 h-4" />
-                    <span>WHATSAPP US</span>
+                    <span>NOTIFY SALON ON WHATSAPP</span>
                   </a>
 
                   <a

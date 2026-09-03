@@ -100,7 +100,6 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `
-    <span>${type === 'error' ? '⚠️' : type === 'success' ? '✨' : 'ℹ️'}</span>
     <span>${message}</span>
   `;
   el.toastContainer.appendChild(toast);
@@ -509,7 +508,7 @@ async function submitBooking() {
     showToast('Network error occurred. Please try again.', 'error');
   } finally {
     el.confirmBookingBtn.disabled = false;
-    el.confirmBookingBtn.innerHTML = `<span>Confirm Appointment</span> <span>✨</span>`;
+    el.confirmBookingBtn.innerHTML = `<span>Confirm Appointment</span>`;
   }
 }
 
@@ -531,6 +530,13 @@ function showConfirmedScreen(booking) {
   if (booking.whatsappUrl) {
     el.confirmWhatsAppBtn.href = booking.whatsappUrl;
     el.confirmWhatsAppBtn.target = '_blank';
+    
+    // Automatically open WhatsApp in new tab with the booking message
+    try {
+      window.open(booking.whatsappUrl, '_blank');
+    } catch (e) {
+      console.warn('Auto open WhatsApp notice:', e);
+    }
   }
 
   // Set ICS Download Button

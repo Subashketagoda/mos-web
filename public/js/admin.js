@@ -17,6 +17,12 @@ const adminState = {
   filterStatus: 'all',
   filterSearch: '',
   
+  // Visual Calendar State
+  currentCalMonth: new Date().getMonth(),
+  currentCalYear: new Date().getFullYear(),
+  selectedCalDate: new Date().toISOString().split('T')[0],
+  viewMode: 'calendar',
+  
   // Selected appointment for modals
   currentAppointment: null,
   rescheduleSlots: []
@@ -43,6 +49,7 @@ const aEl = {
   rescheduleModal: document.getElementById('rescheduleModal'),
   serviceModal: document.getElementById('serviceModal'),
   newBookingModal: document.getElementById('newBookingModal'),
+  appointmentDetailModal: document.getElementById('appointmentDetailModal'),
   
   toastContainer: document.getElementById('adminToastContainer')
 };
@@ -52,7 +59,7 @@ function adminToast(msg, type = 'info') {
   if (!aEl.toastContainer) return;
   const t = document.createElement('div');
   t.className = `toast ${type}`;
-  t.innerHTML = `<span>${type === 'error' ? '⚠️' : '✨'}</span><span>${msg}</span>`;
+  t.innerHTML = `<span>${msg}</span>`;
   aEl.toastContainer.appendChild(t);
   setTimeout(() => {
     t.style.opacity = '0';
@@ -224,9 +231,9 @@ async function loadStats() {
 async function loadAppointments() {
   const tbody = document.getElementById('appointmentsTbody');
   const todayTbody = document.getElementById('todayScheduleTbody');
-  if (!tbody) return;
-
-  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Loading appointments...</td></tr>`;
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Loading appointments...</td></tr>`;
+  }
 
   try {
     const params = new URLSearchParams();
@@ -237,9 +244,16 @@ async function loadAppointments() {
     const data = await adminFetch(`/api/admin/appointments?${params.toString()}`);
     if (data.success) {
       adminState.appointments = data.bookings;
-      renderAppointmentsTable(data.bookings, tbody);
+      
+      // Render Table
+      if (tbody) {
+        renderAppointmentsTable(data.bookings, tbody);
+      }
 
-      // Render today's schedule on dashboard
+      // Render Visual Calendar
+      renderCalendar();
+
+      // Render today's schedule on dashboard overview
       if (todayTbody) {
         const todayStr = new Date().toISOString().split('T')[0];
         const todayItems = data.bookings.filter(b => b.date === todayStr);
@@ -247,9 +261,302 @@ async function loadAppointments() {
       }
     }
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--accent-danger); text-align:center;">Failed to load appointments.</td></tr>`;
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" style="color:var(--accent-danger); text-align:center;">Failed to load appointments.</td></tr>`;
+    }
   }
 }
+
+// ---------------------------------------------------------------------------
+// VISUAL CALENDAR ENGINE
+// ---------------------------------------------------------------------------
+
+const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+window.switchAppointmentsView = function(mode) {
+  adminState.viewMode = mode;
+  const calView = document.getElementById('appointmentsCalendarView');
+  const tblView = document.getElementById('appointmentsTableView');
+  const btnCal = document.getElementById('btnViewCalendar');
+  const btnTbl = document.getElementById('btnViewTable');
+
+  if (mode === 'calendar') {
+    if (calView) calView.style.display = 'block';
+    if (tblView) tblView.style.display = 'none';
+    if (btnCal) btnCal.classList.add('active');
+    if (btnTbl) btnTbl.classList.remove('active');
+    renderCalendar();
+  } else {
+    if (calView) calView.style.display = 'none';
+    if (tblView) tblView.style.display = 'block';
+    if (btnCal) btnCal.classList.remove('active');
+    if (btnTbl) btnTbl.classList.add('active');
+  }
+};
+
+window.navCalendarMonth = function(delta) {
+  adminState.currentCalMonth += delta;
+  if (adminState.currentCalMonth < 0) {
+    adminState.currentCalMonth = 11;
+    adminState.currentCalYear -= 1;
+  } else if (adminState.currentCalMonth > 11) {
+    adminState.currentCalMonth = 0;
+    adminState.currentCalYear += 1;
+  }
+  renderCalendar();
+};
+
+window.navCalendarToday = function() {
+  const now = new Date();
+  adminState.currentCalMonth = now.getMonth();
+  adminState.currentCalYear = now.getFullYear();
+  adminState.selectedCalDate = now.toISOString().split('T')[0];
+  renderCalendar();
+};
+
+window.selectCalendarDate = function(dateStr) {
+  adminState.selectedCalDate = dateStr;
+  
+  // Highlight cell
+  document.querySelectorAll('.cal-day-cell').forEach(c => {
+    if (c.getAttribute('data-date') === dateStr) {
+      c.classList.add('is-selected');
+    } else {
+      c.classList.remove('is-selected');
+    }
+  });
+
+  renderDaySchedule(dateStr);
+};
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarMonthGrid');
+  const titleEl = document.getElementById('calMonthYearTitle');
+  if (!grid || !titleEl) return;
+
+  const month = adminState.currentCalMonth;
+  const year = adminState.currentCalYear;
+  titleEl.textContent = `${monthNames[month]} ${year}`;
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (!adminState.selectedCalDate) {
+    adminState.selectedCalDate = todayStr;
+  }
+
+  // Group appointments by date
+  const apptMap = new Map();
+  for (const b of adminState.appointments) {
+    if (!apptMap.has(b.date)) apptMap.set(b.date, []);
+    apptMap.get(b.date).push(b);
+  }
+
+  // First day of current month & total days
+  const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Sun
+  const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+  let html = '';
+
+  // 1. Prev month trailing days
+  for (let i = firstDayIndex - 1; i >= 0; i--) {
+    const prevDay = prevMonthTotalDays - i;
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevYear = month === 0 ? year - 1 : year;
+    const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(prevDay).padStart(2, '0')}`;
+    const dayAppts = apptMap.get(dateStr) || [];
+    
+    html += renderDayCellHtml(prevDay, dateStr, dayAppts, true, todayStr);
+  }
+
+  // 2. Current month days
+  for (let day = 1; day <= totalDaysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayAppts = apptMap.get(dateStr) || [];
+    
+    html += renderDayCellHtml(day, dateStr, dayAppts, false, todayStr);
+  }
+
+  // 3. Next month leading days to complete 35 or 42 grid cells
+  const totalCellsSoFar = firstDayIndex + totalDaysInMonth;
+  const targetTotalCells = totalCellsSoFar <= 35 ? 35 : 42;
+  const nextMonthDays = targetTotalCells - totalCellsSoFar;
+
+  for (let day = 1; day <= nextMonthDays; day++) {
+    const nextMonth = month === 11 ? 0 : month + 1;
+    const nextYear = month === 11 ? year + 1 : year;
+    const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayAppts = apptMap.get(dateStr) || [];
+
+    html += renderDayCellHtml(day, dateStr, dayAppts, true, todayStr);
+  }
+
+  grid.innerHTML = html;
+
+  // Render Day Schedule for selected date
+  renderDaySchedule(adminState.selectedCalDate);
+}
+
+function renderDayCellHtml(dayNum, dateStr, appts, isOtherMonth, todayStr) {
+  const isToday = dateStr === todayStr;
+  const isSelected = dateStr === adminState.selectedCalDate;
+  const count = appts.length;
+
+  let classes = ['cal-day-cell'];
+  if (isOtherMonth) classes.push('is-other-month');
+  if (isToday) classes.push('is-today');
+  if (isSelected) classes.push('is-selected');
+
+  // Chips preview (max 3)
+  let chipsHtml = '';
+  const maxVisibleChips = 3;
+  const visibleAppts = appts.slice(0, maxVisibleChips);
+
+  visibleAppts.forEach(a => {
+    const statusClass = (a.status || 'confirmed').toLowerCase();
+    chipsHtml += `
+      <div class="cal-booking-chip ${statusClass}" onclick="event.stopPropagation(); openAppointmentDetailModal('${a.id}')" title="${a.customerName} - ${a.serviceName} (${a.startTime})">
+        <span class="cal-chip-time">${a.startTime}</span>
+        <span>${a.customerName.split(' ')[0]} • ${a.serviceName}</span>
+      </div>
+    `;
+  });
+
+  if (appts.length > maxVisibleChips) {
+    chipsHtml += `<div class="cal-chip-more">+${appts.length - maxVisibleChips} more</div>`;
+  }
+
+  return `
+    <div class="${classes.join(' ')}" data-date="${dateStr}" onclick="selectCalendarDate('${dateStr}')">
+      <div class="cal-day-top">
+        <span class="cal-day-num">${dayNum}</span>
+        ${count > 0 ? `<span class="cal-count-badge">${count}</span>` : ''}
+      </div>
+      <div class="cal-chips-container">
+        ${chipsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderDaySchedule(dateStr) {
+  const listEl = document.getElementById('dayScheduleItems');
+  const labelEl = document.getElementById('selectedDayLabel');
+  const subEl = document.getElementById('selectedDaySub');
+  if (!listEl) return;
+
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const formattedDay = dateObj.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const dayAppts = adminState.appointments.filter(a => a.date === dateStr);
+  dayAppts.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+
+  if (labelEl) labelEl.textContent = formattedDay;
+  if (subEl) subEl.textContent = `${dayAppts.length} Reservation${dayAppts.length === 1 ? '' : 's'} scheduled`;
+
+  if (dayAppts.length === 0) {
+    listEl.innerHTML = `
+      <div style="text-align:center; padding: 32px 16px; color: var(--text-muted); background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); border: 1px dashed var(--border-dark);">
+        <div style="font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 4px;">No Bookings Scheduled</div>
+        <p style="font-size: 11px; margin-bottom: 14px;">This date has full availability on the calendar.</p>
+        <button type="button" onclick="openManualBookingForDate('${dateStr}')" class="btn btn-primary btn-sm" style="font-size: 11px;">
+          <span>+ Book Walk-in on ${dateStr}</span>
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = dayAppts.map(b => {
+    const statusClass = (b.status || 'confirmed').toLowerCase();
+    const phoneClean = (b.phone || '').replace(/[^0-9]/g, '');
+    const waText = encodeURIComponent(`Hello ${b.customerName}, this is Mosphere Concierge regarding your appointment for ${b.serviceName} on ${b.date} at ${b.startTime}.`);
+
+    return `
+      <div class="day-schedule-card ${statusClass}" onclick="openAppointmentDetailModal('${b.id}')" style="cursor: pointer;">
+        <div class="day-card-time">
+          <span>${b.startTime} - ${b.endTime}</span>
+          <span class="status-pill ${statusClass}" style="font-size: 10px; padding: 2px 8px;">${b.status}</span>
+        </div>
+        <div class="day-card-customer">${b.customerName}</div>
+        <div class="day-card-service">${b.serviceName} • ${b.duration} mins (₹${b.price})</div>
+        ${b.notes ? `<div style="font-size: 11px; color: var(--gold-light); margin-bottom: 6px; font-style: italic;">"${b.notes}"</div>` : ''}
+        
+        <div class="day-card-actions" onclick="event.stopPropagation()">
+          ${b.status !== 'completed' && b.status !== 'cancelled' ? `
+            <button class="btn-icon" title="Mark Done" onclick="handleMarkCompleted('${b.id}')">Done</button>
+            <button class="btn-icon" title="Reschedule" onclick="openRescheduleModal('${b.id}')">Reschedule</button>
+            <button class="btn-icon danger" title="Cancel" onclick="handleCancelAppointment('${b.id}')">Cancel</button>
+          ` : ''}
+          <a class="btn-icon" title="WhatsApp" href="https://wa.me/${phoneClean}?text=${waText}" target="_blank">WhatsApp</a>
+          <a class="btn-icon" title="Call" href="tel:${b.phone}">Call</a>
+          <button class="btn-icon" title="Quick Details" onclick="openAppointmentDetailModal('${b.id}')">View</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.openManualBookingForDate = function(dateStr) {
+  const targetDate = dateStr || adminState.selectedCalDate || new Date().toISOString().split('T')[0];
+  openManualBookingModal();
+  const dateInput = document.getElementById('manualBookingDate');
+  if (dateInput) {
+    dateInput.value = targetDate;
+    handleManualDateOrServiceChange();
+  }
+};
+
+window.openAppointmentDetailModal = function(id) {
+  const appt = adminState.appointments.find(a => a.id === id);
+  if (!appt || !aEl.appointmentDetailModal) return;
+
+  document.getElementById('detailCustomerName').textContent = appt.customerName;
+  document.getElementById('detailBookingRef').textContent = appt.bookingRef;
+  document.getElementById('detailStatusBadge').innerHTML = `<span class="status-pill ${appt.status.toLowerCase()}">${appt.status}</span>`;
+  document.getElementById('detailPrice').textContent = `₹${appt.price}`;
+  document.getElementById('detailDateTime').textContent = `${appt.date} • ${appt.startTime} - ${appt.endTime}`;
+  document.getElementById('detailDuration').textContent = `Estimated duration: ${appt.duration} minutes`;
+  document.getElementById('detailServiceName').textContent = appt.serviceName;
+  document.getElementById('detailLocation').textContent = `Location: ${appt.location ? appt.location.toUpperCase() : 'COLOMBO'}`;
+  document.getElementById('detailPhone').textContent = appt.phone;
+  document.getElementById('detailNotes').textContent = appt.notes || 'No special notes provided.';
+
+  const phoneClean = appt.phone.replace(/[^0-9]/g, '');
+  const waText = encodeURIComponent(`Hello ${appt.customerName}, this is Mosphere Concierge regarding your appointment for ${appt.serviceName} on ${appt.date} at ${appt.startTime}.`);
+  document.getElementById('detailWhatsAppBtn').href = `https://wa.me/${phoneClean}?text=${waText}`;
+  document.getElementById('detailCallBtn').href = `tel:${appt.phone}`;
+
+  // Action Buttons
+  const actionsContainer = document.getElementById('detailActionButtons');
+  if (actionsContainer) {
+    let btns = `<button type="button" class="btn btn-secondary btn-modal-cancel">Close</button>`;
+    if (appt.status !== 'completed' && appt.status !== 'cancelled') {
+      btns += `
+        <button type="button" class="btn btn-secondary" onclick="aEl.appointmentDetailModal.classList.remove('active'); openRescheduleModal('${appt.id}')">
+          Reschedule
+        </button>
+        <button type="button" class="btn btn-primary" onclick="aEl.appointmentDetailModal.classList.remove('active'); handleMarkCompleted('${appt.id}')">
+          Mark Completed
+        </button>
+        <button type="button" class="btn btn-outline-gold" style="color:var(--accent-danger); border-color:var(--accent-danger);" onclick="aEl.appointmentDetailModal.classList.remove('active'); handleCancelAppointment('${appt.id}')">
+          Cancel
+        </button>
+      `;
+    }
+    actionsContainer.innerHTML = btns;
+  }
+
+  aEl.appointmentDetailModal.classList.add('active');
+};
 
 function renderAppointmentsTable(items, targetTbody, isCompact = false) {
   if (items.length === 0) {
@@ -291,12 +598,12 @@ function renderAppointmentsTable(items, targetTbody, isCompact = false) {
         <td>
           <div class="table-actions">
             ${b.status !== 'completed' && b.status !== 'cancelled' ? `
-              <button class="btn-icon" title="Mark Completed" onclick="handleMarkCompleted('${b.id}')">✓</button>
-              <button class="btn-icon" title="Reschedule" onclick="openRescheduleModal('${b.id}')">📅</button>
-              <button class="btn-icon danger" title="Cancel Appointment" onclick="handleCancelAppointment('${b.id}')">✕</button>
+              <button class="btn-icon" title="Mark Completed" onclick="handleMarkCompleted('${b.id}')">Done</button>
+              <button class="btn-icon" title="Reschedule" onclick="openRescheduleModal('${b.id}')">Reschedule</button>
+              <button class="btn-icon danger" title="Cancel Appointment" onclick="handleCancelAppointment('${b.id}')">Cancel</button>
             ` : ''}
-            <a class="btn-icon" title="WhatsApp Customer" href="https://wa.me/${phoneClean}?text=${waText}" target="_blank">💬</a>
-            <a class="btn-icon" title="Call Customer" href="tel:${b.phone}">📞</a>
+            <a class="btn-icon" title="WhatsApp Customer" href="https://wa.me/${phoneClean}?text=${waText}" target="_blank">WhatsApp</a>
+            <a class="btn-icon" title="Call Customer" href="tel:${b.phone}">Call</a>
           </div>
         </td>
       </tr>
@@ -736,10 +1043,18 @@ function setupEventListeners() {
     });
   }
 
-  // Modal close buttons
+  // Modal close buttons and overlay clicks
   document.querySelectorAll('.modal-close-btn, .btn-modal-cancel').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.admin-modal-overlay').forEach(m => m.classList.remove('active'));
+    });
+  });
+
+  document.querySelectorAll('.admin-modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('active');
+      }
     });
   });
 

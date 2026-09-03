@@ -66,28 +66,28 @@
 
       <nav class="sidebar-menu">
         <button class="menu-item active" data-tab="dashboard">
-          <span>📊</span> <span>Dashboard</span>
+          <span>Dashboard</span>
         </button>
         <button class="menu-item" data-tab="appointments">
-          <span>📅</span> <span>Appointments</span>
+          <span>Appointments</span>
         </button>
         <button class="menu-item" data-tab="services">
-          <span>✂️</span> <span>Services & Menu</span>
+          <span>Services & Menu</span>
         </button>
         <button class="menu-item" data-tab="settings">
-          <span>⚙️</span> <span>Business Hours</span>
+          <span>Business Hours</span>
         </button>
         <button class="menu-item" data-tab="calendar">
-          <span>🌐</span> <span>Google Calendar</span>
+          <span>Google Calendar</span>
         </button>
       </nav>
 
       <div class="sidebar-footer">
         <a href="/" target="_blank" class="menu-item" style="color: var(--gold-light);">
-          <span>↗️</span> <span>View Customer Site</span>
+          <span>View Customer Site</span>
         </a>
         <button id="logoutBtn" class="menu-item" style="color: var(--accent-danger); margin-top: 6px;">
-          <span>🚪</span> <span>Sign Out</span>
+          <span>Sign Out</span>
         </button>
       </div>
     </aside>
@@ -107,7 +107,7 @@
             <span>+ New Appointment</span>
           </button>
           <div style="font-size: 13px; color: var(--text-main); font-weight: 500;">
-            👤 <span id="adminUserDisplay">Admin</span>
+            <span id="adminUserDisplay">Admin</span>
           </div>
         </div>
       </header>
@@ -188,12 +188,22 @@
         <div id="tab_appointments" class="admin-tab-panel" style="display: none;">
           <div class="section-header-row">
             <div>
-              <h2 style="font-size: 24px; color: #fff;">Appointments & Schedule</h2>
-              <p style="font-size: 13px; color: var(--text-muted);">Manage, reschedule, cancel, or complete customer reservations.</p>
+              <h2 style="font-size: 24px; color: #fff;">Appointments & Calendar Schedule</h2>
+              <p style="font-size: 13px; color: var(--text-muted);">Interactive calendar and list views for managing customer appointments and real-time Google Calendar sync.</p>
             </div>
-            <button onclick="openManualBookingModal()" class="btn btn-primary btn-sm">
-              <span>+ Book Walk-in / Phone</span>
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <div class="view-toggle-pill">
+                <button type="button" id="btnViewCalendar" class="view-toggle-btn active" onclick="switchAppointmentsView('calendar')">
+                  <span>Calendar View</span>
+                </button>
+                <button type="button" id="btnViewTable" class="view-toggle-btn" onclick="switchAppointmentsView('table')">
+                  <span>Table List</span>
+                </button>
+              </div>
+              <button onclick="openManualBookingModal()" class="btn btn-primary btn-sm">
+                <span>+ Book Walk-in / Phone</span>
+              </button>
+            </div>
           </div>
 
           <!-- Filter Controls -->
@@ -225,8 +235,72 @@
             </div>
           </div>
 
-          <!-- Appointments Table -->
-          <div class="admin-card-section">
+          <!-- 1. CALENDAR VIEW CONTAINER -->
+          <div id="appointmentsCalendarView" class="admin-card-section" style="padding: 20px; margin-bottom: 24px;">
+            <!-- Calendar Month Header & Navigation -->
+            <div class="cal-nav-bar">
+              <div class="cal-nav-left">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="navCalendarMonth(-1)">
+                  <span>‹</span> Previous
+                </button>
+                <h3 id="calMonthYearTitle" class="cal-month-title">Loading...</h3>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="navCalendarMonth(1)">
+                  Next <span>›</span>
+                </button>
+                <button type="button" class="btn btn-outline-gold btn-sm" onclick="navCalendarToday()" style="margin-left: 6px;">
+                  <span>● Today</span>
+                </button>
+              </div>
+              <div class="cal-legend">
+                <span class="legend-dot confirmed">● Confirmed</span>
+                <span class="legend-dot rescheduled">● Rescheduled</span>
+                <span class="legend-dot completed">● Completed</span>
+                <span class="legend-dot cancelled">● Cancelled</span>
+              </div>
+            </div>
+
+            <!-- Calendar Layout: Main Grid + Side Day Schedule -->
+            <div class="calendar-layout">
+              <!-- Left Grid -->
+              <div class="calendar-grid-container">
+                <!-- Day Names Header -->
+                <div class="calendar-weekdays-row">
+                  <div class="cal-weekday">Sun</div>
+                  <div class="cal-weekday">Mon</div>
+                  <div class="cal-weekday">Tue</div>
+                  <div class="cal-weekday">Wed</div>
+                  <div class="cal-weekday">Thu</div>
+                  <div class="cal-weekday">Fri</div>
+                  <div class="cal-weekday">Sat</div>
+                </div>
+                <!-- 7x5/6 Date Cells -->
+                <div id="calendarMonthGrid" class="calendar-days-grid">
+                  <div class="no-slots-notice" style="grid-column: 1 / -1; padding: 40px;">Loading calendar schedule...</div>
+                </div>
+              </div>
+
+              <!-- Right Day Schedule Panel -->
+              <div class="cal-day-schedule-panel">
+                <div class="day-schedule-header">
+                  <div>
+                    <div id="selectedDayLabel" style="font-size: 15px; font-weight: 700; color: #fff;">Today's Schedule</div>
+                    <div id="selectedDaySub" style="font-size: 12px; color: var(--gold-light);">0 Appointments</div>
+                  </div>
+                  <button type="button" onclick="openManualBookingForDate()" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 6px 10px;">
+                    <span>+ Book This Day</span>
+                  </button>
+                </div>
+
+                <!-- Timeline / Day Items -->
+                <div id="dayScheduleItems" class="day-schedule-items-list">
+                  <div class="no-slots-notice" style="padding: 24px;">Select a date to view hourly schedule.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. TABLE VIEW CONTAINER -->
+          <div id="appointmentsTableView" class="admin-card-section" style="display: none;">
             <div style="overflow-x: auto;">
               <table class="admin-table">
                 <thead>
@@ -541,6 +615,73 @@
           <button type="submit" class="btn btn-primary">Create & Sync Google Calendar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: APPOINTMENT QUICK DETAILS
+       ========================================== -->
+  <div id="appointmentDetailModal" class="admin-modal-overlay">
+    <div class="admin-modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div>
+            <h3 id="detailCustomerName" style="font-size: 18px; color: #fff;">Customer Appointment</h3>
+            <span id="detailBookingRef" style="font-size: 11px; font-family: monospace; color: var(--gold-primary);">REF-0000</span>
+          </div>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; margin: 16px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-dark); border-radius: var(--radius-sm);">
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Status</div>
+            <div id="detailStatusBadge" style="margin-top: 4px;"></div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Service Price</div>
+            <div id="detailPrice" style="font-size: 16px; font-weight: 700; color: var(--gold-light); margin-top: 2px;">₹0</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div style="padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dark); border-radius: var(--radius-sm);">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Date & Time</div>
+            <div id="detailDateTime" style="font-size: 13px; font-weight: 600; color: #fff; margin-top: 4px;">-</div>
+            <div id="detailDuration" style="font-size: 11px; color: var(--gold-light); margin-top: 2px;">-</div>
+          </div>
+          <div style="padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dark); border-radius: var(--radius-sm);">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Service</div>
+            <div id="detailServiceName" style="font-size: 13px; font-weight: 600; color: #fff; margin-top: 4px;">-</div>
+            <div id="detailLocation" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">-</div>
+          </div>
+        </div>
+
+        <div style="padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dark); border-radius: var(--radius-sm);">
+          <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Contact Information</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+            <span id="detailPhone" style="font-size: 14px; font-weight: 600; color: #fff;">-</span>
+            <div style="display: flex; gap: 8px;">
+              <a id="detailWhatsAppBtn" href="#" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 4px 8px;">
+                WhatsApp
+              </a>
+              <a id="detailCallBtn" href="#" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 4px 8px;">
+                Call
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dark); border-radius: var(--radius-sm);">
+          <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Special Notes</div>
+          <div id="detailNotes" style="font-size: 13px; color: var(--text-main); margin-top: 4px; font-style: italic;">None</div>
+        </div>
+      </div>
+
+      <div id="detailActionButtons" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid var(--border-dark); pt: 16px;">
+        <!-- Dynamic Action Buttons injected via JS -->
+      </div>
     </div>
   </div>
 
