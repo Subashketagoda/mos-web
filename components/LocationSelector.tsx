@@ -194,12 +194,10 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
               loop
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
               poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75"
               className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#02180F]"
-            >
-              <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
-            </video>
+            />
             {/* Subtle Luxury Gradient Overlay (Keeps video bright & vibrant) */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/90 via-black/20 to-black/15 group-hover:via-black/10 transition-colors duration-500" />
             <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />

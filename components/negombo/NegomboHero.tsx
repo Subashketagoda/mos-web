@@ -38,13 +38,17 @@ export default function NegomboHero() {
       }
     };
 
-    if (video.readyState >= 2) {
+    if (video.readyState >= 4) {
+      // Already fully buffered enough - play immediately
+      tryPlay();
+    } else if (video.readyState >= 2) {
+      // Has enough data to play
       tryPlay();
     } else {
-      video.addEventListener('loadeddata', tryPlay, { once: true });
+      // Wait for data
       video.addEventListener('canplay', tryPlay, { once: true });
+      video.addEventListener('canplaythrough', tryPlay, { once: true });
     }
-    tryPlay();
   }, []);
 
   return (
@@ -67,12 +71,10 @@ export default function NegomboHero() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#02180F]"
-        >
-          <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
-        </video>
+        />
 
         {/* Minimal Luxury Vignette (Keeps Video Ultra-Bright & Clear) */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/95 via-black/25 to-black/40 pointer-events-none" />
