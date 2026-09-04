@@ -41,7 +41,7 @@ export default function HomePage() {
   const [selectedServiceFromMenu, setSelectedServiceFromMenu] = useState<any>(null);
 
   const handleSelectService = (service: any) => {
-    setSelectedServiceFromMenu(service);
+    setSelectedServiceFromMenu({ ...service, _selectedAt: Date.now() });
   };
 
   const handleLocationSelected = (loc: 'colombo' | 'negombo') => {

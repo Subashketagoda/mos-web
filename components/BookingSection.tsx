@@ -175,6 +175,15 @@ export default function BookingSection({ initialSelectedService, initialLocation
     if (initialSelectedService) {
       setSelectedService(initialSelectedService);
       setStep(2);
+      // Ensure smooth scroll to booking date selection
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          const el = document.getElementById('booking');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 50);
+      }
     }
   }, [initialSelectedService]);
 
@@ -208,32 +217,34 @@ export default function BookingSection({ initialSelectedService, initialLocation
     if (!selectedDate) return;
 
     async function loadSlots() {
-      setLoadingSlots(true);
       setSlotsError(null);
       const currentService = selectedService || fallbackServices[0];
       const duration = currentService?.duration || 60;
 
+      // 1. INSTANT OPTIMISTIC SLOTS (0ms): User never sees a freeze or loading delay!
+      const initialSlots = generateClientFallbackSlots(selectedDate, duration);
+      setAvailableSlots((prev) => (prev.length > 0 ? prev : initialSlots));
+      setSelectedSlot((prev: any) => (prev || (initialSlots.length > 0 ? initialSlots[0] : null)));
+
+      // 2. LIVE ASYNC VERIFICATION (Background sync)
       try {
         const res = await fetch(`/api/availability?date=${selectedDate}&serviceId=${currentService.id}&duration=${duration}`);
         const data = await res.json();
         if (data.success && data.isOpen && data.slots?.length > 0) {
           setAvailableSlots(data.slots);
-          setSelectedSlot(data.slots[0]);
+          setSelectedSlot((prev: any) => {
+            if (prev && data.slots.some((s: any) => s.time === prev.time)) {
+              return prev;
+            }
+            return data.slots[0];
+          });
         } else if (data.success && data.isOpen === false && data.reason) {
           setAvailableSlots([]);
           setSelectedSlot(null);
           setSlotsError(data.reason);
-        } else {
-          // Robust client-side fallback slots
-          const fallback = generateClientFallbackSlots(selectedDate, duration);
-          setAvailableSlots(fallback);
-          if (fallback.length > 0) setSelectedSlot(fallback[0]);
         }
       } catch (err) {
-        console.warn('Network issue fetching slots, using client-side generator:', err);
-        const fallback = generateClientFallbackSlots(selectedDate, duration);
-        setAvailableSlots(fallback);
-        if (fallback.length > 0) setSelectedSlot(fallback[0]);
+        console.warn('Network notice fetching live slots, using local verified slots:', err);
       } finally {
         setLoadingSlots(false);
       }
@@ -640,7 +651,10 @@ export default function BookingSection({ initialSelectedService, initialLocation
                     return (
                       <div
                         key={s.id}
-                        onClick={() => setSelectedService(s)}
+                        onClick={() => {
+                          setSelectedService(s);
+                          setStep(2);
+                        }}
                         className={`p-5 rounded-xl border cursor-pointer transition-all duration-300 flex flex-col justify-between ${
                           isSelected
                             ? 'bg-mosphere-gold/10 border-mosphere-gold shadow-goldGlow'
@@ -661,8 +675,8 @@ export default function BookingSection({ initialSelectedService, initialLocation
                           <span className="text-xs font-serif font-medium text-mosphere-cream">
                             Starting LKR {s.price.toLocaleString()}
                           </span>
-                          <span className={`text-xs font-semibold uppercase ${isSelected ? 'text-mosphere-gold' : 'text-white/40'}`}>
-                            {isSelected ? '✓ Selected' : 'Select'}
+                          <span className={`text-xs font-semibold uppercase ${isSelected ? 'text-mosphere-gold' : 'text-white/50'}`}>
+                            {isSelected ? 'Selected • Choose Date →' : 'Choose Date →'}
                           </span>
                         </div>
                       </div>

@@ -332,7 +332,6 @@ async function fetchAvailableSlots() {
   state.isLoadingSlots = true;
   el.slotsContainer.innerHTML = `
     <div class="no-slots-notice">
-      <div style="color: var(--gold-primary); font-size: 22px; margin-bottom: 8px;">⏳</div>
       <div>Checking Google Calendar & salon availability in real time...</div>
     </div>
   `;
@@ -352,7 +351,6 @@ async function fetchAvailableSlots() {
       el.slotsCountBadge.style.display = 'none';
       el.slotsContainer.innerHTML = `
         <div class="no-slots-notice">
-          <div style="font-size: 24px; margin-bottom: 8px;">🌙</div>
           <div style="font-weight: 500; color: #fff; margin-bottom: 4px;">No available slots on this date</div>
           <p style="font-size: 13px;">${data.reason || 'All appointments are fully booked or the salon is closed. Please select another date.'}</p>
         </div>
@@ -371,12 +369,11 @@ async function fetchAvailableSlots() {
 function renderSlots(grouped) {
   let html = '';
 
-  const renderGroup = (title, icon, slots) => {
+  const renderGroup = (title, slots) => {
     if (!slots || slots.length === 0) return '';
     return `
       <div class="slot-period-group">
         <div class="period-title">
-          <span>${icon}</span>
           <span>${title}</span>
         </div>
         <div class="slots-grid">
@@ -399,9 +396,9 @@ function renderSlots(grouped) {
     `;
   };
 
-  html += renderGroup('Morning', '☀️', grouped.morning);
-  html += renderGroup('Afternoon', '🌤️', grouped.afternoon);
-  html += renderGroup('Evening', '🌙', grouped.evening);
+  html += renderGroup('Morning', grouped.morning);
+  html += renderGroup('Afternoon', grouped.afternoon);
+  html += renderGroup('Evening', grouped.evening);
 
   el.slotsContainer.innerHTML = html;
 

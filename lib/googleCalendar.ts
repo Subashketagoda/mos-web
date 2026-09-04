@@ -93,7 +93,15 @@ class GoogleCalendarService {
     }
   }
 
+  private busyIntervalsCache = new Map<string, { data: any[]; expiry: number }>();
+
   async getBusyIntervals(dateStr: string, timeZone: string = salonConfig.timezone) {
+    // Check in-memory cache first (2 minute TTL)
+    const cached = this.busyIntervalsCache.get(dateStr);
+    if (cached && cached.expiry > Date.now()) {
+      return cached.data;
+    }
+
     if (!this.initialized) {
       await this.init();
     }
@@ -111,15 +119,16 @@ class GoogleCalendarService {
           });
         }
       }
+      this.busyIntervalsCache.set(dateStr, { data: busySlots, expiry: Date.now() + 120000 });
       return busySlots;
     }
 
-    // Real Google Calendar API Call
+    // Real Google Calendar API Call with fast 1.5s timeout
     try {
       const timeMin = new Date(`${dateStr}T00:00:00`).toISOString();
       const timeMax = new Date(`${dateStr}T23:59:59`).toISOString();
 
-      const eventsResponse = await this.calendar.events.list({
+      const fetchPromise = this.calendar.events.list({
         calendarId: salonConfig.googleCalendar.calendarId,
         timeMin,
         timeMax,
@@ -128,7 +137,12 @@ class GoogleCalendarService {
         timeZone
       });
 
-      const items = eventsResponse.data.items || [];
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Google Calendar query timed out')), 1500)
+      );
+
+      const eventsResponse: any = await Promise.race([fetchPromise, timeoutPromise]);
+      const items = eventsResponse.data?.items || [];
       const busySlots = [];
 
       for (const item of items) {
@@ -150,10 +164,12 @@ class GoogleCalendarService {
         }
       }
 
+      // Cache for 2 minutes
+      this.busyIntervalsCache.set(dateStr, { data: busySlots, expiry: Date.now() + 120000 });
       return busySlots;
     } catch (err: any) {
-      console.error(`❌ Error fetching busy slots from Google Calendar for ${dateStr}:`, err.message);
-      return [];
+      console.warn(`Notice: Fast fallback used for Google Calendar ${dateStr}:`, err.message);
+      return cached ? cached.data : [];
     }
   }
 

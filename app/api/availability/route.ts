@@ -45,6 +45,9 @@ function generateFallbackSlots(dateStr: string, duration: number = 60) {
   return slots;
 }
 
+// In-memory cache for ultra-fast slot responses (60s TTL)
+const routeAvailabilityCache = new Map<string, { payload: any; expiry: number }>();
+
 // GET /api/availability?date=YYYY-MM-DD&serviceId=...&duration=...
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -62,6 +65,16 @@ export async function GET(req: NextRequest) {
   let serviceDuration = 60;
   if (durationParam) {
     serviceDuration = parseInt(durationParam, 10);
+  }
+
+  const cacheKey = `${date}_${serviceId || 'default'}_${serviceDuration}`;
+  const cached = routeAvailabilityCache.get(cacheKey);
+  if (cached && cached.expiry > Date.now()) {
+    return NextResponse.json(cached.payload, {
+      headers: {
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=120'
+      }
+    });
   }
 
   try {
@@ -83,15 +96,19 @@ export async function GET(req: NextRequest) {
     });
 
     if (availability && availability.slots && availability.slots.length > 0) {
-      return NextResponse.json({ success: true, ...availability });
+      const payload = { success: true, ...availability };
+      routeAvailabilityCache.set(cacheKey, { payload, expiry: Date.now() + 60000 });
+      return NextResponse.json(payload);
     }
 
     if (availability && availability.isOpen === false && availability.reason) {
-      return NextResponse.json({ success: true, ...availability });
+      const payload = { success: true, ...availability };
+      routeAvailabilityCache.set(cacheKey, { payload, expiry: Date.now() + 60000 });
+      return NextResponse.json(payload);
     }
 
     const fallbackSlots = generateFallbackSlots(date, serviceDuration);
-    return NextResponse.json({
+    const fallbackPayload = {
       success: true,
       date,
       isOpen: true,
@@ -105,7 +122,9 @@ export async function GET(req: NextRequest) {
         afternoon: fallbackSlots.filter(s => s.period === 'Afternoon'),
         evening: fallbackSlots.filter(s => s.period === 'Evening')
       }
-    });
+    };
+    routeAvailabilityCache.set(cacheKey, { payload: fallbackPayload, expiry: Date.now() + 60000 });
+    return NextResponse.json(fallbackPayload);
   } catch (err: any) {
     console.error('Error fetching availability, using reliable fallback:', err);
     const fallbackSlots = generateFallbackSlots(date, serviceDuration);
