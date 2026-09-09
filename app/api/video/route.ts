@@ -7,7 +7,11 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const filePath = path.join(process.cwd(), 'public', 'videos', 'negombo-hero-bg.mp4');
+    const { searchParams } = new URL(req.url);
+    const requestedName = searchParams.get('name') || 'negombo-hero-bg';
+    const safeBase = path.basename(requestedName).replace(/[^a-zA-Z0-9_-]/g, '');
+    const filename = safeBase.endsWith('.mp4') ? safeBase : `${safeBase}.mp4`;
+    const filePath = path.join(process.cwd(), 'public', 'videos', filename);
     
     if (!fs.existsSync(filePath)) {
       return NextResponse.json({ error: 'Video file not found' }, { status: 404 });

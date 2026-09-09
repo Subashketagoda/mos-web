@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, MapPin } from 'lucide-react';
 
@@ -11,6 +11,46 @@ interface LocationSelectorProps {
 export default function LocationSelector({ onSelectLocation }: LocationSelectorProps) {
   const [hovered, setHovered] = useState<'colombo' | 'negombo' | null>(null);
   const [selected, setSelected] = useState<'colombo' | 'negombo' | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+
+    const tryPlay = () => {
+      video.muted = true;
+      const p = video.play();
+      if (p !== undefined) {
+        p.catch(() => {
+          const unlock = () => {
+            video.muted = true;
+            video.play().catch(() => {});
+            ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
+              window.removeEventListener(ev, unlock)
+            );
+          };
+          ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
+            window.addEventListener(ev, unlock, { passive: true, once: true })
+          );
+        });
+      }
+    };
+
+    tryPlay();
+    video.addEventListener('loadeddata', tryPlay, { once: true });
+    video.addEventListener('canplay', tryPlay, { once: true });
+
+    return () => {
+      video.removeEventListener('loadeddata', tryPlay);
+      video.removeEventListener('canplay', tryPlay);
+    };
+  }, []);
 
   const handleSelect = (loc: 'colombo' | 'negombo') => {
     setSelected(loc);
@@ -134,18 +174,24 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative flex-1 min-h-[44svh] lg:min-h-full cursor-pointer overflow-hidden group flex flex-col justify-end p-5 sm:p-10 lg:p-16 transition-all duration-300"
         >
-          {/* Background Visual with Smooth Zoom */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
-            <motion.div
-              animate={{ scale: hovered === 'negombo' ? 1.06 : 1 }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-              className="absolute inset-0 bg-cover bg-center bg-[#02180F]"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75&fm=webp')`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#02180F]/80 to-[#02180F]/45 group-hover:via-[#02180F]/70 transition-colors duration-500" />
-            <div className="absolute inset-0 film-grain pointer-events-none opacity-50" />
+          {/* Background Video Visual - Crystal Clear & Vivid */}
+          <div className="absolute inset-0 z-0 overflow-hidden bg-[#02180F]">
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75&fm=webp"
+              className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#02180F]"
+            >
+              <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
+              <source src="/videos/negombo-launch.mp4" type="video/mp4" />
+              <source src="/api/video" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#02180F]/70 to-[#02180F]/30 group-hover:via-[#02180F]/50 transition-colors duration-500 pointer-events-none" />
+            <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
           </div>
 
           {/* Negombo Content Card */}
