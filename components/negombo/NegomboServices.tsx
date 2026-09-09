@@ -10,7 +10,7 @@ interface NegomboServicesProps {
 
 const negomboServices = [
   {
-    id: 'srv-neg-hair-botox',
+    id: 'srv-hair-botox',
     number: '01',
     name: 'Hair Botox Deep Hydration & Repair',
     category: 'Restorative Hair Lab',
@@ -21,7 +21,7 @@ const negomboServices = [
     tag: 'Negombo Signature',
   },
   {
-    id: 'srv-neg-keratin-silk',
+    id: 'srv-keratin-silk',
     number: '02',
     name: 'Keratin Silk Protein Smoothing',
     category: 'Restorative Hair Lab',
@@ -32,7 +32,7 @@ const negomboServices = [
     tag: 'Long Lasting',
   },
   {
-    id: 'srv-neg-gents-cut-beard',
+    id: 'srv-gents-cut-beard',
     number: '03',
     name: 'Gents Master Cut & Beard Architecture',
     category: 'Gents Bespoke Grooming',
@@ -43,7 +43,7 @@ const negomboServices = [
     tag: 'Master Barber',
   },
   {
-    id: 'srv-neg-ladies-couture-cut',
+    id: 'srv-ladies-couture-cut',
     number: '04',
     name: 'Ladies Couture Cut & Signature Blowout',
     category: 'Ladies Hair & Styling',
@@ -54,7 +54,7 @@ const negomboServices = [
     tag: 'Couture Styling',
   },
   {
-    id: 'srv-neg-color-balayage',
+    id: 'srv-color-balayage',
     number: '05',
     name: 'Dimensional Balayage & Gloss Tone Melt',
     category: 'Color & Highlights',
@@ -65,7 +65,7 @@ const negomboServices = [
     tag: 'Coastal Tone',
   },
   {
-    id: 'srv-neg-beard-sculpt',
+    id: 'srv-beard-sculpt',
     number: '06',
     name: 'Beard Architecture & Steam Razor Shave',
     category: 'Gents Bespoke Grooming',
@@ -76,7 +76,7 @@ const negomboServices = [
     tag: 'Gents Ritual',
   },
   {
-    id: 'srv-neg-scalp-detox',
+    id: 'srv-scalp-detox',
     number: '07',
     name: 'Deep Scalp Detox & High-Frequency Therapy',
     category: 'Scalp & Hair Wellness',
@@ -87,7 +87,7 @@ const negomboServices = [
     tag: 'Scalp Health',
   },
   {
-    id: 'srv-neg-glow-facial',
+    id: 'srv-glow-facial',
     number: '08',
     name: 'Hydro-Radiance Deep Cleanse Facial',
     category: 'Skin & Aesthetics',

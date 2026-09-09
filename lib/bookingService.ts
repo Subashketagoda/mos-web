@@ -76,20 +76,21 @@ export class BookingService {
 
     // 2. Fetch service
     let service: any = null;
+    const canonicalServiceId = (serviceId || '').replace(/^srv-neg-/, 'srv-');
     try {
-      service = await query.get('SELECT * FROM services WHERE id = ?', [serviceId]);
+      service = await query.get('SELECT * FROM services WHERE id = ? OR id = ?', [serviceId, canonicalServiceId]);
     } catch (e) {
       console.warn('Database query for service notice:', e);
     }
 
     if (!service) {
-      const fallback = fallbackServicesCatalog[serviceId] || {
+      const fallback = fallbackServicesCatalog[serviceId] || fallbackServicesCatalog[canonicalServiceId] || {
         name: 'Mosphere Signature Styling & Treatment',
         duration: 60,
         price: 15000
       };
       service = {
-        id: serviceId,
+        id: canonicalServiceId || 'srv-hair-botox',
         name: fallback.name,
         duration: fallback.duration,
         price: fallback.price,
@@ -119,13 +120,10 @@ export class BookingService {
       // 5. Create Google Calendar Event (Server-Side with 2s timeout safeguard)
       let googleCalendarEventId = null;
       try {
-        const gcalPromise = googleCalendarService.createEvent({
+        const gcalPromise = googleCalendarService.createBookingEvent({
           customerName: trimmedName,
           phone: trimmedPhone,
-          email: trimmedEmail,
           serviceName,
-          duration,
-          price,
           date,
           startTime,
           endTime,
@@ -156,7 +154,7 @@ export class BookingService {
             trimmedName,
             trimmedPhone,
             trimmedEmail,
-            serviceId,
+            service.id,
             serviceName,
             date,
             startTime,
