@@ -11,44 +11,56 @@ interface LocationSelectorProps {
 export default function LocationSelector({ onSelectLocation }: LocationSelectorProps) {
   const [hovered, setHovered] = useState<'colombo' | 'negombo' | null>(null);
   const [selected, setSelected] = useState<'colombo' | 'negombo' | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const colomboVideoRef = useRef<HTMLVideoElement | null>(null);
+  const negomboVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const vColombo = colomboVideoRef.current;
+    const vNegombo = negomboVideoRef.current;
+    const videos = [vColombo, vNegombo].filter(Boolean) as HTMLVideoElement[];
 
-    video.muted = true;
-    video.defaultMuted = true;
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-
-    const tryPlay = () => {
+    videos.forEach((video) => {
       video.muted = true;
-      const p = video.play();
-      if (p !== undefined) {
-        p.catch(() => {
-          const unlock = () => {
-            video.muted = true;
-            video.play().catch(() => {});
+      video.defaultMuted = true;
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+    });
+
+    const tryPlayAll = () => {
+      videos.forEach((video) => {
+        video.muted = true;
+        const p = video.play();
+        if (p !== undefined) {
+          p.catch(() => {
+            const unlock = () => {
+              videos.forEach((v) => {
+                v.muted = true;
+                v.play().catch(() => {});
+              });
+              ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
+                window.removeEventListener(ev, unlock)
+              );
+            };
             ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
-              window.removeEventListener(ev, unlock)
+              window.addEventListener(ev, unlock, { passive: true, once: true })
             );
-          };
-          ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
-            window.addEventListener(ev, unlock, { passive: true, once: true })
-          );
-        });
-      }
+          });
+        }
+      });
     };
 
-    tryPlay();
-    video.addEventListener('loadeddata', tryPlay, { once: true });
-    video.addEventListener('canplay', tryPlay, { once: true });
+    tryPlayAll();
+    videos.forEach((video) => {
+      video.addEventListener('loadeddata', tryPlayAll, { once: true });
+      video.addEventListener('canplay', tryPlayAll, { once: true });
+    });
 
     return () => {
-      video.removeEventListener('loadeddata', tryPlay);
-      video.removeEventListener('canplay', tryPlay);
+      videos.forEach((video) => {
+        video.removeEventListener('loadeddata', tryPlayAll);
+        video.removeEventListener('canplay', tryPlayAll);
+      });
     };
   }, []);
 
@@ -101,18 +113,23 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative flex-1 min-h-[44svh] lg:min-h-full cursor-pointer overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 group flex flex-col justify-end p-5 sm:p-10 lg:p-16 transition-all duration-300"
         >
-          {/* Background Visual with Smooth Zoom */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
-            <motion.div
-              animate={{ scale: hovered === 'colombo' ? 1.06 : 1 }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=75&fm=webp')`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/80 to-[#070709]/45 group-hover:via-[#070709]/70 transition-colors duration-500" />
-            <div className="absolute inset-0 film-grain pointer-events-none opacity-50" />
+          {/* Background Video Visual - Urban Noir & Gold */}
+          <div className="absolute inset-0 z-0 overflow-hidden bg-[#070709]">
+            <video
+              ref={colomboVideoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=75&fm=webp"
+              className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#070709]"
+            >
+              <source src="/videos/colombo-hero-bg.mp4" type="video/mp4" />
+              <source src="/api/video?name=colombo-hero-bg" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/75 to-[#070709]/40 group-hover:via-[#070709]/60 transition-colors duration-500 pointer-events-none" />
+            <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
           </div>
 
           {/* Colombo Content Card */}
@@ -177,7 +194,7 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           {/* Background Video Visual - Crystal Clear & Vivid */}
           <div className="absolute inset-0 z-0 overflow-hidden bg-[#02180F]">
             <video
-              ref={videoRef}
+              ref={negomboVideoRef}
               autoPlay
               loop
               muted
