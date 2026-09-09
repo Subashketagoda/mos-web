@@ -77,26 +77,31 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
     <div className="fixed inset-0 z-[9000] bg-[#070709] flex flex-col select-none overflow-y-auto">
       
       {/* Top Floating Brand Header */}
-      <header className="relative lg:absolute top-0 lg:top-6 left-0 lg:left-1/2 lg:-translate-x-1/2 z-30 w-full lg:w-auto flex flex-col items-center justify-center text-center px-4 py-3 lg:py-0 bg-[#070709]/95 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none border-b lg:border-b-0 border-white/10 shrink-0">
-        <div className="flex flex-col items-center gap-1">
-          <div className="h-9 sm:h-12 w-auto flex items-center justify-center">
+      <motion.header
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="relative lg:absolute top-0 lg:top-6 left-0 lg:left-1/2 lg:-translate-x-1/2 z-30 w-full lg:w-auto flex flex-col items-center justify-center text-center px-4 py-3.5 lg:py-0 bg-[#070709]/95 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none border-b lg:border-b-0 border-white/10 shrink-0"
+      >
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="h-8 sm:h-11 w-auto flex items-center justify-center">
             <img
               src="/images/mosphere-full-logo-gold.png"
               alt="MOSPHERE GRAB LIFE"
               loading="eager"
               decoding="async"
-              className="h-full w-auto object-contain filter drop-shadow-[0_0_12px_rgba(212,175,55,0.75)]"
+              className="h-full w-auto object-contain filter drop-shadow-[0_0_15px_rgba(212,175,55,0.75)]"
             />
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="h-[1px] w-5 bg-mosphere-gold/50" />
-            <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.25em] text-mosphere-gold font-semibold">
-              SELECT YOUR SANCTUARY
-            </span>
-            <span className="h-[1px] w-5 bg-mosphere-gold/50" />
+          <div className="flex items-center gap-2.5 sm:gap-3 mt-0.5">
+            <span className="h-[1px] w-6 sm:w-10 bg-gradient-to-r from-transparent to-mosphere-gold/70 shadow-[0_0_8px_#D4AF37]" />
+            <h2 className="text-[10px] sm:text-xs uppercase font-mono tracking-[0.32em] sm:tracking-[0.42em] text-mosphere-gold font-bold pl-[0.32em] sm:pl-[0.42em] drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]">
+              CHOOSE YOUR MOSPHERE
+            </h2>
+            <span className="h-[1px] w-6 sm:w-10 bg-gradient-to-l from-transparent to-mosphere-gold/70 shadow-[0_0_8px_#D4AF37]" />
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Container: Desktop 50/50 Split, Mobile Stack */}
       <div className="relative w-full flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">

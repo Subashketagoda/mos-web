@@ -31,14 +31,30 @@ import NegomboFinalCTA from '@/components/negombo/NegomboFinalCTA';
 import NegomboFooter from '@/components/negombo/NegomboFooter';
 
 // Shared Components
+import CinematicLoader from '@/components/CinematicLoader';
 import BookingSection from '@/components/BookingSection';
 import InstagramSection from '@/components/InstagramSection';
 import MobileBottomDock from '@/components/MobileBottomDock';
 
 export default function HomePage() {
+  const [showCinematicLoader, setShowCinematicLoader] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState<'colombo' | 'negombo' | null>(null);
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [selectedServiceFromMenu, setSelectedServiceFromMenu] = useState<any>(null);
+
+  React.useEffect(() => {
+    const seen = sessionStorage.getItem('mosphere_intro_seen');
+    if (seen === 'true') {
+      setShowCinematicLoader(false);
+    }
+  }, []);
+
+  const handleLoaderComplete = () => {
+    setShowCinematicLoader(false);
+    try {
+      sessionStorage.setItem('mosphere_intro_seen', 'true');
+    } catch {}
+  };
 
   const handleSelectService = (service: any) => {
     setSelectedServiceFromMenu({ ...service, _selectedAt: Date.now() });
@@ -53,6 +69,13 @@ export default function HomePage() {
       {/* Bespoke Desktop Cursor */}
       <CustomCursor />
 
+      {/* Cinematic Brand Intro Loading Screen */}
+      <AnimatePresence mode="wait">
+        {showCinematicLoader && (
+          <CinematicLoader onComplete={handleLoaderComplete} />
+        )}
+      </AnimatePresence>
+
       {/* Location Switcher Modal */}
       {isSwitcherOpen && (
         <LocationSwitcherModal
@@ -66,13 +89,13 @@ export default function HomePage() {
       {/* AnimatePresence for Butter-Smooth Branch Transitions */}
       <AnimatePresence mode="wait">
         {/* 01. Initial Sanctuary Selection Screen */}
-        {!selectedLocation && (
+        {!selectedLocation && !showCinematicLoader && (
           <motion.div
             key="location-selector"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <LocationSelector onSelectLocation={handleLocationSelected} />
           </motion.div>
