@@ -1,26 +1,12 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Calendar,
-  ArrowRight,
-  ArrowDown,
-  Sparkles,
-  Volume2,
-  VolumeX,
-  Play,
-  Pause,
-  X,
-  Film
-} from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Calendar, ArrowRight, ArrowDown, Sparkles } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 
 export default function ColomboHero() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isFilmModalOpen, setIsFilmModalOpen] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -28,6 +14,7 @@ export default function ColomboHero() {
 
     video.muted = true;
     video.defaultMuted = true;
+    video.playsInline = true;
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
@@ -36,27 +23,22 @@ export default function ColomboHero() {
       video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            setIsPlaying(false);
-            const unlock = () => {
-              video.muted = true;
-              video
-                .play()
-                .then(() => setIsPlaying(true))
-                .catch(() => {});
-              ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
-                window.removeEventListener(ev, unlock)
-              );
-            };
+        playPromise.catch(() => {
+          const unlock = () => {
+            video.muted = true;
+            video.play().catch(() => {});
             ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
-              window.addEventListener(ev, unlock, { passive: true, once: true })
+              window.removeEventListener(ev, unlock)
             );
-          });
+          };
+          ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
+            window.addEventListener(ev, unlock, { passive: true, once: true })
+          );
+        });
       }
     };
 
+    video.load();
     tryPlay();
     video.addEventListener('loadeddata', tryPlay, { once: true });
     video.addEventListener('canplay', tryPlay, { once: true });
@@ -67,30 +49,6 @@ export default function ColomboHero() {
     };
   }, []);
 
-  const togglePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const toggleSound = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    const nextMuted = !isMuted;
-    video.muted = nextMuted;
-    setIsMuted(nextMuted);
-    if (!nextMuted && video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
-  };
-
   return (
     <section
       id="hero"
@@ -100,74 +58,24 @@ export default function ColomboHero() {
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#070709]">
         <video
           ref={videoRef}
+          src="/videos/colombo-hero-bg.mp4"
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
+          onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
+          onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
           poster="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75&fm=webp"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#070709]"
         >
           <source src="/videos/colombo-hero-bg.mp4" type="video/mp4" />
-          <source src="/api/video?name=colombo-hero-bg" type="video/mp4" />
         </video>
 
         {/* Layered Noir Gradients (Bright & Clear Focus) */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/75 to-[#070709]/50 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#070709]/50 to-[#070709] pointer-events-none" />
         <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
-
-        {/* Floating Media Controls (Sound & Watch Film) */}
-        <div className="absolute bottom-20 sm:bottom-16 right-4 sm:right-8 lg:right-16 z-20 flex items-center gap-2 sm:gap-3">
-          {/* Sound Toggle */}
-          <button
-            type="button"
-            onClick={toggleSound}
-            title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
-            className="group flex items-center gap-2 px-3.5 py-2 rounded-full bg-black/85 hover:bg-[#15151c] border border-mosphere-gold/40 hover:border-mosphere-gold backdrop-blur-md text-mosphere-gold shadow-[0_4px_20px_rgba(0,0,0,0.6)] transition-all hover:scale-105"
-          >
-            {isMuted ? (
-              <>
-                <VolumeX className="w-3.5 h-3.5 text-mosphere-gold" />
-                <span className="text-[10px] font-mono tracking-wider uppercase font-semibold hidden sm:inline">
-                  SOUND OFF
-                </span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-3.5 h-3.5 text-mosphere-gold animate-pulse" />
-                <span className="text-[10px] font-mono tracking-wider uppercase font-semibold hidden sm:inline text-mosphere-goldLight">
-                  SOUND ON
-                </span>
-              </>
-            )}
-          </button>
-
-          {/* Play/Pause Toggle */}
-          <button
-            type="button"
-            onClick={togglePlay}
-            title={isPlaying ? 'Pause Background Video' : 'Play Background Video'}
-            className="p-2 sm:p-2.5 rounded-full bg-black/85 hover:bg-[#15151c] border border-mosphere-gold/40 hover:border-mosphere-gold backdrop-blur-md text-mosphere-gold shadow-[0_4px_20px_rgba(0,0,0,0.6)] transition-all hover:scale-105"
-          >
-            {isPlaying ? (
-              <Pause className="w-3.5 h-3.5" />
-            ) : (
-              <Play className="w-3.5 h-3.5 fill-mosphere-gold" />
-            )}
-          </button>
-
-          {/* Full Launch Film Button */}
-          <button
-            type="button"
-            onClick={() => setIsFilmModalOpen(true)}
-            title="Watch Official Colombo Film"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark text-black font-bold text-[10px] font-mono tracking-wider uppercase shadow-goldGlow hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] transition-all hover:scale-105"
-          >
-            <Film className="w-3.5 h-3.5 text-black" />
-            <span>WATCH FILM</span>
-          </button>
-        </div>
       </div>
 
       {/* Top Editorial Eyebrow Tag (Desktop) */}
@@ -300,58 +208,6 @@ export default function ColomboHero() {
           <ArrowDown className="w-3.5 h-3.5 text-mosphere-gold group-hover:translate-y-0.5 transition-transform animate-bounce" />
         </a>
       </div>
-
-      {/* Fullscreen Cinema Film Modal for Colombo */}
-      <AnimatePresence>
-        {isFilmModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 sm:p-8"
-            onClick={() => setIsFilmModalOpen(false)}
-          >
-            {/* Modal Header Controls */}
-            <div
-              className="w-full max-w-5xl flex items-center justify-between pb-3 border-b border-mosphere-gold/30 mb-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-mosphere-gold animate-pulse shadow-[0_0_10px_#D4AF37]" />
-                <span className="font-serif text-lg sm:text-xl text-white tracking-wide">
-                  MOSPHERE COLOMBO • OFFICIAL FILM
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsFilmModalOpen(false)}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all"
-                title="Close Film"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Video Player Container */}
-            <div
-              className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-mosphere-gold/40 shadow-goldGlow"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <video
-                src="/videos/colombo-hero-bg.mp4"
-                controls
-                autoPlay
-                playsInline
-                className="w-full h-full object-contain bg-black"
-              >
-                <source src="/videos/colombo-hero-bg.mp4" type="video/mp4" />
-                Your browser does not support HTML5 video.
-              </video>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }

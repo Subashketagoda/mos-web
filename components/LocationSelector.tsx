@@ -22,9 +22,11 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
     videos.forEach((video) => {
       video.muted = true;
       video.defaultMuted = true;
+      video.playsInline = true;
       video.setAttribute('muted', '');
       video.setAttribute('playsinline', '');
       video.setAttribute('webkit-playsinline', '');
+      video.load();
     });
 
     const tryPlayAll = () => {
@@ -117,16 +119,18 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           <div className="absolute inset-0 z-0 overflow-hidden bg-[#070709]">
             <video
               ref={colomboVideoRef}
+              src="/videos/colombo-hero-bg.mp4"
               autoPlay
               loop
               muted
               playsInline
               preload="auto"
+              onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
+              onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
               poster="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=75&fm=webp"
               className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#070709]"
             >
               <source src="/videos/colombo-hero-bg.mp4" type="video/mp4" />
-              <source src="/api/video?name=colombo-hero-bg" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/75 to-[#070709]/40 group-hover:via-[#070709]/60 transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />
@@ -195,17 +199,18 @@ export default function LocationSelector({ onSelectLocation }: LocationSelectorP
           <div className="absolute inset-0 z-0 overflow-hidden bg-[#02180F]">
             <video
               ref={negomboVideoRef}
+              src="/videos/negombo-hero-bg.mp4"
               autoPlay
               loop
               muted
               playsInline
               preload="auto"
+              onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
+              onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
               poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=75&fm=webp"
               className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform group-hover:scale-105 transition-transform duration-1000 ease-out bg-[#02180F]"
             >
               <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
-              <source src="/videos/negombo-launch.mp4" type="video/mp4" />
-              <source src="/api/video" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-[#02180F] via-[#02180F]/70 to-[#02180F]/30 group-hover:via-[#02180F]/50 transition-colors duration-500 pointer-events-none" />
             <div className="absolute inset-0 film-grain pointer-events-none opacity-40" />

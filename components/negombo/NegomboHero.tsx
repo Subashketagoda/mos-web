@@ -1,26 +1,11 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Calendar,
-  ArrowRight,
-  ArrowDown,
-  Sparkles,
-  Volume2,
-  VolumeX,
-  Play,
-  Pause,
-  X,
-  Film
-} from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Calendar, ArrowRight, ArrowDown, Sparkles } from 'lucide-react';
 
 export default function NegomboHero() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isFilmModalOpen, setIsFilmModalOpen] = useState(false);
-  const [activeFilmSource, setActiveFilmSource] = useState<string>('/videos/negombo-launch.mp4');
 
   // Ultra-robust autoplay with gesture unlock fallback
   useEffect(() => {
@@ -29,6 +14,7 @@ export default function NegomboHero() {
 
     video.muted = true;
     video.defaultMuted = true;
+    video.playsInline = true;
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
@@ -37,31 +23,23 @@ export default function NegomboHero() {
       video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch(() => {
-            setIsPlaying(false);
-            // Browser autoplay restrictions: unlock on first touch/click/scroll
-            const unlock = () => {
-              video.muted = true;
-              video
-                .play()
-                .then(() => setIsPlaying(true))
-                .catch(() => {});
-              ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
-                window.removeEventListener(ev, unlock)
-              );
-            };
+        playPromise.catch(() => {
+          // Browser autoplay restrictions: unlock on first touch/click/scroll
+          const unlock = () => {
+            video.muted = true;
+            video.play().catch(() => {});
             ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
-              window.addEventListener(ev, unlock, { passive: true, once: true })
+              window.removeEventListener(ev, unlock)
             );
-          });
+          };
+          ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
+            window.addEventListener(ev, unlock, { passive: true, once: true })
+          );
+        });
       }
     };
 
-    // Execute immediately on mount
+    video.load();
     tryPlay();
 
     // Fallback listeners for fast streaming readiness
@@ -74,30 +52,6 @@ export default function NegomboHero() {
     };
   }, []);
 
-  const togglePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const toggleSound = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    const nextMuted = !isMuted;
-    video.muted = nextMuted;
-    setIsMuted(nextMuted);
-    if (!nextMuted && video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
-  };
-
   return (
     <section
       id="hero"
@@ -107,78 +61,24 @@ export default function NegomboHero() {
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#02180F]">
         <video
           ref={videoRef}
+          src="/videos/negombo-hero-bg.mp4"
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
+          onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
+          onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
           poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75&fm=webp"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#02180F]"
         >
           <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
-          <source src="/videos/negombo-launch.mp4" type="video/mp4" />
-          <source src="/api/video" type="video/mp4" />
         </video>
 
         {/* Minimal Luxury Vignette (Keeps Video Ultra-Bright & Clear) */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#02180F]/95 via-black/30 to-black/40 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#02180F]/80 via-transparent to-black/45 pointer-events-none" />
         <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
-
-        {/* Floating Quick Media Controls (Sound & Watch Film) */}
-        <div className="absolute bottom-20 sm:bottom-16 right-4 sm:right-8 lg:right-16 z-20 flex items-center gap-2 sm:gap-3">
-          {/* Sound Toggle */}
-          <button
-            type="button"
-            onClick={toggleSound}
-            title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
-            className="group flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#02180F]/85 hover:bg-[#062A1D] border border-[#E5B842]/40 hover:border-[#E5B842] backdrop-blur-md text-[#E5B842] shadow-[0_4px_20px_rgba(0,0,0,0.6)] transition-all hover:scale-105"
-          >
-            {isMuted ? (
-              <>
-                <VolumeX className="w-3.5 h-3.5 text-[#E5B842]" />
-                <span className="text-[10px] font-mono tracking-wider uppercase font-semibold hidden sm:inline">
-                  SOUND OFF
-                </span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-3.5 h-3.5 text-[#E5B842] animate-pulse" />
-                <span className="text-[10px] font-mono tracking-wider uppercase font-semibold hidden sm:inline text-[#F3CC68]">
-                  SOUND ON
-                </span>
-              </>
-            )}
-          </button>
-
-          {/* Pause / Play Toggle */}
-          <button
-            type="button"
-            onClick={togglePlay}
-            title={isPlaying ? 'Pause Background Video' : 'Play Background Video'}
-            className="p-2 sm:p-2.5 rounded-full bg-[#02180F]/85 hover:bg-[#062A1D] border border-[#E5B842]/40 hover:border-[#E5B842] backdrop-blur-md text-[#E5B842] shadow-[0_4px_20px_rgba(0,0,0,0.6)] transition-all hover:scale-105"
-          >
-            {isPlaying ? (
-              <Pause className="w-3.5 h-3.5" />
-            ) : (
-              <Play className="w-3.5 h-3.5 fill-[#E5B842]" />
-            )}
-          </button>
-
-          {/* Full Launch Film Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setActiveFilmSource('/videos/negombo-launch.mp4');
-              setIsFilmModalOpen(true);
-            }}
-            title="Watch Official Negombo Launch Film"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#E5B842] hover:bg-[#F3CC68] text-black font-bold text-[10px] font-mono tracking-wider uppercase shadow-[0_0_20px_rgba(229,184,66,0.6)] hover:shadow-[0_0_30px_rgba(229,184,66,0.9)] transition-all hover:scale-105"
-          >
-            <Film className="w-3.5 h-3.5 text-black" />
-            <span>WATCH FILM</span>
-          </button>
-        </div>
       </div>
 
       {/* Top Editorial Eyebrow Tag (Desktop) */}
@@ -318,85 +218,6 @@ export default function NegomboHero() {
           <ArrowDown className="w-3.5 h-3.5 text-[#E5B842] group-hover:translate-y-0.5 transition-transform animate-bounce" />
         </a>
       </div>
-
-      {/* Luxury Cinematic Film Modal */}
-      <AnimatePresence>
-        {isFilmModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 sm:p-8"
-            onClick={() => setIsFilmModalOpen(false)}
-          >
-            {/* Modal Header Controls */}
-            <div
-              className="w-full max-w-5xl flex items-center justify-between pb-3 border-b border-[#E5B842]/30 mb-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#E5B842] animate-pulse shadow-[0_0_10px_#E5B842]" />
-                <span className="font-serif text-lg sm:text-xl text-white tracking-wide">
-                  MOSPHERE NEGOMBO • OFFICIAL FILM
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {/* Switch between Launch Film and Master Stylist Video */}
-                <button
-                  type="button"
-                  onClick={() => setActiveFilmSource('/videos/negombo-launch.mp4')}
-                  className={`px-3 py-1.5 rounded-full text-[10px] font-mono uppercase tracking-wider transition-all ${
-                    activeFilmSource === '/videos/negombo-launch.mp4'
-                      ? 'bg-[#E5B842] text-black font-bold'
-                      : 'bg-white/10 text-white/70 hover:text-white'
-                  }`}
-                >
-                  Launch Film
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveFilmSource('/videos/negombo-duli-fernando.mp4')}
-                  className={`px-3 py-1.5 rounded-full text-[10px] font-mono uppercase tracking-wider transition-all ${
-                    activeFilmSource === '/videos/negombo-duli-fernando.mp4'
-                      ? 'bg-[#E5B842] text-black font-bold'
-                      : 'bg-white/10 text-white/70 hover:text-white'
-                  }`}
-                >
-                  Duli Fernando
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsFilmModalOpen(false)}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all ml-2"
-                  title="Close Film"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Video Player Container */}
-            <div
-              className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-[#E5B842]/40 shadow-[0_0_60px_rgba(229,184,66,0.25)]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <video
-                key={activeFilmSource}
-                src={activeFilmSource}
-                controls
-                autoPlay
-                playsInline
-                className="w-full h-full object-contain bg-black"
-              >
-                <source src={activeFilmSource} type="video/mp4" />
-                Your browser does not support HTML5 video.
-              </video>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
