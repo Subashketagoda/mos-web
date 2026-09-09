@@ -26,6 +26,8 @@ export default function FinalCTA() {
           <img
             src={salonConfig.emblem}
             alt="Mosphere Emblem"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(212,175,55,0.6)]"
           />
         </motion.div>

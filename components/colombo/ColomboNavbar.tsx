@@ -81,7 +81,7 @@ export default function ColomboNavbar({ onOpenLocationSwitcher }: ColomboNavbarP
             {/* Quick Location Switcher Button */}
             <button
               onClick={onOpenLocationSwitcher}
-              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-mosphere-gold/40 text-[9.5px] font-mono tracking-wider text-mosphere-gold uppercase transition-all duration-300 group"
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-mosphere-gold/40 text-[9.5px] font-mono tracking-wider text-mosphere-gold uppercase transition-all duration-300 group"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-mosphere-gold animate-pulse" />
               <span className="text-white/70 group-hover:text-white">NEGOMBO</span>

@@ -22,10 +22,10 @@ export default function NegomboLocation() {
           className="flex items-center justify-between border-b border-[#D4AF37]/25 pb-4 mb-16"
         >
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-[#D4AF37] font-semibold">05</span>
+            <span className="text-xs font-mono text-[#D4AF37] font-semibold">06</span>
             <span className="text-emerald-300/30">/</span>
             <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-emerald-200/70 font-medium">
-              FIND US IN NEGOMBO
+              FIND OUR SANCTUARY
             </span>
           </div>
           <span className="text-xs font-mono text-emerald-300/50 tracking-widest hidden sm:inline uppercase">

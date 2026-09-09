@@ -115,6 +115,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${plusJakarta.variable}`}>
       <head>
+        {/* Performance Resource Hints for Fast Asset Discovery */}
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preload" as="image" href="/images/mosphere-full-logo-gold.png" type="image/png" fetchPriority="high" />
+        <link rel="preload" as="image" href="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75&fm=webp" fetchPriority="high" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

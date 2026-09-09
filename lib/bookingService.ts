@@ -239,6 +239,20 @@ export class BookingService {
         notes: trimmedNotes
       });
 
+      // Background automated server notification to salon if webhook/API configured
+      this.notifySalonViaWhatsApp({
+        bookingRef,
+        customerName: trimmedName,
+        phone: trimmedPhone,
+        serviceName,
+        date,
+        startTime,
+        duration,
+        price,
+        location,
+        notes: trimmedNotes
+      }).catch((err) => console.warn('Automated salon WhatsApp dispatch notice:', err));
+
       return {
         success: true,
         booking: {
@@ -388,6 +402,59 @@ export class BookingService {
     ].filter(Boolean).join('\n');
 
     return `https://wa.me/${num || salonConfig.whatsapp}?text=${encodeURIComponent(msg)}`;
+  }
+
+  /**
+   * Automated server-side dispatch to Salon WhatsApp
+   * Dispatches via webhook or WhatsApp notification gateway if configured in .env
+   */
+  async notifySalonViaWhatsApp(bookingData: any) {
+    try {
+      const loc = bookingData.location === 'negombo' ? 'Negombo' : 'Colombo / Nawala';
+      const num = bookingData.location === 'negombo' ? salonConfig.locations.negombo.whatsapp : salonConfig.locations.colombo.whatsapp;
+      const targetPhone = num || salonConfig.whatsapp;
+
+      const messageText = [
+        `*NEW APPOINTMENT RESERVATION*`,
+        `----------------------------------`,
+        `*Ref:* ${bookingData.bookingRef}`,
+        `*Guest:* ${bookingData.customerName}`,
+        bookingData.phone ? `*Phone:* ${bookingData.phone}` : null,
+        `*Branch:* ${loc}`,
+        `*Service:* ${bookingData.serviceName}`,
+        `*Date:* ${bookingData.date}`,
+        `*Time:* ${bookingData.startTime}`,
+        bookingData.duration ? `*Duration:* ${bookingData.duration} mins` : null,
+        bookingData.price ? `*Estimated:* LKR ${Number(bookingData.price).toLocaleString()}` : null,
+        bookingData.notes ? `*Notes:* ${bookingData.notes}` : null,
+        `----------------------------------`,
+        `_Sent automatically from Mosphere Online Concierge_`
+      ].filter(Boolean).join('\n');
+
+      console.log(`[Auto WhatsApp Dispatch] Reservation ${bookingData.bookingRef} ready for salon at +${targetPhone}`);
+
+      // 1. If Webhook URL is defined (e.g. Zapier, Make, custom WhatsApp bot, UltraMsg)
+      if (process.env.WHATSAPP_WEBHOOK_URL) {
+        await fetch(process.env.WHATSAPP_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'new_booking',
+            phone: targetPhone,
+            message: messageText,
+            booking: bookingData
+          }),
+        });
+      }
+
+      // 2. If CallMeBot API Key is defined
+      if (process.env.CALLMEBOT_API_KEY) {
+        const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(targetPhone)}&text=${encodeURIComponent(messageText)}&apikey=${encodeURIComponent(process.env.CALLMEBOT_API_KEY)}`;
+        await fetch(url);
+      }
+    } catch (err: any) {
+      console.warn('[Auto WhatsApp Dispatch Notice]', err?.message || err);
+    }
   }
 }
 

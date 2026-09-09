@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import CustomCursor from '@/components/CustomCursor';
-import LoadingScreen from '@/components/LoadingScreen';
 import LocationSelector from '@/components/LocationSelector';
 import LocationSwitcherModal from '@/components/LocationSwitcherModal';
 
@@ -53,75 +53,95 @@ export default function HomePage() {
       {/* Bespoke Desktop Cursor */}
       <CustomCursor />
 
-      {/* 01. Initial Cinematic Loading Screen */}
-      <LoadingScreen />
-
-      {/* 02. Location Selection Choice Screen (Shown until user selects Colombo or Negombo) */}
-      {!selectedLocation && (
-        <LocationSelector onSelectLocation={handleLocationSelected} />
-      )}
-
       {/* Location Switcher Modal */}
-      <LocationSwitcherModal
-        isOpen={isSwitcherOpen}
-        onClose={() => setIsSwitcherOpen(false)}
-        currentLocation={selectedLocation || 'colombo'}
-        onSelectLocation={(loc) => setSelectedLocation(loc)}
-      />
-
-      {/* =========================================================================
-          BRANCH EXPERIENCE: NEGOMBO (DEEP EMERALD GREEN + METALLIC GOLD)
-          ========================================================================= */}
-      {selectedLocation === 'negombo' && (
-        <div className="bg-[#03150F] text-emerald-100 transition-colors duration-500">
-          <NegomboNavbar onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
-          <NegomboHero />
-          <NegomboIntro />
-          <NegomboServices onSelectService={handleSelectService} />
-          <NegomboExperience />
-          <NegomboGallery />
-          <NegomboReviews />
-          <BookingSection
-            initialSelectedService={selectedServiceFromMenu}
-            initialLocation="negombo"
-          />
-          <NegomboLocation />
-          <InstagramSection location="negombo" />
-          <NegomboFinalCTA />
-          <NegomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
-          <MobileBottomDock
-            location="negombo"
-            onOpenLocationSwitcher={() => setIsSwitcherOpen(true)}
-          />
-        </div>
+      {isSwitcherOpen && (
+        <LocationSwitcherModal
+          isOpen={isSwitcherOpen}
+          onClose={() => setIsSwitcherOpen(false)}
+          currentLocation={selectedLocation || 'colombo'}
+          onSelectLocation={(loc) => handleLocationSelected(loc)}
+        />
       )}
 
-      {/* =========================================================================
-          BRANCH EXPERIENCE: COLOMBO / NAWALA (URBAN NOIR + CHAMPAGNE GOLD)
-          ========================================================================= */}
-      {selectedLocation === 'colombo' && (
-        <div className="bg-[#070709] text-mosphere-cream transition-colors duration-500">
-          <ColomboNavbar onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
-          <ColomboHero />
-          <BrandStatement />
-          <ColomboServices onSelectService={handleSelectService} />
-          <FeaturedVisual />
-          <GallerySection />
-          <ReviewsSection />
-          <BookingSection
-            initialSelectedService={selectedServiceFromMenu}
-            initialLocation="colombo"
-          />
-          <ColomboLocation />
-          <InstagramSection location="colombo" />
-          <FinalCTA />
-          <ColomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
-          <MobileBottomDock
-            location="colombo"
-            onOpenLocationSwitcher={() => setIsSwitcherOpen(true)}
-          />
-        </div>
-      )}
+      {/* AnimatePresence for Butter-Smooth Branch Transitions */}
+      <AnimatePresence mode="wait">
+        {/* 01. Initial Sanctuary Selection Screen */}
+        {!selectedLocation && (
+          <motion.div
+            key="location-selector"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <LocationSelector onSelectLocation={handleLocationSelected} />
+          </motion.div>
+        )}
+
+        {/* 02. Negombo Experience (Deep Pine Emerald & Gold) */}
+        {selectedLocation === 'negombo' && (
+          <motion.div
+            key="branch-negombo"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="bg-[#03150F] text-emerald-100 transition-colors duration-500 pb-24 lg:pb-0"
+          >
+            <NegomboNavbar onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
+            <NegomboHero />
+            <NegomboIntro />
+            <NegomboServices onSelectService={handleSelectService} />
+            <NegomboExperience />
+            <NegomboGallery />
+            <NegomboReviews />
+            <BookingSection
+              initialSelectedService={selectedServiceFromMenu}
+              initialLocation="negombo"
+            />
+            <NegomboLocation />
+            <InstagramSection location="negombo" />
+            <NegomboFinalCTA />
+            <NegomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
+            <MobileBottomDock
+              location="negombo"
+              onOpenLocationSwitcher={() => setIsSwitcherOpen(true)}
+            />
+          </motion.div>
+        )}
+
+        {/* 03. Colombo Experience (Urban Noir & Champagne Gold) */}
+        {selectedLocation === 'colombo' && (
+          <motion.div
+            key="branch-colombo"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="bg-[#070709] text-mosphere-cream transition-colors duration-500 pb-24 lg:pb-0"
+          >
+            <ColomboNavbar onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
+            <ColomboHero />
+            <BrandStatement />
+            <ColomboServices onSelectService={handleSelectService} />
+            <FeaturedVisual />
+            <GallerySection />
+            <ReviewsSection />
+            <BookingSection
+              initialSelectedService={selectedServiceFromMenu}
+              initialLocation="colombo"
+            />
+            <ColomboLocation />
+            <InstagramSection location="colombo" />
+            <FinalCTA />
+            <ColomboFooter onOpenLocationSwitcher={() => setIsSwitcherOpen(true)} />
+            <MobileBottomDock
+              location="colombo"
+              onOpenLocationSwitcher={() => setIsSwitcherOpen(true)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

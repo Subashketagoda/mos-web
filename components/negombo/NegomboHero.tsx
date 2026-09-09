@@ -66,13 +66,13 @@ export default function NegomboHero() {
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           ref={videoRef}
-          src="/videos/negombo-hero-bg.mp4"
+          src="/api/video"
           autoPlay
           loop
           muted
           playsInline
           preload="metadata"
-          poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75"
+          poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75&fm=webp"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#02180F]"
         />
 
@@ -121,6 +121,9 @@ export default function NegomboHero() {
                 <img
                   src="/images/mosphere-emblem-gold.png"
                   alt="Mosphere"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="w-full h-full object-contain"
                 />
               </div>

@@ -48,52 +48,68 @@ export interface BookingSectionProps {
 
 const fallbackServices: Service[] = [
   {
-    id: 'srv-1',
-    name: 'Hair Botox Signature Treatment',
-    description: 'Deep restorative protein infusion with hyaluronic acid and caviar extract for luminous, frizz-free glass hair.',
+    id: 'srv-hair-botox',
+    name: 'Hair Botox Deep Hydration & Repair',
+    description: 'Intense amino-collagen infusion to seal cuticles, eliminate humidity frizz, and restore glass-like shine.',
     duration: 90,
-    price: 18500,
-    category: 'Hair Botox'
-  },
-  {
-    id: 'srv-2',
-    name: 'Balayage & Dimensional Color Glaze',
-    description: 'Custom hand-painted French balayage with high-gloss toning glaze and bond protection.',
-    duration: 120,
-    price: 26000,
-    category: 'Hair Coloring'
-  },
-  {
-    id: 'srv-3',
-    name: 'Precision Designer Haircut & Styling',
-    description: 'Tailored architectural haircut, scalp shampoo, hot towel massage, and luxury blowout styling.',
-    duration: 45,
-    price: 7500,
-    category: 'Hair Design'
-  },
-  {
-    id: 'srv-4',
-    name: 'Gents Executive Beard & Hair Architecture',
-    description: 'Master razor fade, precision beard sculpting, botanical steam therapy, and charcoal face mask.',
-    duration: 45,
-    price: 6500,
-    category: 'Gents Grooming'
-  },
-  {
-    id: 'srv-5',
-    name: 'Hydro-Radiance Facial & Collagen Firming',
-    description: 'Advanced ultrasonic exfoliation, marine collagen infusion, and lymphatic drainage massage.',
-    duration: 60,
     price: 14500,
-    category: 'Aesthetic Wellness'
+    category: 'Restorative Hair Lab'
   },
   {
-    id: 'srv-6',
-    name: 'Holistic Scalp Detox & Caviar Massage',
-    description: 'Deep follicle detoxifying exfoliation, warm Ayurvedic herb oil massage, and infrared scalp stimulation.',
+    id: 'srv-keratin-silk',
+    name: 'Keratin Silk Protein Smoothing',
+    description: 'Structural bio-smoothing protein therapy for mirror-smooth manageability and long-lasting silkiness.',
+    duration: 120,
+    price: 18500,
+    category: 'Restorative Hair Lab'
+  },
+  {
+    id: 'srv-gents-cut-beard',
+    name: 'Gents Master Cut & Beard Architecture',
+    description: 'Precision taper or fade consultation, eucalyptus hot towel prep, and sharp straight-razor detailing.',
     duration: 45,
-    price: 9500,
-    category: 'Scalp Sanctuary'
+    price: 3500,
+    category: 'Gents Bespoke Grooming'
+  },
+  {
+    id: 'srv-ladies-couture-cut',
+    name: 'Ladies Couture Cut & Signature Blowout',
+    description: 'Architectural haircut tailored to facial geometry, finished with a high-volume runway blowout.',
+    duration: 60,
+    price: 4500,
+    category: 'Ladies Hair & Styling'
+  },
+  {
+    id: 'srv-color-balayage',
+    name: 'Dimensional Balayage & Gloss Tone Melt',
+    description: 'Bespoke hand-painted highlights with seamless transitions and a radiant pH-balancing gloss tone.',
+    duration: 120,
+    price: 15500,
+    category: 'Color & Highlights'
+  },
+  {
+    id: 'srv-beard-sculpt',
+    name: 'Beard Sculpture & Hot Towel Shave Ritual',
+    description: 'Crisp beard contouring, dual aromatic hot towel compresses, and soothing sandalwood balm finish.',
+    duration: 30,
+    price: 2200,
+    category: 'Gents Bespoke Grooming'
+  },
+  {
+    id: 'srv-scalp-detox',
+    name: 'Deep Scalp Detox & High-Frequency Therapy',
+    description: 'Exfoliating scalp cleanse, ozone stimulation, and botanical nourishment for healthy follicle growth.',
+    duration: 45,
+    price: 5500,
+    category: 'Scalp & Hair Wellness'
+  },
+  {
+    id: 'srv-glow-facial',
+    name: 'Hydro-Radiance Deep Cleanse Facial',
+    description: 'Enzyme pore purification, antioxidant hydration infusion, and jade-stone lymphatic sculpting.',
+    duration: 60,
+    price: 7500,
+    category: 'Skin & Aesthetics'
   }
 ];
 
@@ -169,6 +185,56 @@ export default function BookingSection({ initialSelectedService, initialLocation
   
   // Confirmed Result
   const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
+  const [waCountdown, setWaCountdown] = useState<number>(3);
+  const [waAutoRedirectDone, setWaAutoRedirectDone] = useState<boolean>(false);
+
+  // Formats complete WhatsApp message and URL for salon concierge
+  const buildWhatsAppUrl = (booking: any, loc: 'colombo' | 'negombo') => {
+    const locConfig = loc === 'negombo' ? salonConfig.locations.negombo : salonConfig.locations.colombo;
+    const targetWhatsApp = locConfig?.whatsapp || salonConfig.whatsapp;
+    const branchName = loc === 'negombo' ? 'Negombo Branch (51 Galison Mawatha)' : 'Colombo / Nawala Branch (422A Nawala Rd)';
+    const msg = [
+      `*NEW APPOINTMENT RESERVATION — MOSPHERE SALON*`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `*Booking Ref:* ${booking.bookingRef}`,
+      `*Guest Name:* ${booking.customerName}`,
+      `*Phone Number:* ${booking.phone}`,
+      booking.email ? `*Email:* ${booking.email}` : null,
+      `*Sanctuary:* ${branchName}`,
+      `*Service:* ${booking.serviceName}`,
+      `*Date:* ${booking.date}`,
+      `*Time Slot:* ${booking.startTime}${booking.endTime ? ` – ${booking.endTime}` : ''}`,
+      `*Duration:* ${booking.duration} mins`,
+      `*Estimated:* LKR ${Number(booking.price || 0).toLocaleString()}`,
+      booking.notes ? `*Special Notes:* ${booking.notes}` : null,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `_Sent automatically from Mosphere Online Concierge_`
+    ].filter(Boolean).join('\n');
+
+    return `https://wa.me/${targetWhatsApp}?text=${encodeURIComponent(msg)}`;
+  };
+
+  // Automated WhatsApp Dispatch Countdown in Step 5
+  useEffect(() => {
+    if (step !== 5 || !confirmedBooking || waAutoRedirectDone) return;
+
+    const timer = setInterval(() => {
+      setWaCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setWaAutoRedirectDone(true);
+          const targetUrl = buildWhatsAppUrl(confirmedBooking, activeLocation);
+          if (typeof window !== 'undefined') {
+            window.location.href = targetUrl;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [step, confirmedBooking, waAutoRedirectDone, activeLocation]);
 
   // Sync external selected service from ServicesSection
   useEffect(() => {
@@ -186,6 +252,13 @@ export default function BookingSection({ initialSelectedService, initialLocation
       }
     }
   }, [initialSelectedService]);
+
+  // Sync initial location changes
+  useEffect(() => {
+    if (initialLocation) {
+      setActiveLocation(initialLocation);
+    }
+  }, [initialLocation]);
 
   // Load active services
   useEffect(() => {
@@ -269,7 +342,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
     if (calendarMonth === 11) setCalendarYear((prev) => prev + 1);
   };
 
-  // Submit Booking
+  // Submit Booking with Automatic WhatsApp Salon Dispatch
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedService || !selectedDate || !selectedSlot || !customerName || !phone) {
@@ -279,6 +352,17 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
     setSubmitting(true);
     setBookingError(null);
+
+    // Synchronously create a window on desktop click gesture to bypass popup blocker
+    const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    let preOpenedWaWindow: Window | null = null;
+    if (!isMobile && typeof window !== 'undefined') {
+      try {
+        preOpenedWaWindow = window.open('about:blank', '_blank');
+      } catch (e) {
+        console.warn('Popup blank tab notice:', e);
+      }
+    }
 
     try {
       const res = await fetch('/api/bookings', {
@@ -318,35 +402,15 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
         setConfirmedBooking(confirmed);
         setSubmitting(false);
+        setWaCountdown(3);
+        setWaAutoRedirectDone(false);
         setStep(5);
 
-        // Auto-open WhatsApp with formatted booking details
+        // Auto-deliver to Salon WhatsApp
         try {
-          const locConfig = activeLocation === 'negombo' ? salonConfig.locations.negombo : salonConfig.locations.colombo;
-          const targetWhatsApp = locConfig?.whatsapp || salonConfig.whatsapp;
-          const branchName = activeLocation === 'negombo' ? 'Negombo Branch' : 'Colombo / Nawala Branch';
-          const msg = [
-            `*NEW APPOINTMENT RESERVATION*`,
-            `----------------------------------`,
-            `*Ref:* ${confirmed.bookingRef}`,
-            `*Guest:* ${confirmed.customerName}`,
-            `*Phone:* ${confirmed.phone}`,
-            confirmed.email ? `*Email:* ${confirmed.email}` : null,
-            `*Branch:* ${branchName}`,
-            `*Service:* ${confirmed.serviceName}`,
-            `*Date:* ${confirmed.date}`,
-            `*Time:* ${confirmed.startTime}`,
-            `*Duration:* ${confirmed.duration} mins`,
-            `*Estimated:* LKR ${confirmed.price?.toLocaleString?.() || confirmed.price}`,
-            confirmed.notes ? `*Notes:* ${confirmed.notes}` : null,
-            `----------------------------------`,
-            `_Sent automatically from Mosphere Online Concierge_`
-          ].filter(Boolean).join('\n');
-
-          const waUrl = `https://wa.me/${targetWhatsApp}?text=${encodeURIComponent(msg)}`;
-          // Open WhatsApp in a new tab/app immediately
-          if (typeof window !== 'undefined') {
-            window.open(waUrl, '_blank');
+          const waUrl = buildWhatsAppUrl(confirmed, activeLocation);
+          if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
+            preOpenedWaWindow.location.href = waUrl;
           }
         } catch (waErr) {
           console.warn('WhatsApp auto-redirect notice:', waErr);
@@ -375,6 +439,9 @@ export default function BookingSection({ initialSelectedService, initialLocation
         }
         return;
       } else {
+        if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
+          preOpenedWaWindow.close();
+        }
         // Race condition / double booking
         setSubmitting(false);
         setBookingError(data.error || 'This time slot was just booked. Please select another time.');
@@ -405,34 +472,15 @@ export default function BookingSection({ initialSelectedService, initialLocation
         };
         setConfirmedBooking(fallbackBooking);
         setSubmitting(false);
+        setWaCountdown(3);
+        setWaAutoRedirectDone(false);
         setStep(5);
 
-        // Auto-open WhatsApp with formatted fallback booking details
+        // Auto-deliver to Salon WhatsApp
         try {
-          const locConfig = activeLocation === 'negombo' ? salonConfig.locations.negombo : salonConfig.locations.colombo;
-          const targetWhatsApp = locConfig?.whatsapp || salonConfig.whatsapp;
-          const branchName = activeLocation === 'negombo' ? 'Negombo Branch' : 'Colombo / Nawala Branch';
-          const msg = [
-            `*NEW APPOINTMENT RESERVATION*`,
-            `----------------------------------`,
-            `*Ref:* ${fallbackBooking.bookingRef}`,
-            `*Guest:* ${fallbackBooking.customerName}`,
-            `*Phone:* ${fallbackBooking.phone}`,
-            fallbackBooking.email ? `*Email:* ${fallbackBooking.email}` : null,
-            `*Branch:* ${branchName}`,
-            `*Service:* ${fallbackBooking.serviceName}`,
-            `*Date:* ${fallbackBooking.date}`,
-            `*Time:* ${fallbackBooking.startTime}`,
-            `*Duration:* ${fallbackBooking.duration} mins`,
-            `*Estimated:* LKR ${fallbackBooking.price?.toLocaleString?.() || fallbackBooking.price}`,
-            fallbackBooking.notes ? `*Notes:* ${fallbackBooking.notes}` : null,
-            `----------------------------------`,
-            `_Sent automatically from Mosphere Online Concierge_`
-          ].filter(Boolean).join('\n');
-
-          const waUrl = `https://wa.me/${targetWhatsApp}?text=${encodeURIComponent(msg)}`;
-          if (typeof window !== 'undefined') {
-            window.open(waUrl, '_blank');
+          const waUrl = buildWhatsAppUrl(fallbackBooking, activeLocation);
+          if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
+            preOpenedWaWindow.location.href = waUrl;
           }
         } catch (waErr) {
           console.warn('WhatsApp auto-redirect notice:', waErr);
@@ -444,6 +492,9 @@ export default function BookingSection({ initialSelectedService, initialLocation
           console.warn('Firestore fallback sync notice:', fsErr);
         }
       } catch (fallbackErr) {
+        if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
+          preOpenedWaWindow.close();
+        }
         setSubmitting(false);
         setBookingError('Something went wrong. Please try again or message via WhatsApp.');
       }
@@ -496,52 +547,59 @@ export default function BookingSection({ initialSelectedService, initialLocation
     return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const isNegombo = activeLocation === 'negombo';
+  const branchConfig = isNegombo ? salonConfig.locations.negombo : salonConfig.locations.colombo;
+
   return (
-    <section id="booking" className="py-24 sm:py-32 relative bg-[#09090B] border-t border-white/10 overflow-hidden">
+    <section id="booking" className={`py-24 sm:py-32 relative border-t overflow-hidden transition-colors duration-500 ${
+      isNegombo ? 'bg-[#02180F] border-emerald-500/20' : 'bg-[#09090B] border-white/10'
+    }`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-white/10 pb-8">
+        <div className={`flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b pb-8 ${
+          isNegombo ? 'border-emerald-500/25' : 'border-white/10'
+        }`}>
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-xs font-mono text-mosphere-gold font-semibold">07</span>
+              <span className={`text-xs font-mono font-semibold ${isNegombo ? 'text-[#E5B842]' : 'text-mosphere-gold'}`}>05</span>
               <span className="text-white/20">/</span>
               <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-white/60 font-medium">
-                RESERVATIONS & CONCIERGE
+                ONLINE RESERVATIONS & CONCIERGE
               </span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-white tracking-tight">
-              RESERVE YOUR <span className="italic text-mosphere-goldLight">EXPERIENCE</span>
+              RESERVE YOUR <span className={`italic ${isNegombo ? 'text-[#F3CC68]' : 'text-mosphere-goldLight'}`}>EXPERIENCE</span>
             </h2>
           </div>
 
-          <p className="text-xs sm:text-sm text-white/50 font-light max-w-sm">
-            Live Google Calendar synchronization. Select your bespoke ritual, choose your preferred slot, and receive instant confirmation.
+          <p className="text-xs sm:text-sm text-white/60 font-light max-w-sm">
+            Live Google Calendar synchronization for {isNegombo ? 'Negombo Coastal Studio' : 'Colombo Nawala Sanctuary'}. Select your bespoke ritual, choose your preferred slot, and receive instant confirmation.
           </p>
         </div>
 
         {/* Action Button Strip */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
           <a
-            href={`tel:${salonConfig.phone.replace(/[^0-9]/g, '')}`}
+            href={`tel:${branchConfig.phone.replace(/[^0-9]/g, '')}`}
             className="px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-mosphere-gold/40 transition-all uppercase flex items-center gap-2"
           >
-            <Phone className="w-3.5 h-3.5 text-mosphere-gold" />
-            <span>CALL NOW</span>
+            <Phone className={`w-3.5 h-3.5 ${isNegombo ? 'text-[#E5B842]' : 'text-mosphere-gold'}`} />
+            <span>CALL {isNegombo ? 'NEGOMBO' : 'COLOMBO'}</span>
           </a>
 
           <a
-            href={`https://wa.me/${salonConfig.whatsapp}`}
+            href={`https://wa.me/${branchConfig.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider text-white bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 hover:text-emerald-300 transition-all uppercase flex items-center gap-2"
           >
-            <span>WHATSAPP</span>
+            <span>WHATSAPP CONCIERGE</span>
           </a>
 
           <a
-            href={salonConfig.instagram}
+            href={branchConfig.instagram || salonConfig.instagram}
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-mosphere-gold/40 transition-all uppercase flex items-center gap-2"
@@ -550,7 +608,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
           </a>
 
           <a
-            href={salonConfig.googleMapsUrl}
+            href={branchConfig.googleMapsUrl || salonConfig.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-mosphere-gold/40 transition-all uppercase flex items-center gap-2"
@@ -981,7 +1039,9 @@ export default function BookingSection({ initialSelectedService, initialLocation
                         </div>
                         <div className="flex justify-between">
                           <span className="text-white/40 uppercase tracking-wider">Location</span>
-                          <span className="font-medium text-white text-right">422A Nawala Rd, Colombo</span>
+                          <span className="font-medium text-white text-right">
+                            {isNegombo ? '51 Galison Mawatha, Negombo' : '422A Nawala Rd, Rajagiriya'}
+                          </span>
                         </div>
 
                         <div className="pt-4 mt-4 border-t border-white/10 flex flex-col gap-1.5">
@@ -1050,9 +1110,53 @@ export default function BookingSection({ initialSelectedService, initialLocation
                 </p>
 
                 {/* Booking Reference Chip */}
-                <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-mosphere-gold/10 border border-mosphere-gold/40 text-xs font-semibold text-mosphere-gold mb-8">
+                <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-mosphere-gold/10 border border-mosphere-gold/40 text-xs font-semibold text-mosphere-gold mb-6">
                   <span>Booking Reference:</span>
                   <span className="font-mono tracking-wider">{confirmedBooking.bookingRef}</span>
+                </div>
+
+                {/* ✦ AUTOMATIC WHATSAPP DISPATCH TO SALON ✦ */}
+                <div className="mb-8 p-6 rounded-2xl bg-gradient-to-b from-[#062A1D] to-[#03150F] border-2 border-emerald-500/50 shadow-[0_0_35px_rgba(16,185,129,0.3)] text-center relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-mosphere-gold to-emerald-500" />
+
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="text-xs font-mono tracking-widest text-emerald-400 font-bold uppercase">
+                      ✦ AUTOMATIC SALON WHATSAPP DISPATCH ✦
+                    </span>
+                  </div>
+
+                  <h4 className="font-serif text-xl sm:text-2xl text-white font-medium mb-2">
+                    {waAutoRedirectDone ? 'Reservation Forwarded to WhatsApp' : `Opening WhatsApp in ${waCountdown}s...`}
+                  </h4>
+
+                  <p className="text-xs sm:text-sm text-emerald-100/75 max-w-md mx-auto mb-5 leading-relaxed">
+                    Your appointment is being forwarded automatically to Mosphere Salon at{' '}
+                    <strong className="text-emerald-300 font-mono">077 729 1629</strong> with all reservation details pre-formatted.
+                  </p>
+
+                  <a
+                    href={buildWhatsAppUrl(confirmedBooking, activeLocation)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setWaAutoRedirectDone(true)}
+                    className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-xs sm:text-sm font-bold tracking-wider text-black bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 hover:brightness-110 shadow-[0_0_25px_rgba(52,211,153,0.7)] hover:scale-[1.02] transition-all uppercase"
+                  >
+                    <MessageSquare className="w-4 h-4 text-black fill-current" />
+                    <span>OPEN WHATSAPP NOW & DELIVER RESERVATION</span>
+                  </a>
+
+                  {!waAutoRedirectDone && (
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        onClick={() => setWaAutoRedirectDone(true)}
+                        className="text-[11px] text-white/50 hover:text-white underline underline-offset-4 tracking-wider uppercase transition-colors"
+                      >
+                        Cancel auto-redirect (stay on this page)
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Details Breakdown */}
@@ -1106,33 +1210,14 @@ export default function BookingSection({ initialSelectedService, initialLocation
                   )}
 
                   <a
-                    href={`https://wa.me/${
-                      (activeLocation === 'negombo' ? salonConfig.locations.negombo.whatsapp : salonConfig.locations.colombo.whatsapp) || salonConfig.whatsapp
-                    }?text=${encodeURIComponent(
-                      [
-                        `*CONFIRMED APPOINTMENT RESERVATION*`,
-                        `----------------------------------`,
-                        `*Ref:* ${confirmedBooking.bookingRef}`,
-                        `*Guest:* ${confirmedBooking.customerName}`,
-                        `*Phone:* ${confirmedBooking.phone}`,
-                        confirmedBooking.email ? `*Email:* ${confirmedBooking.email}` : null,
-                        `*Branch:* ${activeLocation === 'negombo' ? 'Negombo' : 'Colombo / Nawala'}`,
-                        `*Service:* ${confirmedBooking.serviceName}`,
-                        `*Date:* ${confirmedBooking.date}`,
-                        `*Time:* ${confirmedBooking.startTime}`,
-                        `*Duration:* ${confirmedBooking.duration} mins`,
-                        `*Estimated:* LKR ${confirmedBooking.price?.toLocaleString?.() || confirmedBooking.price}`,
-                        confirmedBooking.notes ? `*Notes:* ${confirmedBooking.notes}` : null,
-                        `----------------------------------`,
-                        `_Sent from Mosphere Online Concierge_`
-                      ].filter(Boolean).join('\n')
-                    )}`}
+                    href={buildWhatsAppUrl(confirmedBooking, activeLocation)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => setWaAutoRedirectDone(true)}
                     className="px-6 py-3 rounded-full text-xs font-bold tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.7)] transition-all uppercase flex items-center gap-2"
                   >
-                    <MessageSquare className="w-4 h-4" />
-                    <span>NOTIFY SALON ON WHATSAPP</span>
+                    <MessageSquare className="w-4 h-4 fill-current" />
+                    <span>DELIVER VIA WHATSAPP</span>
                   </a>
 
                   <a

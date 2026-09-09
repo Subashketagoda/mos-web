@@ -19,28 +19,29 @@ export default function CustomCursor() {
 
   useEffect(() => {
     // Only enable on desktop fine pointer devices
-    const checkIsDesktop = () => {
-      const isFinePointer = window.matchMedia('(pointer: fine)').matches;
-      const isWideScreen = window.innerWidth >= 1024;
-      const enabled = isFinePointer && isWideScreen;
-      setIsDesktop(enabled);
-      if (enabled) {
-        document.body.classList.add('custom-cursor-enabled');
-      } else {
-        document.body.classList.remove('custom-cursor-enabled');
-      }
-    };
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+    const isWideScreen = window.innerWidth >= 1024;
+    const enabled = isFinePointer && isWideScreen;
+    setIsDesktop(enabled);
 
-    checkIsDesktop();
-    window.addEventListener('resize', checkIsDesktop, { passive: true });
+    if (!enabled) {
+      document.body.classList.remove('custom-cursor-enabled');
+      return;
+    }
+
+    document.body.classList.add('custom-cursor-enabled');
 
     let lastTarget: EventTarget | null = null;
+    let isCursorVisible = false;
 
     const onMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
 
-      if (!isVisible) setIsVisible(true);
+      if (!isCursorVisible) {
+        isCursorVisible = true;
+        setIsVisible(true);
+      }
 
       // Only check target hierarchy if target changed to save CPU cycles
       if (e.target !== lastTarget) {
@@ -70,15 +71,20 @@ export default function CustomCursor() {
       }
     };
 
-    const onMouseLeave = () => setIsVisible(false);
-    const onMouseEnter = () => setIsVisible(true);
+    const onMouseLeave = () => {
+      isCursorVisible = false;
+      setIsVisible(false);
+    };
+    const onMouseEnter = () => {
+      isCursorVisible = true;
+      setIsVisible(true);
+    };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     document.addEventListener('mouseleave', onMouseLeave, { passive: true });
     document.addEventListener('mouseenter', onMouseEnter, { passive: true });
 
     return () => {
-      window.removeEventListener('resize', checkIsDesktop);
       window.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);

@@ -22,42 +22,42 @@ const galleryItems = [
     title: 'Bespoke Hair Architecture',
     category: 'Haute Styling',
     aspect: 'portrait',
-    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'gal-2',
     title: 'Mosphere Private Suite',
     category: 'Sanctuary Interior',
     aspect: 'portrait',
-    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'gal-3',
     title: 'Precision Wash & Rejuvenation Ritual',
     category: 'Scalp Therapy',
     aspect: 'square',
-    src: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'gal-4',
     title: 'Bio-Active Caviar & Keratin Formulations',
     category: 'Pure Care',
     aspect: 'landscape',
-    src: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'gal-5',
     title: 'Dimensional Tone Melt Balayage',
     category: 'Color Artistry',
     aspect: 'portrait',
-    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'gal-6',
     title: 'Hydro-Radiance Skincare Lounge',
     category: 'Facial Aesthetics',
     aspect: 'landscape',
-    src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
+    src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
 ];
 
@@ -248,6 +248,8 @@ export default function GallerySection() {
               <img
                 src={item.src}
                 alt={item.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
 

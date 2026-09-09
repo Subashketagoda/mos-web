@@ -28,7 +28,7 @@ export default function NegomboIntro() {
             <span className="text-xs font-mono text-[#E5B842] font-semibold">01</span>
             <span className="text-emerald-300/30">/</span>
             <span className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-emerald-100/70 font-medium">
-              MOSPHERE NEGOMBO
+              INTRODUCTION
             </span>
           </div>
           <span className="text-xs font-mono text-emerald-300/50 tracking-widest hidden sm:inline uppercase">

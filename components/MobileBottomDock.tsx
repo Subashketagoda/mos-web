@@ -83,14 +83,14 @@ export default function MobileBottomDock({
           type="button"
           onClick={onOpenLocationSwitcher}
           aria-label="Switch Salon Location"
-          className={`px-2.5 py-2 rounded-full border text-[9.5px] font-mono tracking-wider uppercase flex items-center gap-1 transition-transform active:scale-95 shrink-0 ${
+          className={`px-3 py-2 rounded-full border text-[9.5px] font-mono tracking-wider uppercase flex items-center gap-1.5 transition-transform active:scale-95 shrink-0 ${
             isNegombo
-              ? 'bg-[#062A1D] border-emerald-500/40 text-[#E5B842]'
-              : 'bg-white/5 border-white/15 text-mosphere-gold'
+              ? 'bg-[#062A1D] border-emerald-500/40 text-[#E5B842] hover:border-[#E5B842]'
+              : 'bg-white/5 border-white/15 text-mosphere-gold hover:border-mosphere-gold/50'
           }`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-          <span>{isNegombo ? 'NEGOMBO' : 'COLOMBO'}</span>
+          <span className="text-[11px] leading-none">⇄</span>
+          <span>{isNegombo ? 'COLOMBO' : 'NEGOMBO'}</span>
         </button>
       </div>
     </aside>

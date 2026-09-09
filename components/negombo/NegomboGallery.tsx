@@ -20,37 +20,37 @@ const negomboGalleryItems = [
     id: 'neg-gal-1',
     title: 'Coastal Suite & Styling Bar',
     category: 'Sanctuary Interior',
-    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
+    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'neg-gal-2',
     title: 'Bespoke Hair Architecture',
     category: 'Haute Artistry',
-    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'neg-gal-3',
     title: 'Precision Razor & Steam Shave',
     category: 'Gents Grooming',
-    src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'neg-gal-4',
     title: 'Hydro-Radiance Skincare Lounge',
     category: 'Facial Aesthetics',
-    src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
+    src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'neg-gal-5',
     title: 'Sunlit Balayage & Glaze',
     category: 'Color Artistry',
-    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1000&q=80',
+    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
   {
     id: 'neg-gal-6',
     title: 'Coastal Marine Scalp Therapy',
     category: 'Scalp Sanctuary',
-    src: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
+    src: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=75&fm=webp',
   },
 ];
 
@@ -166,7 +166,7 @@ export default function NegomboGallery() {
             <span className="text-xs font-mono text-[#D4AF37] font-semibold">03</span>
             <span className="text-emerald-300/30">/</span>
             <span className="text-xs uppercase tracking-[0.3em] text-emerald-200/70 font-medium">
-              NEGOMBO GALLERY
+              STUDIO GALLERY
             </span>
           </div>
 
@@ -238,6 +238,8 @@ export default function NegomboGallery() {
               <img
                 src={item.src}
                 alt={item.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
 

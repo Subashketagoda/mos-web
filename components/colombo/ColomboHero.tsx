@@ -19,7 +19,7 @@ export default function ColomboHero() {
           transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75&fm=webp')`,
           }}
         />
         {/* Layered Noir Gradients */}
@@ -65,7 +65,7 @@ export default function ColomboHero() {
               className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-mosphere-gold/40 bg-black/60 backdrop-blur-md shadow-[0_0_20px_rgba(212,175,55,0.2)] mb-4 sm:mb-5"
             >
               <div className="w-5 h-5 rounded-full border border-mosphere-gold/60 flex items-center justify-center bg-black p-0.5 shadow-[0_0_8px_rgba(212,175,55,0.6)]">
-                <img src={salonConfig.emblem} alt="Mosphere" className="w-full h-full object-contain" />
+                <img src={salonConfig.emblem} alt="Mosphere" loading="eager" decoding="async" fetchPriority="high" className="w-full h-full object-contain" />
               </div>
               <span className="text-[9px] sm:text-xs font-sans tracking-[0.16em] sm:tracking-[0.3em] text-mosphere-gold uppercase font-semibold">
                 HAUTE BEAUTY & PRECISION GROOMING

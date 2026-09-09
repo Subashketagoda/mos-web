@@ -16,11 +16,11 @@ export const config = {
   
   // Salon Information
   salonName: process.env.SALON_NAME || 'Mosphere Luxury Salon',
-  salonPhone: process.env.SALON_PHONE || '+91 98765 43210',
-  salonWhatsApp: process.env.SALON_WHATSAPP || '919876543210',
-  salonEmail: process.env.SALON_EMAIL || 'concierge@mosphere.com',
-  salonTimezone: process.env.SALON_TIMEZONE || 'Asia/Kolkata',
-  salonAddress: process.env.SALON_ADDRESS || '7th Avenue, Luxury District, Suite 101',
+  salonPhone: process.env.SALON_PHONE || '+94 77 729 1629',
+  salonWhatsApp: process.env.SALON_WHATSAPP || '94777291629',
+  salonEmail: process.env.SALON_EMAIL || 'concierge@mosphere.lk',
+  salonTimezone: process.env.SALON_TIMEZONE || 'Asia/Colombo',
+  salonAddress: process.env.SALON_ADDRESS || '422A Nawala Rd, Rajagiriya, Sri Lanka',
 
   // Google Calendar Integration
   googleCalendar: {

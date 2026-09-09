@@ -26,12 +26,31 @@ export default function SmoothScroll({ children }: { children?: React.ReactNode 
     // Global Lenis ref for anchor link clicks
     (window as any).__lenis = lenis;
 
+    let rafId: number | null = null;
+    let isRunning = true;
+
     function raf(time: number) {
+      if (!isRunning) return;
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
 
-    const rafId = requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isRunning = false;
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      } else if (!isRunning) {
+        isRunning = true;
+        rafId = requestAnimationFrame(raf);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
 
     // Intercept in-page hash links for silky smooth scrolling
     const handleAnchorClick = (e: MouseEvent) => {
@@ -54,7 +73,9 @@ export default function SmoothScroll({ children }: { children?: React.ReactNode 
     document.addEventListener('click', handleAnchorClick);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      isRunning = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('click', handleAnchorClick);
       lenis.destroy();
       delete (window as any).__lenis;

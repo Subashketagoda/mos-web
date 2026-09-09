@@ -26,6 +26,8 @@ export default function NegomboFinalCTA() {
           <img
             src={salonConfig.locations.negombo.logo}
             alt="Mosphere Negombo Logo"
+            loading="lazy"
+            decoding="async"
             className="max-h-24 sm:max-h-28 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(229,184,66,0.7)]"
           />
         </motion.div>

@@ -8,25 +8,25 @@ import { salonConfig } from '@/lib/config';
 const instagramPosts = [
   {
     id: 'ig-1',
-    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=75&fm=webp',
     likes: '142',
     caption: 'Restorative Hair Botox glass-shine finish at Mosphere Nawala. ✨ #Mosphere #ColomboHair',
   },
   {
     id: 'ig-2',
-    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=75&fm=webp',
     likes: '210',
     caption: 'Private sanctuary aesthetics. Step in, unwind, and experience bespoke personal elevation. 🏛️',
   },
   {
     id: 'ig-3',
-    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=600&q=75&fm=webp',
     likes: '188',
     caption: 'Dimensional Blonde & Caramel Balayage melt. Hand-painted with bio-protecting gloss. 💫',
   },
   {
     id: 'ig-4',
-    src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=75&fm=webp',
     likes: '175',
     caption: 'Precision Fade Architecture & eucalyptus hot towel beard ritual in the Gents Suite. ✂️',
   },
@@ -55,7 +55,7 @@ export default function InstagramSection({ location = 'colombo' }: InstagramSect
         }`}>
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className={`text-xs font-mono font-semibold ${isNegombo ? 'text-[#E5B842]' : 'text-mosphere-gold'}`}>09</span>
+              <span className={`text-xs font-mono font-semibold ${isNegombo ? 'text-[#E5B842]' : 'text-mosphere-gold'}`}>07</span>
               <span className="text-white/20">/</span>
               <span className="text-xs uppercase tracking-[0.3em] text-white/60 font-medium">
                 SOCIAL JOURNAL {isNegombo ? '• NEGOMBO' : '• COLOMBO'}
@@ -101,6 +101,8 @@ export default function InstagramSection({ location = 'colombo' }: InstagramSect
               <img
                 src={post.src}
                 alt="Mosphere Instagram"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               />
 
