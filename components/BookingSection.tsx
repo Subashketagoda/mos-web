@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar as CalendarIcon,
@@ -159,6 +159,39 @@ export default function BookingSection({ initialSelectedService, initialLocation
   // Wizard Steps: 1 = Service, 2 = Date, 3 = Time, 4 = Details, 5 = Confirmed
   const [step, setStep] = useState(1);
   const [activeLocation, setActiveLocation] = useState<'colombo' | 'negombo'>(initialLocation);
+  const isInitialMount = useRef(true);
+
+  // Smoothly scrolls user back to the top of the booking wizard
+  const scrollToBookingTop = useCallback((smooth = true) => {
+    if (typeof window === 'undefined') return;
+    const target = document.getElementById('booking-wizard') || document.getElementById('booking');
+    if (target) {
+      // Offset for fixed top navbar (approx 85-95px)
+      const navbarOffset = 90;
+      const elementPosition = target.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
+  }, []);
+
+  // When step changes (e.g. 1->2, 2->3, 3->4, 4->5 or previous steps),
+  // automatically scroll user back up to the top of the booking wizard
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      scrollToBookingTop(true);
+    }, 60);
+
+    return () => clearTimeout(timer);
+  }, [step, scrollToBookingTop]);
   
   // Data State
   const [services, setServices] = useState<Service[]>(fallbackServices);
@@ -244,14 +277,11 @@ export default function BookingSection({ initialSelectedService, initialLocation
       // Ensure smooth scroll to booking date selection
       if (typeof window !== 'undefined') {
         setTimeout(() => {
-          const el = document.getElementById('booking');
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 50);
+          scrollToBookingTop(true);
+        }, 80);
       }
     }
-  }, [initialSelectedService]);
+  }, [initialSelectedService, scrollToBookingTop]);
 
   // Sync initial location changes
   useEffect(() => {
@@ -618,7 +648,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
         </div>
 
         {/* Booking Card & Wizard */}
-        <div className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
+        <div id="booking-wizard" className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
           
           {/* Top Gold Border */}
           <div className="h-1 w-full bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark" />
@@ -663,6 +693,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
                   { num: 4, title: 'Details' },
                 ].map((s) => (
                   <button
+                    type="button"
                     key={s.num}
                     onClick={() => s.num < step && setStep(s.num)}
                     disabled={s.num > step}
@@ -749,6 +780,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
                 <div className="flex justify-end">
                   <button
+                    type="button"
                     onClick={() => setStep(2)}
                     disabled={!selectedService}
                     className="px-8 py-3.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark shadow-goldGlow hover:-translate-y-0.5 transition-all uppercase"
@@ -843,12 +875,14 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
                 <div className="flex items-center justify-between">
                   <button
+                    type="button"
                     onClick={() => setStep(1)}
                     className="px-6 py-3 rounded-full text-xs font-medium tracking-wider text-white/70 hover:text-white bg-white/5 uppercase"
                   >
                     ← Back to Services
                   </button>
                   <button
+                    type="button"
                     onClick={() => setStep(3)}
                     disabled={!selectedDate}
                     className="px-8 py-3.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark shadow-goldGlow hover:-translate-y-0.5 transition-all uppercase"
@@ -922,12 +956,14 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
                 <div className="flex items-center justify-between">
                   <button
+                    type="button"
                     onClick={() => setStep(2)}
                     className="px-6 py-3 rounded-full text-xs font-medium tracking-wider text-white/70 hover:text-white bg-white/5 uppercase"
                   >
                     ← Back to Date
                   </button>
                   <button
+                    type="button"
                     onClick={() => setStep(4)}
                     disabled={!selectedSlot}
                     className="px-8 py-3.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark shadow-goldGlow hover:-translate-y-0.5 transition-all uppercase"
@@ -1080,6 +1116,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
                 <div className="mt-8 pt-4 border-t border-white/5 flex justify-start">
                   <button
+                    type="button"
                     onClick={() => setStep(3)}
                     className="px-6 py-3 rounded-full text-xs font-medium tracking-wider text-white/70 hover:text-white bg-white/5 uppercase"
                   >
@@ -1229,6 +1266,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
                   </a>
 
                   <button
+                    type="button"
                     onClick={downloadIcs}
                     className="px-5 py-3 rounded-full text-xs font-medium tracking-wider text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all uppercase flex items-center gap-2"
                   >
@@ -1239,6 +1277,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
                 <div>
                   <button
+                    type="button"
                     onClick={() => {
                       setStep(1);
                       setCustomerName('');
