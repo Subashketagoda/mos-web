@@ -30,6 +30,51 @@ interface Service {
   duration: number;
   price: number;
   category: string;
+  image?: string;
+}
+
+const serviceImages: Record<string, string> = {
+  'srv-hair-botox': 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80',
+  'srv-keratin-silk': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
+  'srv-gents-cut-beard': 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80',
+  'srv-ladies-couture-cut': 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=80',
+  'srv-color-balayage': 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80',
+  'srv-beard-sculpt': 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80',
+  'srv-scalp-detox': 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
+  'srv-glow-facial': 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80',
+};
+
+export function getServiceImage(service: { id?: string; name?: string; category?: string; image?: string }): string {
+  if (service.image) return service.image;
+  if (service.id && serviceImages[service.id]) return serviceImages[service.id];
+  const name = (service.name || '').toLowerCase();
+  const cat = (service.category || '').toLowerCase();
+
+  if (name.includes('botox') || name.includes('hydrate') || name.includes('repair')) {
+    return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('keratin') || name.includes('smoothing') || name.includes('silk')) {
+    return 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('beard') || name.includes('shave')) {
+    return 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('gent') || name.includes('fade') || name.includes('men') || cat.includes('gent')) {
+    return 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('balayage') || name.includes('color') || name.includes('highlight') || cat.includes('color')) {
+    return 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('scalp') || name.includes('detox')) {
+    return 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('facial') || name.includes('skin') || name.includes('glow') || cat.includes('skin')) {
+    return 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80';
+  }
+  if (name.includes('ladies') || name.includes('cut') || name.includes('blowout') || cat.includes('ladies')) {
+    return 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=80';
+  }
+  return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
 }
 
 interface AvailableSlot {
@@ -53,7 +98,8 @@ const fallbackServices: Service[] = [
     description: 'Intense amino-collagen infusion to seal cuticles, eliminate humidity frizz, and restore glass-like shine.',
     duration: 90,
     price: 14500,
-    category: 'Restorative Hair Lab'
+    category: 'Restorative Hair Lab',
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-keratin-silk',
@@ -61,7 +107,8 @@ const fallbackServices: Service[] = [
     description: 'Structural bio-smoothing protein therapy for mirror-smooth manageability and long-lasting silkiness.',
     duration: 120,
     price: 18500,
-    category: 'Restorative Hair Lab'
+    category: 'Restorative Hair Lab',
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-gents-cut-beard',
@@ -69,7 +116,8 @@ const fallbackServices: Service[] = [
     description: 'Precision taper or fade consultation, eucalyptus hot towel prep, and sharp straight-razor detailing.',
     duration: 45,
     price: 3500,
-    category: 'Gents Bespoke Grooming'
+    category: 'Gents Bespoke Grooming',
+    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-ladies-couture-cut',
@@ -77,7 +125,8 @@ const fallbackServices: Service[] = [
     description: 'Architectural haircut tailored to facial geometry, finished with a high-volume runway blowout.',
     duration: 60,
     price: 4500,
-    category: 'Ladies Hair & Styling'
+    category: 'Ladies Hair & Styling',
+    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-color-balayage',
@@ -85,7 +134,8 @@ const fallbackServices: Service[] = [
     description: 'Bespoke hand-painted highlights with seamless transitions and a radiant pH-balancing gloss tone.',
     duration: 120,
     price: 15500,
-    category: 'Color & Highlights'
+    category: 'Color & Highlights',
+    image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-beard-sculpt',
@@ -93,7 +143,8 @@ const fallbackServices: Service[] = [
     description: 'Crisp beard contouring, dual aromatic hot towel compresses, and soothing sandalwood balm finish.',
     duration: 30,
     price: 2200,
-    category: 'Gents Bespoke Grooming'
+    category: 'Gents Bespoke Grooming',
+    image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-scalp-detox',
@@ -101,7 +152,8 @@ const fallbackServices: Service[] = [
     description: 'Exfoliating scalp cleanse, ozone stimulation, and botanical nourishment for healthy follicle growth.',
     duration: 45,
     price: 5500,
-    category: 'Scalp & Hair Wellness'
+    category: 'Scalp & Hair Wellness',
+    image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'srv-glow-facial',
@@ -109,7 +161,8 @@ const fallbackServices: Service[] = [
     description: 'Enzyme pore purification, antioxidant hydration infusion, and jade-stone lymphatic sculpting.',
     duration: 60,
     price: 7500,
-    category: 'Skin & Aesthetics'
+    category: 'Skin & Aesthetics',
+    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80'
   }
 ];
 
@@ -297,9 +350,13 @@ export default function BookingSection({ initialSelectedService, initialLocation
         const res = await fetch('/api/services');
         const data = await res.json();
         if (data.success && data.services && data.services.length > 0) {
-          setServices(data.services);
+          const withImages: Service[] = data.services.map((s: any) => ({
+            ...s,
+            image: s.image || getServiceImage(s),
+          }));
+          setServices(withImages);
           if (!selectedService) {
-            setSelectedService(data.services[0]);
+            setSelectedService(withImages[0]);
           }
         }
       } catch (err) {
@@ -734,39 +791,86 @@ export default function BookingSection({ initialSelectedService, initialLocation
                 <h3 className="font-serif text-2xl text-white font-light mb-2">Step 1: Choose Your Service</h3>
                 <p className="text-xs text-white/60 mb-8">Select the grooming or aesthetic treatment you wish to reserve.</p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
                   {services.map((s) => {
                     const isSelected = selectedService?.id === s.id;
+                    const imageUrl = s.image || getServiceImage(s);
                     return (
                       <div
                         key={s.id}
                         onClick={() => {
-                          setSelectedService(s);
+                          setSelectedService({ ...s, image: imageUrl });
                           setStep(2);
                         }}
-                        className={`p-5 rounded-xl border cursor-pointer transition-all duration-300 flex flex-col justify-between ${
+                        className={`group rounded-2xl border cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
                           isSelected
-                            ? 'bg-mosphere-gold/10 border-mosphere-gold shadow-goldGlow'
-                            : 'bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06]'
+                            ? 'bg-mosphere-gold/[0.12] border-mosphere-gold shadow-goldGlow ring-1 ring-mosphere-gold/50'
+                            : 'bg-[#0E0E14] border-white/10 hover:border-mosphere-gold/50 hover:bg-[#14141E]'
                         }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] uppercase tracking-widest text-mosphere-gold font-medium">
-                              {s.category}
-                            </span>
-                            <span className="text-xs text-white/50">{s.duration} mins</span>
+                        {/* Service Photo Header */}
+                        {imageUrl && (
+                          <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-black/60">
+                            <img
+                              src={imageUrl}
+                              alt={s.name}
+                              className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                              loading="lazy"
+                            />
+                            {/* Seamless dark gradient fade into card body */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E14] via-[#0E0E14]/20 to-black/35" />
+                            
+                            {/* Top Badges */}
+                            <div className="absolute top-3 left-3">
+                              <span className="text-[10px] uppercase font-mono tracking-wider px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-mosphere-gold font-medium">
+                                {s.category}
+                              </span>
+                            </div>
+                            <div className="absolute top-3 right-3">
+                              <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white/90 flex items-center gap-1.5">
+                                <Clock className="w-3 h-3 text-mosphere-gold" />
+                                {s.duration} mins
+                              </span>
+                            </div>
+
+                            {/* Selection Checkmark Indicator on Image if selected */}
+                            {isSelected && (
+                              <div className="absolute bottom-3 right-3 bg-mosphere-gold text-black p-1.5 rounded-full shadow-goldGlow flex items-center justify-center">
+                                <CheckCircle2 className="w-4 h-4 fill-black text-mosphere-gold" />
+                              </div>
+                            )}
                           </div>
-                          <h4 className="font-serif text-lg text-white font-medium mb-1">{s.name}</h4>
-                          <p className="text-xs text-white/60 font-light leading-relaxed mb-4">{s.description}</p>
-                        </div>
-                        <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-                          <span className="text-xs font-serif font-medium text-mosphere-cream">
-                            Starting LKR {s.price.toLocaleString()}
-                          </span>
-                          <span className={`text-xs font-semibold uppercase ${isSelected ? 'text-mosphere-gold' : 'text-white/50'}`}>
-                            {isSelected ? 'Selected • Choose Date →' : 'Choose Date →'}
-                          </span>
+                        )}
+
+                        <div className="p-5 sm:p-6 flex flex-col flex-1 justify-between">
+                          <div>
+                            {!imageUrl && (
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[10px] uppercase tracking-widest text-mosphere-gold font-medium">
+                                  {s.category}
+                                </span>
+                                <span className="text-xs text-white/50">{s.duration} mins</span>
+                              </div>
+                            )}
+                            <h4 className="font-serif text-lg sm:text-xl text-white font-medium mb-2 group-hover:text-mosphere-goldLight transition-colors">
+                              {s.name}
+                            </h4>
+                            <p className="text-xs sm:text-sm text-white/60 font-light leading-relaxed mb-5">
+                              {s.description}
+                            </p>
+                          </div>
+                          
+                          <div className="pt-3.5 border-t border-white/10 flex items-center justify-between mt-auto">
+                            <div>
+                              <span className="text-[10px] uppercase font-mono text-white/40 block">Investment</span>
+                              <span className="text-sm sm:text-base font-serif font-medium text-mosphere-cream">
+                                Starting LKR {s.price.toLocaleString()}
+                              </span>
+                            </div>
+                            <span className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-1 transition-colors ${isSelected ? 'text-mosphere-gold' : 'text-white/50 group-hover:text-mosphere-gold'}`}>
+                              {isSelected ? 'Selected • Choose Date →' : 'Choose Date →'}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     );
@@ -802,9 +906,18 @@ export default function BookingSection({ initialSelectedService, initialLocation
                     <p className="text-xs text-white/60">Choose your preferred day for your visit.</p>
                   </div>
                   {selectedService && (
-                    <div className="text-right hidden sm:block">
-                      <span className="text-xs text-mosphere-gold block">{selectedService.name}</span>
-                      <span className="text-xs text-white/50">{selectedService.duration} min • Starting LKR {selectedService.price.toLocaleString()}</span>
+                    <div className="hidden sm:flex items-center gap-3 text-right">
+                      {(selectedService.image || getServiceImage(selectedService)) && (
+                        <img
+                          src={selectedService.image || getServiceImage(selectedService)}
+                          alt={selectedService.name}
+                          className="w-11 h-11 rounded-lg object-cover border border-mosphere-gold/40 shadow-sm"
+                        />
+                      )}
+                      <div className="text-right">
+                        <span className="text-xs text-mosphere-gold block font-medium">{selectedService.name}</span>
+                        <span className="text-xs text-white/50">{selectedService.duration} min • Starting LKR {selectedService.price.toLocaleString()}</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1049,7 +1162,25 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
                   {/* Right Summary Card */}
                   <div className="lg:col-span-5">
-                    <div className="bg-black/60 rounded-xl border border-mosphere-gold/30 p-6">
+                    <div className="bg-black/60 rounded-xl border border-mosphere-gold/30 p-6 overflow-hidden">
+                      {selectedService && (selectedService.image || getServiceImage(selectedService)) && (
+                        <div className="relative h-36 -mx-6 -mt-6 mb-5 overflow-hidden bg-black/60 border-b border-white/10">
+                          <img
+                            src={selectedService.image || getServiceImage(selectedService)}
+                            alt={selectedService.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                          <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                            <span className="text-[10px] uppercase font-mono tracking-wider text-mosphere-gold bg-black/70 px-2.5 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                              {selectedService.category}
+                            </span>
+                            <span className="text-[10px] font-mono text-white/80 bg-black/70 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                              {selectedService.duration} mins
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       <h4 className="font-serif text-lg text-white font-medium mb-4 pb-3 border-b border-white/10">
                         Appointment Summary
                       </h4>

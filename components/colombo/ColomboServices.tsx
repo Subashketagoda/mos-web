@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Clock } from 'lucide-react';
 
 interface ColomboServicesProps {
   onSelectService?: (service: any) => void;
@@ -207,44 +207,67 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
                 onMouseEnter={() => setHoveredService(service)}
                 onMouseLeave={() => setHoveredService(null)}
                 onClick={() => handleSelectCard(service)}
-                className={`group relative p-5 sm:p-8 rounded-2xl bg-[#0C0C12] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+                className={`group relative rounded-2xl bg-[#0C0C12] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
                   isSelected
-                    ? 'border-mosphere-gold ring-1 ring-mosphere-gold/40'
+                    ? 'border-mosphere-gold ring-1 ring-mosphere-gold/40 shadow-goldGlow'
                     : 'border-white/10 hover:border-mosphere-gold/50'
                 }`}
               >
-                {/* Subtle background image reveal on hover */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-15 transition-opacity duration-500 scale-105 group-hover:scale-100"
-                  style={{ backgroundImage: `url('${service.image}')` }}
-                />
-
-                <div>
-                  {/* Header Meta */}
-                  <div className="flex items-center justify-between gap-4 mb-4">
-                    <span className="text-xs font-mono text-mosphere-gold font-semibold">
-                      {service.number}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase font-mono tracking-widest text-white/40">
+                {/* Visual Image Header */}
+                {service.image && (
+                  <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-black/50">
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0C0C12] via-[#0C0C12]/20 to-black/35" />
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="text-xs font-mono text-mosphere-gold font-semibold px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15">
+                        {service.number}
+                      </span>
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-mosphere-cream px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15">
                         {service.category}
                       </span>
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-mono">
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <span className="text-[11px] px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white/80 font-mono flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-mosphere-gold" />
                         {service.duration}
                       </span>
                     </div>
                   </div>
+                )}
 
-                  {/* Service Name */}
-                  <h3 className="font-serif text-xl sm:text-2xl text-white font-medium group-hover:text-mosphere-goldLight transition-colors duration-300">
-                    {service.name}
-                  </h3>
+                <div className="p-5 sm:p-7 flex flex-col flex-1 justify-between">
+                  <div>
+                    {!service.image && (
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <span className="text-xs font-mono text-mosphere-gold font-semibold">
+                          {service.number}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase font-mono tracking-widest text-white/40">
+                            {service.category}
+                          </span>
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-mono">
+                            {service.duration}
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-white/50 font-light leading-relaxed mt-2.5">
-                    {service.description}
-                  </p>
-                </div>
+                    {/* Service Name */}
+                    <h3 className="font-serif text-xl sm:text-2xl text-white font-medium group-hover:text-mosphere-goldLight transition-colors duration-300">
+                      {service.name}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-xs sm:text-sm text-white/50 font-light leading-relaxed mt-2.5">
+                      {service.description}
+                    </p>
+                  </div>
 
                 {/* Bottom Price and Book Action */}
                 <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
@@ -265,7 +288,8 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </motion.div>
+              </div>
+            </motion.div>
             );
           })}
         </div>

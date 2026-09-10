@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Clock } from 'lucide-react';
 
 interface NegomboServicesProps {
   onSelectService?: (service: any) => void;
@@ -207,44 +207,67 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
                 onMouseEnter={() => setHoveredService(service)}
                 onMouseLeave={() => setHoveredService(null)}
                 onClick={() => handleSelectCard(service)}
-                className={`group relative p-5 sm:p-8 rounded-2xl bg-[#062A1D] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+                className={`group relative rounded-2xl bg-[#062A1D] border shadow-xl cursor-pointer transition-all duration-300 flex flex-col justify-between overflow-hidden ${
                   isSelected
-                    ? 'border-[#E5B842] ring-1 ring-[#E5B842]/40'
+                    ? 'border-[#E5B842] ring-1 ring-[#E5B842]/40 shadow-[0_0_25px_rgba(229,184,66,0.2)]'
                     : 'border-[#E5B842]/20 hover:border-[#E5B842]/60'
                 }`}
               >
-                {/* Subtle background image reveal on hover */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-15 transition-opacity duration-500 scale-105 group-hover:scale-100"
-                  style={{ backgroundImage: `url('${service.image}')` }}
-                />
-
-                <div className="relative z-10">
-                  {/* Header Meta */}
-                  <div className="flex items-center justify-between gap-4 mb-4">
-                    <span className="text-xs font-mono text-[#E5B842] font-semibold">
-                      {service.number}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase font-mono tracking-widest text-emerald-200/60">
+                {/* Visual Image Header */}
+                {service.image && (
+                  <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-black/50">
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#062A1D] via-[#062A1D]/20 to-black/35" />
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="text-xs font-mono text-[#E5B842] font-semibold px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15">
+                        {service.number}
+                      </span>
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-100/90 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15">
                         {service.category}
                       </span>
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#03180F] border border-[#E5B842]/25 text-emerald-100/70 font-mono">
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <span className="text-[11px] px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-emerald-100/80 font-mono flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-[#E5B842]" />
                         {service.duration}
                       </span>
                     </div>
                   </div>
+                )}
 
-                  {/* Service Name */}
-                  <h3 className="font-serif text-xl sm:text-2xl text-white font-medium group-hover:text-[#F3CC68] transition-colors duration-300">
-                    {service.name}
-                  </h3>
+                <div className="p-5 sm:p-7 flex flex-col flex-1 justify-between">
+                  <div>
+                    {!service.image && (
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <span className="text-xs font-mono text-[#E5B842] font-semibold">
+                          {service.number}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase font-mono tracking-widest text-emerald-200/60">
+                            {service.category}
+                          </span>
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#03180F] border border-[#E5B842]/25 text-emerald-100/70 font-mono">
+                            {service.duration}
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-emerald-100/60 font-light leading-relaxed mt-2.5">
-                    {service.description}
-                  </p>
-                </div>
+                    {/* Service Name */}
+                    <h3 className="font-serif text-xl sm:text-2xl text-white font-medium group-hover:text-[#F3CC68] transition-colors duration-300">
+                      {service.name}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-xs sm:text-sm text-emerald-100/60 font-light leading-relaxed mt-2.5">
+                      {service.description}
+                    </p>
+                  </div>
 
                 {/* Bottom Price and Book Action */}
                 <div className="pt-6 mt-6 border-t border-[#E5B842]/15 flex items-center justify-between relative z-10">
@@ -265,7 +288,8 @@ export default function NegomboServices({ onSelectService }: NegomboServicesProp
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </motion.div>
+              </div>
+            </motion.div>
             );
           })}
         </div>
