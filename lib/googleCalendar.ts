@@ -173,13 +173,29 @@ class GoogleCalendarService {
     }
   }
 
+  async createBookingEvent(booking: {
+    customerName: string;
+    phone: string;
+    email?: string;
+    serviceName: string;
+    duration?: number;
+    price?: number;
+    date: string;
+    startTime: string;
+    endTime: string;
+    notes?: string;
+    bookingRef: string;
+  }) {
+    return this.createEvent(booking);
+  }
+
   async createEvent(booking: {
     customerName: string;
     phone: string;
     email?: string;
     serviceName: string;
-    duration: number;
-    price: number;
+    duration?: number;
+    price?: number;
     date: string;
     startTime: string;
     endTime: string;
@@ -190,12 +206,17 @@ class GoogleCalendarService {
       await this.init();
     }
 
+    const durationText = booking.duration ? `${booking.duration} min` : '';
+    const priceText = booking.price !== undefined && booking.price !== null ? `LKR ${booking.price}` : '';
+    const serviceDetails = [durationText, priceText].filter(Boolean).join(' - ');
+    const serviceLine = serviceDetails ? `Service: ${booking.serviceName} (${serviceDetails})` : `Service: ${booking.serviceName}`;
+
     const title = `Mosphere Appointment — ${booking.customerName}`;
     const description = [
       `Customer Name: ${booking.customerName}`,
       `Phone: ${booking.phone}`,
       booking.email ? `Email: ${booking.email}` : null,
-      `Service: ${booking.serviceName} (${booking.duration} min - LKR ${booking.price})`,
+      serviceLine,
       `Notes: ${booking.notes && booking.notes.trim() ? booking.notes.trim() : 'None'}`,
       `Booking ID: ${booking.bookingRef}`,
       `Booked through: Mosphere Website`,

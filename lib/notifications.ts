@@ -140,7 +140,7 @@ export async function sendLockScreenNotification({
     playNotificationChime();
   }
 
-  const notificationOptions: NotificationOptions = {
+  const notificationOptions: any = {
     body,
     icon,
     badge,
@@ -150,14 +150,14 @@ export async function sendLockScreenNotification({
     silent: false,
     // Vibration pattern wakes phone and alerts on lock screen
     // 300ms vibrate, 100ms pause, 300ms vibrate, 100ms pause, 500ms vibrate
-    vibrate: [300, 100, 300, 100, 500] as any,
+    vibrate: [300, 100, 300, 100, 500],
     data: { url },
   };
 
   try {
     // Prefer service worker registration because it stays alive when screen is locked
     if ('serviceWorker' in navigator) {
-      let reg = await navigator.serviceWorker.getRegistration();
+      let reg: ServiceWorkerRegistration | null | undefined = await navigator.serviceWorker.getRegistration();
       if (!reg) {
         reg = await registerNotificationServiceWorker();
       }
