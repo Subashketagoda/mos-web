@@ -23,14 +23,15 @@ self.addEventListener('push', (event) => {
   }
 
   const title = payload.title || '💈 Mosphere New Booking!';
+  const bookingTag = payload.tag || ('mosphere-booking-' + Date.now());
   const options = {
     body: payload.body || 'A new appointment has been scheduled.',
     icon: payload.icon || '/apple-touch-icon.png',
     badge: payload.badge || '/images/mosphere-emblem-gold.png',
     vibrate: [300, 100, 300, 100, 500],
-    tag: payload.tag || 'mosphere-booking-latest',
-    renotify: false,
-    requireInteraction: false,
+    tag: bookingTag,
+    renotify: true,
+    requireInteraction: true,
     data: payload.data || { url: '/admin' },
     actions: [
       { action: 'view', title: 'Open Admin' },
