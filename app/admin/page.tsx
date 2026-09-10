@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -29,10 +29,21 @@ import {
   Upload,
   Menu,
   X,
-  Phone
+  Phone,
+  Bell,
+  BellRing,
+  BellOff,
+  Volume2
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 import { subscribeToBookings, subscribeToGallery, uploadImageFile } from '@/lib/firebaseService';
+import {
+  requestNotificationPermission,
+  sendLockScreenNotification,
+  getNotificationPermissionStatus,
+  registerNotificationServiceWorker,
+  playNotificationChime,
+} from '@/lib/notifications';
 
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -103,6 +114,98 @@ export default function AdminPage() {
   const [galRatio, setGalRatio] = useState('portrait');
   const [galLocation, setGalLocation] = useState<'colombo' | 'negombo' | 'all'>('colombo');
 
+  // Lock Screen Notification States
+  const [notificationStatus, setNotificationStatus] = useState<NotificationPermission | 'unsupported'>('default');
+  const [notificationTesting, setNotificationTesting] = useState(false);
+  const seenBookingIds = useRef<Set<string>>(new Set());
+  const isInitialBookingsLoad = useRef(true);
+
+  // Initialize notification permission status and Service Worker
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setNotificationStatus(getNotificationPermissionStatus());
+      registerNotificationServiceWorker();
+    }
+  }, []);
+
+  function checkAndNotifyNewBookings(incomingBookings: any[]) {
+    if (!Array.isArray(incomingBookings) || incomingBookings.length === 0) return;
+
+    if (isInitialBookingsLoad.current) {
+      incomingBookings.forEach((b: any) => {
+        const key = b.id || b.bookingRef;
+        if (key) seenBookingIds.current.add(String(key));
+      });
+      isInitialBookingsLoad.current = false;
+      return;
+    }
+
+    const newArrivals = incomingBookings.filter((b: any) => {
+      const key = b.id || b.bookingRef;
+      return key && !seenBookingIds.current.has(String(key));
+    });
+
+    if (newArrivals.length > 0) {
+      newArrivals.forEach((b: any) => {
+        const key = String(b.id || b.bookingRef);
+        seenBookingIds.current.add(key);
+
+        sendLockScreenNotification({
+          title: `💈 New Booking: ${b.customerName || 'Client'}`,
+          body: `📅 ${b.date} at ${b.startTime || ''}\n✂️ ${b.serviceName || 'Salon Service'}\n💰 Starting LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${b.bookingRef || b.id || 'N/A'}\n📞 ${b.phone || ''}`,
+          tag: `booking-${key}`,
+          url: '/admin',
+          playChime: true,
+        });
+      });
+    }
+  }
+
+  async function handleEnableNotifications() {
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      setNotificationStatus('granted');
+      sendLockScreenNotification({
+        title: '💈 Mosphere Lock Screen Alerts Active!',
+        body: 'You will now receive alerts directly on your lock screen when any client reserves an appointment.',
+        tag: 'mosphere-enabled',
+        url: '/admin',
+        playChime: true,
+      });
+    } else {
+      const current = getNotificationPermissionStatus();
+      setNotificationStatus(current);
+      if (current === 'denied') {
+        alert('Notifications are blocked in your browser settings. Please allow notifications for this site to receive lock screen alerts.');
+      }
+    }
+  }
+
+  async function handleTestNotification() {
+    setNotificationTesting(true);
+    try {
+      if (notificationStatus !== 'granted') {
+        const granted = await requestNotificationPermission();
+        if (!granted) {
+          alert('Please grant notification permission when prompted by your browser.');
+          setNotificationTesting(false);
+          return;
+        }
+        setNotificationStatus('granted');
+      }
+
+      await sendLockScreenNotification({
+        title: '💈 Lock Screen Alert Test Successful!',
+        body: 'Lock your phone or desktop right now! This alert appears directly on your lock screen with audio chime and vibration.',
+        tag: 'test-' + Date.now(),
+        url: '/admin',
+        playChime: true,
+      });
+    } finally {
+      setTimeout(() => setNotificationTesting(false), 1200);
+    }
+  }
+
   // Check existing token on mount
   useEffect(() => {
     const savedToken = localStorage.getItem('mosphere_admin_token');
@@ -127,6 +230,7 @@ export default function AdminPage() {
     // 3. Cloud Firestore Real-time push listeners
     const unsubBookings = subscribeToBookings((liveBookings) => {
       if (liveBookings && liveBookings.length > 0) {
+        checkAndNotifyNewBookings(liveBookings);
         setBookings((prev) => {
           const liveIds = new Set(liveBookings.map((b) => b.id));
           const remaining = prev.filter((p) => !liveIds.has(p.id));
@@ -239,6 +343,7 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.bookings)) {
+        checkAndNotifyNewBookings(data.bookings);
         setBookings((prev) => {
           const apiList = data.bookings;
           const apiIds = new Set(apiList.map((b: any) => b.id || b.bookingRef));
@@ -779,6 +884,38 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Lock Screen Notification Controls */}
+            {notificationStatus === 'granted' ? (
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleTestNotification}
+                  disabled={notificationTesting}
+                  title="Send a test alert to your lock screen right now"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-mono font-medium border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <BellRing className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="hidden lg:inline">Lock Screen Alerts: ON</span>
+                  <span className="lg:hidden">Alerts ON</span>
+                  <span className="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                    {notificationTesting ? 'Testing...' : 'Test'}
+                  </span>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleEnableNotifications}
+                title="Enable sound and lock screen alerts on this device for new bookings"
+                className="px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold border border-mosphere-gold/50 bg-mosphere-gold/15 text-mosphere-gold hover:bg-mosphere-gold hover:text-black transition-all flex items-center gap-1.5 shadow-goldGlow animate-pulse"
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Turn On Lock Screen Alerts</span>
+                <span className="sm:hidden">Alerts</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 if (token) loadAllData(token);
@@ -838,6 +975,53 @@ export default function AdminPage() {
                   <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-white/40 block mb-1.5 sm:mb-2">Total Completed</span>
                   <div className="text-2xl sm:text-3xl font-serif font-bold text-emerald-400">{stats?.completedCount || 0}</div>
                   <span className="text-[11px] sm:text-xs text-white/40 mt-1 block truncate">LKR {(stats?.totalRevenue || 0).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Lock Screen Notification Concierge Card */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#07131F] via-[#0B1B2C] to-[#08131E] border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.15)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    <BellRing className="w-5 h-5 text-cyan-300" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-serif text-base font-medium text-white">Device Lock Screen Notifications</h4>
+                      <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full uppercase tracking-wider font-bold ${
+                        notificationStatus === 'granted'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      }`}>
+                        {notificationStatus === 'granted' ? '● Active on this Device' : '● Setup Required'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-cyan-100/75 mt-1 leading-relaxed">
+                      Phone එක lock කර හෝ screen off කර තිබුණද, customer කෙනෙක් appointment එකක් book කළ සැනින් lock screen එකට sound සහ vibration සමඟ notification එකක් ලැබෙයි.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 w-full md:w-auto">
+                  {notificationStatus !== 'granted' ? (
+                    <button
+                      type="button"
+                      onClick={handleEnableNotifications}
+                      className="w-full md:w-auto px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-cyan-400 to-blue-400 hover:brightness-110 transition-all uppercase shadow-[0_0_18px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 active:scale-95"
+                    >
+                      <Bell className="w-3.5 h-3.5 text-black" />
+                      <span>Enable on this Device</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleTestNotification}
+                      disabled={notificationTesting}
+                      className="w-full md:w-auto px-5 py-2.5 rounded-full text-xs font-mono font-medium tracking-wider text-cyan-200 border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 transition-all uppercase flex items-center justify-center gap-2 active:scale-95 shadow-sm"
+                    >
+                      <Volume2 className="w-3.5 h-3.5 text-cyan-300" />
+                      <span>{notificationTesting ? 'Testing Alert...' : 'Test Lock Screen Alert'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 

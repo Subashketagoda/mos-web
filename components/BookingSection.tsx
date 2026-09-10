@@ -19,9 +19,12 @@ import {
   PhoneCall,
   Download,
   RotateCcw,
+  Bell,
+  BellRing,
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 import { syncBookingToFirestore } from '@/lib/firebaseService';
+import { requestNotificationPermission, sendLockScreenNotification } from '@/lib/notifications';
 
 interface Service {
   id: string;
@@ -273,6 +276,28 @@ export default function BookingSection({ initialSelectedService, initialLocation
   const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
   const [waCountdown, setWaCountdown] = useState<number>(3);
   const [waAutoRedirectDone, setWaAutoRedirectDone] = useState<boolean>(false);
+  const [clientNotifSent, setClientNotifSent] = useState<boolean>(false);
+
+  const handleEnableClientLockScreenReminder = async () => {
+    if (!confirmedBooking) return;
+    try {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        await sendLockScreenNotification({
+          title: '💈 Mosphere Appointment Reminder!',
+          body: `✂️ ${confirmedBooking.serviceName}\n📅 ${confirmedBooking.date} at ${confirmedBooking.startTime}\nRef: ${confirmedBooking.bookingRef}`,
+          tag: `confirmed-${confirmedBooking.bookingRef}`,
+          url: '/',
+          playChime: true,
+        });
+        setClientNotifSent(true);
+      } else {
+        alert('Please allow notifications in your browser permissions to receive lock screen reminders.');
+      }
+    } catch (err) {
+      console.warn('Reminder error:', err);
+    }
+  };
 
   // Formats complete WhatsApp message and URL for salon concierge
   const buildWhatsAppUrl = (booking: any, loc: 'colombo' | 'negombo') => {
@@ -1395,6 +1420,19 @@ export default function BookingSection({ initialSelectedService, initialLocation
                     <PhoneCall className="w-4 h-4 text-mosphere-gold" />
                     <span>CALL MOSPHERE</span>
                   </a>
+
+                  <button
+                    type="button"
+                    onClick={handleEnableClientLockScreenReminder}
+                    className={`px-5 py-3 rounded-full text-xs font-semibold tracking-wider transition-all uppercase flex items-center gap-2 border ${
+                      clientNotifSent
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                        : 'bg-cyan-500/15 text-cyan-200 border-cyan-500/40 hover:bg-cyan-500/25 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                    }`}
+                  >
+                    <BellRing className="w-4 h-4 text-cyan-300" />
+                    <span>{clientNotifSent ? '✓ Reminder Sent to Lock Screen' : 'Send Lock Screen Alert'}</span>
+                  </button>
 
                   <button
                     type="button"
