@@ -170,6 +170,7 @@ export default function AdminPage() {
   const [notificationTesting, setNotificationTesting] = useState(false);
   const notifiedKeysRef = useRef<Set<string>>(new Set());
   const isInitialBookingsLoad = useRef(true);
+  const sessionStartMsRef = useRef(Date.now());
 
   // Initialize notification permission status, Service Worker, and load notified history from localStorage
   useEffect(() => {
@@ -177,7 +178,7 @@ export default function AdminPage() {
       setNotificationStatus(getNotificationPermissionStatus());
       registerNotificationServiceWorker();
 
-      // Load already notified booking keys from localStorage to prevent re-notifying on page reload
+      // Load already notified booking keys from localStorage so notifications never fire again on page reload
       try {
         const stored = localStorage.getItem('mosphere_notified_bookings');
         if (stored) {
@@ -195,63 +196,84 @@ export default function AdminPage() {
   function checkAndNotifyNewBookings(incomingBookings: any[]) {
     if (!Array.isArray(incomingBookings) || incomingBookings.length === 0) return;
 
-    // First load: mark all existing bookings as seen so we never blast notifications on startup
+    // First load: mark all existing bookings as seen and save to localStorage so we NEVER notify for past bookings
     if (isInitialBookingsLoad.current) {
       incomingBookings.forEach((b: any) => {
         if (b.bookingRef) notifiedKeysRef.current.add(String(b.bookingRef).trim().toUpperCase());
         if (b.id) notifiedKeysRef.current.add(String(b.id).trim());
       });
       isInitialBookingsLoad.current = false;
+      try {
+        const keysArray = Array.from(notifiedKeysRef.current).slice(-300);
+        localStorage.setItem('mosphere_notified_bookings', JSON.stringify(keysArray));
+      } catch (e) {
+        // ignore
+      }
       return;
     }
 
-    const now = Date.now();
-    const newArrivals = incomingBookings.filter((b: any) => {
+    const sessionStart = sessionStartMsRef.current;
+    const newArrivals: any[] = [];
+
+    for (const b of incomingBookings) {
       const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : null;
       const idKey = b.id ? String(b.id).trim() : null;
 
-      // Check if already notified
-      if (refKey && notifiedKeysRef.current.has(refKey)) return false;
-      if (idKey && notifiedKeysRef.current.has(idKey)) return false;
+      // Skip if already seen or notified
+      if (refKey && notifiedKeysRef.current.has(refKey)) continue;
+      if (idKey && notifiedKeysRef.current.has(idKey)) continue;
 
-      // Check age: skip bookings created more than 10 minutes ago
+      // Skip bookings created before this admin session started (pre-existing bookings)
       if (b.createdAt) {
         const createdMs = new Date(b.createdAt).getTime();
-        if (!isNaN(createdMs) && now - createdMs > 10 * 60 * 1000) {
+        if (!isNaN(createdMs) && createdMs <= sessionStart) {
           if (refKey) notifiedKeysRef.current.add(refKey);
           if (idKey) notifiedKeysRef.current.add(idKey);
-          return false;
+          continue;
         }
+      } else {
+        // If no createdAt is provided, treat as pre-existing to avoid repeated alerts
+        if (refKey) notifiedKeysRef.current.add(refKey);
+        if (idKey) notifiedKeysRef.current.add(idKey);
+        continue;
       }
 
-      return true;
-    });
+      // Mark immediately to prevent duplicate documents in the same snapshot from passing
+      if (refKey) notifiedKeysRef.current.add(refKey);
+      if (idKey) notifiedKeysRef.current.add(idKey);
+      newArrivals.push(b);
+    }
 
     if (newArrivals.length > 0) {
-      newArrivals.forEach((b: any) => {
-        const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : String(b.id || Date.now());
-        const idKey = b.id ? String(b.id).trim() : refKey;
+      // Persist notified keys to localStorage
+      try {
+        const keysArray = Array.from(notifiedKeysRef.current).slice(-300);
+        localStorage.setItem('mosphere_notified_bookings', JSON.stringify(keysArray));
+      } catch (e) {
+        // ignore
+      }
 
-        // Mark as notified immediately
-        notifiedKeysRef.current.add(refKey);
-        notifiedKeysRef.current.add(idKey);
-
-        // Save up to 200 notified keys in localStorage
-        try {
-          const keysArray = Array.from(notifiedKeysRef.current).slice(-200);
-          localStorage.setItem('mosphere_notified_bookings', JSON.stringify(keysArray));
-        } catch (e) {
-          // ignore
-        }
-
+      if (newArrivals.length === 1) {
+        const b = newArrivals[0];
+        const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : String(b.id || 'N/A');
         sendLockScreenNotification({
           title: `💈 New Booking: ${b.customerName || 'Client'}`,
-          body: `📅 ${b.date} at ${b.startTime || ''}\n✂️ ${b.serviceName || 'Salon Service'}\n💰 Starting LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${b.bookingRef || 'N/A'}\n📞 ${b.phone || ''}`,
+          body: `📅 ${b.date} at ${b.startTime || ''}\n✂️ ${b.serviceName || 'Salon Service'}\n💰 Starting LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${refKey}\n📞 ${b.phone || ''}`,
           tag: `booking-${refKey}`,
           url: '/admin',
           playChime: true,
         });
-      });
+      } else {
+        // Multiple simultaneous bookings: trigger a single consolidated alert
+        const lead = newArrivals[0];
+        sendLockScreenNotification({
+          title: `💈 ${newArrivals.length} New Bookings Received!`,
+          body: `Latest: ${lead.customerName || 'Client'} - ${lead.serviceName || 'Service'}\nTap to view all incoming appointments in the portal.`,
+          tag: `bulk-booking-${Date.now()}`,
+          url: '/admin',
+          playChime: true,
+        });
+      }
     }
   }
 
@@ -332,10 +354,10 @@ export default function AdminPage() {
     // 1. Initial Load
     loadAllData(token);
 
-    // 2. Continuous 3-second live sync interval for all mobile & remote bookings
+    // 2. Periodic 30-second background sync for non-Firestore endpoints (Firestore provides instant push)
     const interval = setInterval(() => {
       loadAllData(token);
-    }, 3000);
+    }, 30000);
 
     // 3. Cloud Firestore Real-time push listeners
     const unsubBookings = subscribeToBookings((liveBookings) => {

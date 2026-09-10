@@ -2,11 +2,19 @@
 // Native Lock Screen & System Notifications for Mosphere Salon
 
 let audioCtx: AudioContext | null = null;
+let lastChimePlayedAt = 0;
 
 /**
  * Play a high-end luxury dual-tone chime for incoming booking alerts
+ * Throttled to never play more than once every 4 seconds
  */
 export function playNotificationChime(): void {
+  const nowMs = Date.now();
+  if (nowMs - lastChimePlayedAt < 4000) {
+    return;
+  }
+  lastChimePlayedAt = nowMs;
+
   try {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContextClass) return;
@@ -120,6 +128,8 @@ export interface LockScreenNotificationOptions {
   playChime?: boolean;
 }
 
+const recentNotificationTags = new Map<string, number>();
+
 /**
  * Send a native notification that displays directly on the device Lock Screen & Action Center
  */
@@ -140,6 +150,22 @@ export async function sendLockScreenNotification({
     return false;
   }
 
+  // Deduplicate rapid duplicate calls with the same tag (within 15 seconds)
+  const effectiveTag = tag || 'mosphere-booking-latest';
+  const nowMs = Date.now();
+  const lastSent = recentNotificationTags.get(effectiveTag) || 0;
+  if (nowMs - lastSent < 15000) {
+    return false;
+  }
+  recentNotificationTags.set(effectiveTag, nowMs);
+
+  // Clean memory periodically
+  if (recentNotificationTags.size > 200) {
+    for (const [k, t] of recentNotificationTags.entries()) {
+      if (nowMs - t > 60000) recentNotificationTags.delete(k);
+    }
+  }
+
   if (playChime) {
     playNotificationChime();
   }
@@ -148,9 +174,9 @@ export async function sendLockScreenNotification({
     body,
     icon,
     badge,
-    tag: tag || `mosphere-${Date.now()}`,
+    tag: effectiveTag,
     renotify: false,
-    requireInteraction: true,
+    requireInteraction: false,
     silent: false,
     // Vibration pattern wakes phone and alerts on lock screen
     // 300ms vibrate, 100ms pause, 300ms vibrate, 100ms pause, 500ms vibrate

@@ -28,9 +28,9 @@ self.addEventListener('push', (event) => {
     icon: payload.icon || '/apple-touch-icon.png',
     badge: payload.badge || '/images/mosphere-emblem-gold.png',
     vibrate: [300, 100, 300, 100, 500],
-    tag: payload.tag || 'mosphere-booking-' + Date.now(),
+    tag: payload.tag || 'mosphere-booking-latest',
     renotify: false,
-    requireInteraction: true,
+    requireInteraction: false,
     data: payload.data || { url: '/admin' },
     actions: [
       { action: 'view', title: 'Open Admin' },
