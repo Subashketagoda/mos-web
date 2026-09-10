@@ -56,9 +56,13 @@ export async function registerNotificationServiceWorker(): Promise<ServiceWorker
     return null;
   }
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const swUrl = `${basePath}/sw.js`;
+  const scope = basePath ? `${basePath}/` : '/';
+
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
+    const registration = await navigator.serviceWorker.register(swUrl, {
+      scope,
     });
     return registration;
   } catch (err) {

@@ -2,19 +2,19 @@
   "name": "Mosphere Luxury Salon",
   "short_name": "Mosphere",
   "description": "Haute Grooming & Luxury Appointment Booking Platform",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#070709",
   "theme_color": "#D4AF37",
   "icons": [
     {
-      "src": "/apple-touch-icon.png",
+      "src": "./apple-touch-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/images/mosphere-logo-512.png",
+      "src": "./apple-touch-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

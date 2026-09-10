@@ -49,7 +49,8 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  const targetUrl = (event.notification.data && event.notification.data.url) || '/admin';
+  const rawUrl = (event.notification.data && event.notification.data.url) || 'admin';
+  const targetUrl = new URL(rawUrl, self.registration.scope).href;
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
