@@ -182,3 +182,138 @@ export async function sendLockScreenNotification({
     return false;
   }
 }
+
+const DEFAULT_VAPID_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+  'BGzWKJ8VD6koWDYTAw5bU7Y4d3nNa-t3p6Rg5n1J2w4LXV_Agvra4M98N-ODk8uxoEbO7NA_4xMEeSZjjRdn3S0';
+
+export function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+/**
+ * Check if the current browser has an active PushSubscription registered with OS Push Service
+ */
+export async function isPushSubscribed(): Promise<boolean> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return false;
+  }
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return false;
+    const sub = await reg.pushManager.getSubscription();
+    return Boolean(sub);
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Subscribes this device to OS-level Lock Screen Web Push notifications.
+ * This allows alerts to arrive EVEN WHEN the browser/tab is completely closed and phone is locked!
+ */
+export async function subscribeToLockScreenPush(): Promise<{ success: boolean; error?: string }> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return { success: false, error: 'Push notifications are not supported by this browser.' };
+  }
+
+  const permissionGranted = await requestNotificationPermission();
+  if (!permissionGranted) {
+    return { success: false, error: 'Notification permission denied.' };
+  }
+
+  try {
+    let reg: ServiceWorkerRegistration | null | undefined = await navigator.serviceWorker.getRegistration();
+    if (!reg) {
+      reg = (await registerNotificationServiceWorker()) ?? undefined;
+    }
+    if (!reg) {
+      return { success: false, error: 'Service worker registration failed.' };
+    }
+
+    // Ensure service worker is active
+    if (!reg.active) {
+      await navigator.serviceWorker.ready;
+    }
+
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      const convertedVapidKey = urlBase64ToUint8Array(DEFAULT_VAPID_PUBLIC_KEY);
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey as any,
+      });
+    }
+
+    const subJson = sub.toJSON();
+
+    // 1. Send to Backend API
+    try {
+      await fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: subJson }),
+      });
+    } catch (e) {
+      console.warn('API push subscription sync notice:', e);
+    }
+
+    // 2. Direct Sync to Cloud Firestore (so it works on static GitHub Pages hosting too!)
+    try {
+      const { db } = await import('./firebase');
+      const { collection, addDoc, getDocs } = await import('firebase/firestore');
+      if (db && subJson.endpoint) {
+        const snap = await getDocs(collection(db, 'push_subscriptions'));
+        let found = false;
+        snap.forEach((d) => {
+          if (d.data().endpoint === subJson.endpoint) found = true;
+        });
+        if (!found) {
+          await addDoc(collection(db, 'push_subscriptions'), {
+            endpoint: subJson.endpoint,
+            p256dh: subJson.keys?.p256dh || '',
+            auth: subJson.keys?.auth || '',
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
+    } catch (fsErr) {
+      console.warn('Firestore push subscription sync notice:', fsErr);
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error subscribing to push:', err);
+    return { success: false, error: err.message || 'Push subscription failed.' };
+  }
+}
+
+/**
+ * Triggers a push broadcast to all subscribed admin devices
+ */
+export async function triggerPushNotificationToAll(payload: {
+  title: string;
+  body: string;
+  url?: string;
+  tag?: string;
+}): Promise<boolean> {
+  try {
+    const res = await fetch('/api/notifications/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Trigger push notice:', e);
+    return false;
+  }
+}
+

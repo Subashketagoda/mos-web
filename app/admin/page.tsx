@@ -43,6 +43,8 @@ import {
   getNotificationPermissionStatus,
   registerNotificationServiceWorker,
   playNotificationChime,
+  subscribeToLockScreenPush,
+  isPushSubscribed,
 } from '@/lib/notifications';
 
 export default function AdminPage() {
@@ -162,22 +164,34 @@ export default function AdminPage() {
   }
 
   async function handleEnableNotifications() {
-    const granted = await requestNotificationPermission();
-    if (granted) {
-      setNotificationStatus('granted');
-      sendLockScreenNotification({
-        title: '💈 Mosphere Lock Screen Alerts Active!',
-        body: 'You will now receive alerts directly on your lock screen when any client reserves an appointment.',
-        tag: 'mosphere-enabled',
-        url: '/admin',
-        playChime: true,
-      });
-    } else {
-      const current = getNotificationPermissionStatus();
-      setNotificationStatus(current);
-      if (current === 'denied') {
-        alert('Notifications are blocked in your browser settings. Please allow notifications for this site to receive lock screen alerts.');
+    setNotificationTesting(true);
+    try {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        setNotificationStatus('granted');
+
+        // Subscribe to OS Push Service (Google FCM / Apple APNs / Mozilla)
+        // This ensures lock screen notifications work EVEN WHEN the browser/tab is closed!
+        const pushResult = await subscribeToLockScreenPush();
+
+        sendLockScreenNotification({
+          title: '💈 Mosphere Lock Screen Alerts Active!',
+          body: pushResult.success
+            ? '✅ Device registered for background lock screen push alerts! You will receive notifications even when this browser tab is closed.'
+            : 'Lock screen alerts enabled for active sessions.',
+          tag: 'mosphere-enabled',
+          url: '/admin',
+          playChime: true,
+        });
+      } else {
+        const current = getNotificationPermissionStatus();
+        setNotificationStatus(current);
+        if (current === 'denied') {
+          alert('Notifications are blocked in your browser settings. Please allow notifications for this site to receive lock screen alerts.');
+        }
       }
+    } finally {
+      setNotificationTesting(false);
     }
   }
 
@@ -194,6 +208,10 @@ export default function AdminPage() {
         setNotificationStatus('granted');
       }
 
+      // Ensure push subscription is active
+      await subscribeToLockScreenPush();
+
+      // 1. Instant local lock screen notification
       await sendLockScreenNotification({
         title: '💈 Lock Screen Alert Test Successful!',
         body: 'Lock your phone or desktop right now! This alert appears directly on your lock screen with audio chime and vibration.',
@@ -201,6 +219,25 @@ export default function AdminPage() {
         url: '/admin',
         playChime: true,
       });
+
+      // 2. Schedule a real server-side Web Push after 4 seconds
+      // Gives the user 4 seconds to LOCK their screen / close the tab to see it arrive while locked!
+      setTimeout(async () => {
+        try {
+          await fetch('/api/notifications/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: '💈 Background Lock Screen Alert (Closed Tab)',
+              body: '✅ Success! This notification reached your phone through the OS Push Service while locked.',
+              url: '/admin',
+              tag: 'test-push-' + Date.now(),
+            }),
+          });
+        } catch (e) {
+          // ignore
+        }
+      }, 4000);
     } finally {
       setTimeout(() => setNotificationTesting(false), 1200);
     }

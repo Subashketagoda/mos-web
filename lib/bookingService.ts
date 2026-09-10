@@ -211,6 +211,20 @@ export class BookingService {
         console.warn('Notice: Firestore cloud sync in createBooking:', fsSyncErr);
       }
 
+      // 8. Trigger real-time OS Lock Screen Web Push to all registered admin devices (closed/locked screen)
+      try {
+        import('./webPushService').then(({ sendPushToAllSubscribers }) => {
+          sendPushToAllSubscribers({
+            title: `💈 New Appointment: ${trimmedName}`,
+            body: `${serviceName} on ${date} at ${startTime} (${trimmedPhone})`,
+            url: '/admin',
+            tag: `booking-${bookingId}`
+          }).catch((err: any) => console.warn('Web push notice:', err));
+        }).catch((e: any) => console.warn('Web push import notice:', e));
+      } catch (pushErr) {
+        console.warn('Web push trigger notice:', pushErr);
+      }
+
       // 9. Generate Customer Links
       const addToGoogleCalendarUrl = this.generateGoogleCalendarLink({
         customerName: trimmedName,

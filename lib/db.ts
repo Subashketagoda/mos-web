@@ -166,6 +166,14 @@ export async function initDatabase(): Promise<void> {
       createdAt TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id TEXT PRIMARY KEY,
+      endpoint TEXT UNIQUE NOT NULL,
+      p256dh TEXT NOT NULL,
+      auth TEXT NOT NULL,
+      createdAt TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(date);
     CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
     CREATE INDEX IF NOT EXISTS idx_bookings_ref ON bookings(bookingRef);
