@@ -29,7 +29,7 @@ self.addEventListener('push', (event) => {
     badge: payload.badge || '/images/mosphere-emblem-gold.png',
     vibrate: [300, 100, 300, 100, 500],
     tag: payload.tag || 'mosphere-booking-' + Date.now(),
-    renotify: true,
+    renotify: false,
     requireInteraction: true,
     data: payload.data || { url: '/admin' },
     actions: [

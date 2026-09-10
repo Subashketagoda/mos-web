@@ -119,43 +119,86 @@ export default function AdminPage() {
   // Lock Screen Notification States
   const [notificationStatus, setNotificationStatus] = useState<NotificationPermission | 'unsupported'>('default');
   const [notificationTesting, setNotificationTesting] = useState(false);
-  const seenBookingIds = useRef<Set<string>>(new Set());
+  const notifiedKeysRef = useRef<Set<string>>(new Set());
   const isInitialBookingsLoad = useRef(true);
 
-  // Initialize notification permission status and Service Worker
+  // Initialize notification permission status, Service Worker, and load notified history from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setNotificationStatus(getNotificationPermissionStatus());
       registerNotificationServiceWorker();
+
+      // Load already notified booking keys from localStorage to prevent re-notifying on page reload
+      try {
+        const stored = localStorage.getItem('mosphere_notified_bookings');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            notifiedKeysRef.current = new Set(parsed);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
     }
   }, []);
 
   function checkAndNotifyNewBookings(incomingBookings: any[]) {
     if (!Array.isArray(incomingBookings) || incomingBookings.length === 0) return;
 
+    // First load: mark all existing bookings as seen so we never blast notifications on startup
     if (isInitialBookingsLoad.current) {
       incomingBookings.forEach((b: any) => {
-        const key = b.id || b.bookingRef;
-        if (key) seenBookingIds.current.add(String(key));
+        if (b.bookingRef) notifiedKeysRef.current.add(String(b.bookingRef).trim().toUpperCase());
+        if (b.id) notifiedKeysRef.current.add(String(b.id).trim());
       });
       isInitialBookingsLoad.current = false;
       return;
     }
 
+    const now = Date.now();
     const newArrivals = incomingBookings.filter((b: any) => {
-      const key = b.id || b.bookingRef;
-      return key && !seenBookingIds.current.has(String(key));
+      const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : null;
+      const idKey = b.id ? String(b.id).trim() : null;
+
+      // Check if already notified
+      if (refKey && notifiedKeysRef.current.has(refKey)) return false;
+      if (idKey && notifiedKeysRef.current.has(idKey)) return false;
+
+      // Check age: skip bookings created more than 10 minutes ago
+      if (b.createdAt) {
+        const createdMs = new Date(b.createdAt).getTime();
+        if (!isNaN(createdMs) && now - createdMs > 10 * 60 * 1000) {
+          if (refKey) notifiedKeysRef.current.add(refKey);
+          if (idKey) notifiedKeysRef.current.add(idKey);
+          return false;
+        }
+      }
+
+      return true;
     });
 
     if (newArrivals.length > 0) {
       newArrivals.forEach((b: any) => {
-        const key = String(b.id || b.bookingRef);
-        seenBookingIds.current.add(key);
+        const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : String(b.id || Date.now());
+        const idKey = b.id ? String(b.id).trim() : refKey;
+
+        // Mark as notified immediately
+        notifiedKeysRef.current.add(refKey);
+        notifiedKeysRef.current.add(idKey);
+
+        // Save up to 200 notified keys in localStorage
+        try {
+          const keysArray = Array.from(notifiedKeysRef.current).slice(-200);
+          localStorage.setItem('mosphere_notified_bookings', JSON.stringify(keysArray));
+        } catch (e) {
+          // ignore
+        }
 
         sendLockScreenNotification({
           title: `💈 New Booking: ${b.customerName || 'Client'}`,
-          body: `📅 ${b.date} at ${b.startTime || ''}\n✂️ ${b.serviceName || 'Salon Service'}\n💰 Starting LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${b.bookingRef || b.id || 'N/A'}\n📞 ${b.phone || ''}`,
-          tag: `booking-${key}`,
+          body: `📅 ${b.date} at ${b.startTime || ''}\n✂️ ${b.serviceName || 'Salon Service'}\n💰 Starting LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${b.bookingRef || 'N/A'}\n📞 ${b.phone || ''}`,
+          tag: `booking-${refKey}`,
           url: '/admin',
           playChime: true,
         });
@@ -211,35 +254,16 @@ export default function AdminPage() {
       // Ensure push subscription is active
       await subscribeToLockScreenPush();
 
-      // 1. Instant local lock screen notification
+      // Send a single, clean test notification with fixed tag to prevent stacking
       await sendLockScreenNotification({
         title: '💈 Lock Screen Alert Test Successful!',
         body: 'Lock your phone or desktop right now! This alert appears directly on your lock screen with audio chime and vibration.',
-        tag: 'test-' + Date.now(),
+        tag: 'mosphere-test-alert',
         url: '/admin',
         playChime: true,
       });
-
-      // 2. Schedule a real server-side Web Push after 4 seconds
-      // Gives the user 4 seconds to LOCK their screen / close the tab to see it arrive while locked!
-      setTimeout(async () => {
-        try {
-          await fetch('/api/notifications/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              title: '💈 Background Lock Screen Alert (Closed Tab)',
-              body: '✅ Success! This notification reached your phone through the OS Push Service while locked.',
-              url: '/admin',
-              tag: 'test-push-' + Date.now(),
-            }),
-          });
-        } catch (e) {
-          // ignore
-        }
-      }, 4000);
     } finally {
-      setTimeout(() => setNotificationTesting(false), 1200);
+      setTimeout(() => setNotificationTesting(false), 800);
     }
   }
 
@@ -380,7 +404,6 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.bookings)) {
-        checkAndNotifyNewBookings(data.bookings);
         setBookings((prev) => {
           const apiList = data.bookings;
           const apiIds = new Set(apiList.map((b: any) => b.id || b.bookingRef));

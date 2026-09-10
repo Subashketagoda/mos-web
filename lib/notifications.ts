@@ -149,7 +149,7 @@ export async function sendLockScreenNotification({
     icon,
     badge,
     tag: tag || `mosphere-${Date.now()}`,
-    renotify: true,
+    renotify: false,
     requireInteraction: true,
     silent: false,
     // Vibration pattern wakes phone and alerts on lock screen
