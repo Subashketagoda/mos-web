@@ -42,18 +42,8 @@ export default function HomePage() {
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [selectedServiceFromMenu, setSelectedServiceFromMenu] = useState<any>(null);
 
-  React.useEffect(() => {
-    const seen = sessionStorage.getItem('mosphere_intro_seen');
-    if (seen === 'true') {
-      setShowCinematicLoader(false);
-    }
-  }, []);
-
   const handleLoaderComplete = () => {
     setShowCinematicLoader(false);
-    try {
-      sessionStorage.setItem('mosphere_intro_seen', 'true');
-    } catch {}
   };
 
   const handleSelectService = (service: any) => {
@@ -69,10 +59,10 @@ export default function HomePage() {
       {/* Bespoke Desktop Cursor */}
       <CustomCursor />
 
-      {/* Cinematic Brand Intro Loading Screen */}
+      {/* Cinematic Brand Intro Loading Screen (Guaranteed 3 Seconds) */}
       <AnimatePresence mode="wait">
         {showCinematicLoader && (
-          <CinematicLoader onComplete={handleLoaderComplete} />
+          <CinematicLoader durationMs={3000} onComplete={handleLoaderComplete} />
         )}
       </AnimatePresence>
 

@@ -10,7 +10,7 @@ interface CinematicLoaderProps {
 
 export default function CinematicLoader({
   onComplete,
-  durationMs = 1750,
+  durationMs = 3000,
 }: CinematicLoaderProps) {
   const shouldReduceMotion = useReducedMotion();
   const [isFinished, setIsFinished] = useState(false);
@@ -21,16 +21,11 @@ export default function CinematicLoader({
     setIsFinished(true);
     setTimeout(() => {
       onComplete();
-    }, 450);
+    }, 500);
   }, [isFinished, onComplete]);
 
-  // Progress ticker and auto-complete
+  // Guaranteed 3-second progress ticker and completion
   useEffect(() => {
-    if (shouldReduceMotion) {
-      const timer = setTimeout(finish, 400);
-      return () => clearTimeout(timer);
-    }
-
     const startTime = performance.now();
     let animFrame: number;
 
@@ -48,12 +43,7 @@ export default function CinematicLoader({
 
     animFrame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animFrame);
-  }, [durationMs, finish, shouldReduceMotion]);
-
-  // Click or touch anywhere to instantly skip/fast-forward
-  const handleUserBypass = () => {
-    finish();
-  };
+  }, [durationMs, finish]);
 
   return (
     <AnimatePresence>
@@ -66,8 +56,7 @@ export default function CinematicLoader({
             scale: 1.02,
             transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
           }}
-          onClick={handleUserBypass}
-          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#050507] select-none cursor-pointer overflow-hidden"
+          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#050507] select-none overflow-hidden"
           style={{ minHeight: '100svh' }}
           role="dialog"
           aria-label="Loading MOSPHERE"
@@ -125,12 +114,12 @@ export default function CinematicLoader({
           {/* Delicate traveling light sheen */}
           <motion.div
             initial={{ x: '-120%', opacity: 0 }}
-            animate={{ x: '220%', opacity: [0, 0.5, 0] }}
-            transition={{ duration: 1.5, delay: 0.25, ease: 'easeInOut' }}
+            animate={{ x: '220%', opacity: [0, 0.6, 0] }}
+            transition={{ duration: 2.4, delay: 0.3, ease: 'easeInOut' }}
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(105deg, transparent 42%, rgba(255, 245, 215, 0.07) 50%, transparent 58%)',
+                'linear-gradient(105deg, transparent 40%, rgba(255, 245, 215, 0.08) 50%, transparent 60%)',
             }}
           />
 
@@ -219,14 +208,14 @@ export default function CinematicLoader({
             </motion.p>
           </motion.div>
 
-          {/* Micro Fast-Forward Hint (Fade-in after 1s) */}
+          {/* Ambient Brand Cue */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
-            transition={{ delay: 0.9, duration: 0.5 }}
-            className="absolute bottom-6 sm:bottom-8 text-[9px] font-mono tracking-[0.25em] text-white/40 uppercase pointer-events-none"
+            animate={{ opacity: [0.25, 0.6, 0.25] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute bottom-6 sm:bottom-8 text-[9px] font-mono tracking-[0.3em] text-[#E5B842]/60 uppercase pointer-events-none"
           >
-            TAP TO ENTER
+            MOSPHERE SALON &bull; SRI LANKA
           </motion.div>
         </motion.div>
       )}
