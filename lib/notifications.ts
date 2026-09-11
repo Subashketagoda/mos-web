@@ -219,6 +219,13 @@ export async function sendLockScreenNotification({
         reg = await registerNotificationServiceWorker();
       }
       if (reg) {
+        try {
+          const active = await reg.getNotifications({ tag: effectiveTag });
+          if (active && active.length > 0) {
+            console.log('[LockScreen] Notification already displayed by Web Push for tag:', effectiveTag);
+            return true;
+          }
+        } catch (getErr) {}
         await reg.showNotification(title, notificationOptions);
         return true;
       }

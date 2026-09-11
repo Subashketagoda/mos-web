@@ -278,12 +278,18 @@ export default function AdminPage() {
         // ignore
       }
 
+      // If admin tab is already active and visible on screen, play audio chime and update UI without showing an intrusive OS banner
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        playNotificationChime();
+        return;
+      }
+
       if (newArrivals.length === 1) {
         const b = newArrivals[0];
         const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : String(b.id || 'N/A');
         sendLockScreenNotification({
           title: `💈 New Booking: ${b.customerName || 'Client'}`,
-          body: `📅 ${b.date} at ${b.startTime || ''}\n✂️ ${b.serviceName || 'Salon Service'}\n💰 Starting LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${refKey}\n📞 ${b.phone || ''}`,
+          body: `✂️ ${b.serviceName || 'Salon Service'}\n📅 ${b.date} at ${b.startTime || ''}\n💰 LKR ${Number(b.price || 0).toLocaleString()} • Ref: ${refKey}\n📞 ${b.phone || ''}`,
           tag: `booking-${refKey}`,
           url: '/admin',
           playChime: true,

@@ -1,7 +1,10 @@
 // public/sw.js
 // Mosphere Luxury Salon - Service Worker for Lock Screen & Push Notifications
 
-const CACHE_NAME = 'mosphere-sw-v2';
+const CACHE_NAME = 'mosphere-sw-v3';
+
+// In-memory debounce cache to eliminate duplicate push events arriving within 60s
+const recentPushTags = new Map();
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -26,6 +29,29 @@ self.addEventListener('push', (event) => {
 
       const title = payload.title || '💈 Mosphere New Booking!';
       const bookingTag = payload.tag || 'mosphere-booking-alert';
+
+      // 1. Debounce rapid duplicate push deliveries with same tag (within 60s)
+      const now = Date.now();
+      const lastSeen = recentPushTags.get(bookingTag);
+      if (lastSeen && (now - lastSeen < 60000)) {
+        console.log('[SW] Deduplicating push event for tag:', bookingTag);
+        return;
+      }
+      recentPushTags.set(bookingTag, now);
+      if (recentPushTags.size > 100) {
+        for (const [k, t] of recentPushTags.entries()) {
+          if (now - t > 120000) recentPushTags.delete(k);
+        }
+      }
+
+      // 2. If notification with this tag is ALREADY active on screen, do not duplicate
+      try {
+        const active = await self.registration.getNotifications({ tag: bookingTag });
+        if (active && active.length > 0) {
+          console.log('[SW] Notification already displayed for tag:', bookingTag);
+          return;
+        }
+      } catch (getErr) {}
 
       // Cross-platform options safe for iOS WebKit & Android/Desktop Chrome
       const options = {

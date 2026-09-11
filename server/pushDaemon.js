@@ -74,6 +74,14 @@ export function startPushDaemon() {
           const data = doc.data();
           const refKey = data.bookingRef ? String(data.bookingRef).trim().toUpperCase() : doc.id;
 
+          // 0. Skip if push was already dispatched directly by booking service
+          if (data.pushSent) {
+            console.log(`[PushDaemon] Skipping booking ${refKey} (already dispatched by booking service).`);
+            knownIds.add(doc.id);
+            if (data.bookingRef) knownIds.add(refKey);
+            continue;
+          }
+
           // 1. Skip if already known/seen
           if (knownIds.has(doc.id) || (data.bookingRef && knownIds.has(refKey))) {
             continue;

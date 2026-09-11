@@ -205,6 +205,7 @@ export class BookingService {
             status: 'confirmed',
             notes: trimmedNotes || '',
             googleCalendarEventId,
+            pushSent: true, // Prevents pushBridge from broadcasting a duplicate alert
           }).catch((e: any) => console.warn('Firestore server sync notice:', e));
         }).catch((e: any) => console.warn('Dynamic import notice in createBooking:', e));
       } catch (fsSyncErr) {
@@ -215,10 +216,10 @@ export class BookingService {
       try {
         import('./webPushService').then(({ sendPushToAllSubscribers }) => {
           sendPushToAllSubscribers({
-            title: `💈 New Appointment: ${trimmedName}`,
-            body: `${serviceName} on ${date} at ${startTime} (${trimmedPhone})`,
+            title: `💈 New Booking: ${trimmedName}`,
+            body: `✂️ ${serviceName}\n📅 ${date} at ${startTime}\n💰 LKR ${Number(price || 0).toLocaleString()} • Ref: ${bookingRef}\n📞 ${trimmedPhone}`,
             url: '/admin',
-            tag: `booking-${bookingId}`
+            tag: `booking-${bookingRef}`
           }).catch((err: any) => console.warn('Web push notice:', err));
         }).catch((e: any) => console.warn('Web push import notice:', e));
       } catch (pushErr) {
