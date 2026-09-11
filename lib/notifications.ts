@@ -129,6 +129,20 @@ export interface LockScreenNotificationOptions {
 }
 
 const recentNotificationTags = new Map<string, number>();
+const permanentlyDispatchedTags = new Set<string>();
+
+// Pre-load permanently dispatched tags from localStorage
+if (typeof window !== 'undefined') {
+  try {
+    const stored = localStorage.getItem('mosphere_dispatched_notif_tags');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        parsed.forEach((t) => permanentlyDispatchedTags.add(t));
+      }
+    }
+  } catch {}
+}
 
 /**
  * Send a native notification that displays directly on the device Lock Screen & Action Center
@@ -150,11 +164,24 @@ export async function sendLockScreenNotification({
     return false;
   }
 
-  // Deduplicate rapid duplicate calls with the same tag (within 15 seconds)
   const effectiveTag = tag || 'mosphere-booking-latest';
+
+  // 1. Permanent deduplication: Any booking notification tag can ONLY ever be triggered once!
+  if (effectiveTag.startsWith('booking-') || effectiveTag.startsWith('confirmed-')) {
+    if (permanentlyDispatchedTags.has(effectiveTag)) {
+      return false;
+    }
+    permanentlyDispatchedTags.add(effectiveTag);
+    try {
+      const list = Array.from(permanentlyDispatchedTags).slice(-500);
+      localStorage.setItem('mosphere_dispatched_notif_tags', JSON.stringify(list));
+    } catch {}
+  }
+
+  // 2. Debounce rapid duplicate calls with the same tag (within 60 seconds)
   const nowMs = Date.now();
   const lastSent = recentNotificationTags.get(effectiveTag) || 0;
-  if (nowMs - lastSent < 15000) {
+  if (nowMs - lastSent < 60000) {
     return false;
   }
   recentNotificationTags.set(effectiveTag, nowMs);
@@ -162,7 +189,7 @@ export async function sendLockScreenNotification({
   // Clean memory periodically
   if (recentNotificationTags.size > 200) {
     for (const [k, t] of recentNotificationTags.entries()) {
-      if (nowMs - t > 60000) recentNotificationTags.delete(k);
+      if (nowMs - t > 120000) recentNotificationTags.delete(k);
     }
   }
 

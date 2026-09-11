@@ -164,7 +164,7 @@ export function startPushBridge(): void {
               for (const sub of subs) {
                 try {
                   const res = await webpush.sendNotification(sub, payload, {
-                    TTL: 86400,
+                    TTL: 180, // 3 minutes max - prevents APNs from retrying stale notifications for 24 hours
                     urgency: 'high',
                   });
                   console.log(`✅ [PushBridge] Alert delivered to ${sub.endpoint.slice(0, 35)}... (HTTP ${res.statusCode})`);

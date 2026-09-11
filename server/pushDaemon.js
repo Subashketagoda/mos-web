@@ -166,7 +166,7 @@ export function startPushDaemon() {
             for (const sub of subscriptions) {
               try {
                 const res = await webpush.sendNotification(sub, payload, {
-                  TTL: 86400,
+                  TTL: 180, // 3 minutes max - prevents APNs 24hr retry loops
                   urgency: 'high'
                 });
                 console.log(`✅ [PushDaemon] Dispatched to ${sub.endpoint.slice(0, 35)}... (Status ${res.statusCode})`);

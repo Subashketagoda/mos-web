@@ -168,7 +168,18 @@ export default function AdminPage() {
   // Lock Screen Notification States
   const [notificationStatus, setNotificationStatus] = useState<NotificationPermission | 'unsupported'>('default');
   const [notificationTesting, setNotificationTesting] = useState(false);
-  const notifiedKeysRef = useRef<Set<string>>(new Set());
+  const notifiedKeysRef = useRef<Set<string>>((() => {
+    if (typeof window === 'undefined') return new Set<string>();
+    try {
+      const stored = localStorage.getItem('mosphere_notified_bookings');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return new Set<string>(parsed);
+      }
+    } catch {}
+    return new Set<string>();
+  })());
+  const sentAlertRefsRef = useRef<Set<string>>(new Set());
   const isInitialBookingsLoad = useRef(true);
   const sessionStartMsRef = useRef(Date.now());
   const startupSilenceUntilMsRef = useRef(Date.now() + 6000); // 6s silence window on page load
@@ -225,8 +236,8 @@ export default function AdminPage() {
       const idKey = b.id ? String(b.id).trim() : null;
 
       // 1. Skip if already seen or notified
-      if (refKey && notifiedKeysRef.current.has(refKey)) continue;
-      if (idKey && notifiedKeysRef.current.has(idKey)) continue;
+      if (refKey && (notifiedKeysRef.current.has(refKey) || sentAlertRefsRef.current.has(refKey))) continue;
+      if (idKey && (notifiedKeysRef.current.has(idKey) || sentAlertRefsRef.current.has(idKey))) continue;
 
       // Mark immediately to prevent duplicate alerts
       if (refKey) notifiedKeysRef.current.add(refKey);
@@ -238,7 +249,7 @@ export default function AdminPage() {
       if (isNaN(createdMs)) continue;
 
       // 3. Skip bookings created before this admin session started or during startup
-      if (createdMs <= sessionStartMsRef.current) continue;
+      if (createdMs <= sessionStartMsRef.current + 6000) continue;
 
       // 4. Skip stale bookings created more than 5 minutes ago
       if (now - createdMs > 5 * 60 * 1000) continue;
@@ -253,6 +264,12 @@ export default function AdminPage() {
     }
 
     if (newArrivals.length > 0) {
+      // Mark all new arrivals as alerted immediately
+      newArrivals.forEach((b: any) => {
+        if (b.bookingRef) sentAlertRefsRef.current.add(String(b.bookingRef).trim().toUpperCase());
+        if (b.id) sentAlertRefsRef.current.add(String(b.id).trim());
+      });
+
       // Persist notified keys to localStorage
       try {
         const keysArray = Array.from(notifiedKeysRef.current).slice(-500);

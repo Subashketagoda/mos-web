@@ -151,7 +151,7 @@ export async function sendPushToAllSubscribers(payload: {
           },
           notificationPayload,
           {
-            TTL: 86400, // 24 hours
+            TTL: 180, // 3 minutes max - prevents APNs 24hr retry loops
             urgency: 'high'
           }
         );
