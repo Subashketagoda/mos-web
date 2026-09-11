@@ -403,7 +403,9 @@ export function subscribeToBookings(
             price: data.price || 0,
             status: data.status || 'confirmed',
             notes: data.notes || '',
-            createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
+            createdAt: data.createdAt?.toDate
+              ? data.createdAt.toDate().toISOString()
+              : (typeof data.createdAt === 'string' ? data.createdAt : ''),
           });
         });
 
@@ -473,7 +475,9 @@ export async function getBookingsFromFirestore(): Promise<FirebaseBooking[]> {
         price: data.price || 0,
         status: data.status || 'confirmed',
         notes: data.notes || '',
-        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt || new Date().toISOString(),
+        createdAt: data.createdAt?.toDate
+          ? data.createdAt.toDate().toISOString()
+          : (typeof data.createdAt === 'string' ? data.createdAt : ''),
       });
     });
 

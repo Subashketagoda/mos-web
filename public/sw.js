@@ -23,7 +23,7 @@ self.addEventListener('push', (event) => {
   }
 
   const title = payload.title || '💈 Mosphere New Booking!';
-  const bookingTag = payload.tag || ('mosphere-booking-' + Date.now());
+  const bookingTag = payload.tag || 'mosphere-booking-alert';
   const options = {
     body: payload.body || 'A new appointment has been scheduled.',
     icon: payload.icon || '/apple-touch-icon.png',

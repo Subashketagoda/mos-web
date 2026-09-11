@@ -171,6 +171,7 @@ export default function AdminPage() {
   const notifiedKeysRef = useRef<Set<string>>(new Set());
   const isInitialBookingsLoad = useRef(true);
   const sessionStartMsRef = useRef(Date.now());
+  const startupSilenceUntilMsRef = useRef(Date.now() + 6000); // 6s silence window on page load
 
   // Initialize notification permission status, Service Worker, and load notified history from localStorage
   useEffect(() => {
@@ -196,15 +197,19 @@ export default function AdminPage() {
   function checkAndNotifyNewBookings(incomingBookings: any[]) {
     if (!Array.isArray(incomingBookings) || incomingBookings.length === 0) return;
 
-    // First load: mark all existing bookings as seen and save to localStorage so we NEVER notify for past bookings
-    if (isInitialBookingsLoad.current) {
+    const now = Date.now();
+    const isInsideStartupGracePeriod = now < startupSilenceUntilMsRef.current;
+
+    // First load or during initial startup grace period:
+    // Mark all existing bookings as seen and save to localStorage so we NEVER notify for past bookings
+    if (isInitialBookingsLoad.current || isInsideStartupGracePeriod) {
       incomingBookings.forEach((b: any) => {
         if (b.bookingRef) notifiedKeysRef.current.add(String(b.bookingRef).trim().toUpperCase());
         if (b.id) notifiedKeysRef.current.add(String(b.id).trim());
       });
       isInitialBookingsLoad.current = false;
       try {
-        const keysArray = Array.from(notifiedKeysRef.current).slice(-300);
+        const keysArray = Array.from(notifiedKeysRef.current).slice(-500);
         localStorage.setItem('mosphere_notified_bookings', JSON.stringify(keysArray));
       } catch (e) {
         // ignore
@@ -212,42 +217,45 @@ export default function AdminPage() {
       return;
     }
 
-    const sessionStart = sessionStartMsRef.current;
     const newArrivals: any[] = [];
+    const todayColombo = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Colombo' }).format(new Date());
 
     for (const b of incomingBookings) {
       const refKey = b.bookingRef ? String(b.bookingRef).trim().toUpperCase() : null;
       const idKey = b.id ? String(b.id).trim() : null;
 
-      // Skip if already seen or notified
+      // 1. Skip if already seen or notified
       if (refKey && notifiedKeysRef.current.has(refKey)) continue;
       if (idKey && notifiedKeysRef.current.has(idKey)) continue;
 
-      // Skip bookings created before this admin session started (pre-existing bookings)
-      if (b.createdAt) {
-        const createdMs = new Date(b.createdAt).getTime();
-        if (!isNaN(createdMs) && createdMs <= sessionStart) {
-          if (refKey) notifiedKeysRef.current.add(refKey);
-          if (idKey) notifiedKeysRef.current.add(idKey);
-          continue;
-        }
-      } else {
-        // If no createdAt is provided, treat as pre-existing to avoid repeated alerts
-        if (refKey) notifiedKeysRef.current.add(refKey);
-        if (idKey) notifiedKeysRef.current.add(idKey);
-        continue;
-      }
-
-      // Mark immediately to prevent duplicate documents in the same snapshot from passing
+      // Mark immediately to prevent duplicate alerts
       if (refKey) notifiedKeysRef.current.add(refKey);
       if (idKey) notifiedKeysRef.current.add(idKey);
+
+      // 2. Strict timestamp verification: must have createdAt
+      if (!b.createdAt) continue;
+      const createdMs = new Date(b.createdAt).getTime();
+      if (isNaN(createdMs)) continue;
+
+      // 3. Skip bookings created before this admin session started or during startup
+      if (createdMs <= sessionStartMsRef.current) continue;
+
+      // 4. Skip stale bookings created more than 5 minutes ago
+      if (now - createdMs > 5 * 60 * 1000) continue;
+
+      // 5. Skip appointments on past dates
+      if (b.date && b.date < todayColombo) continue;
+
+      // 6. Skip cancelled or completed appointments
+      if (b.status === 'cancelled' || b.status === 'completed') continue;
+
       newArrivals.push(b);
     }
 
     if (newArrivals.length > 0) {
       // Persist notified keys to localStorage
       try {
-        const keysArray = Array.from(notifiedKeysRef.current).slice(-300);
+        const keysArray = Array.from(notifiedKeysRef.current).slice(-500);
         localStorage.setItem('mosphere_notified_bookings', JSON.stringify(keysArray));
       } catch (e) {
         // ignore
@@ -264,12 +272,12 @@ export default function AdminPage() {
           playChime: true,
         });
       } else {
-        // Multiple simultaneous bookings: trigger a single consolidated alert
+        // Multiple simultaneous bookings: trigger a single consolidated alert with fixed tag
         const lead = newArrivals[0];
         sendLockScreenNotification({
           title: `💈 ${newArrivals.length} New Bookings Received!`,
           body: `Latest: ${lead.customerName || 'Client'} - ${lead.serviceName || 'Service'}\nTap to view all incoming appointments in the portal.`,
-          tag: `bulk-booking-${Date.now()}`,
+          tag: 'mosphere-bulk-bookings',
           url: '/admin',
           playChime: true,
         });

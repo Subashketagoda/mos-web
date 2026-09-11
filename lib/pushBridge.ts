@@ -29,10 +29,26 @@ export function startPushBridge(): void {
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    const bridgeStartTime = Date.now();
     const knownIds = new Set<string>();
+    const alreadyPushedKeys = new Set<string>();
     let isInitial = true;
 
     console.log('⚡ [PushBridge] Real-time Lock Screen Web Push daemon active. Watching Firestore...');
+
+    // Pre-seed known IDs from Firestore immediately on boot so existing records never trigger alerts
+    getDocs(collection(db, 'bookings'))
+      .then((existingSnap) => {
+        existingSnap.forEach((doc) => {
+          knownIds.add(doc.id);
+          const data = doc.data();
+          if (data.bookingRef) knownIds.add(String(data.bookingRef).trim().toUpperCase());
+        });
+        console.log(`⚡ [PushBridge] Pre-seeded ${knownIds.size} historical booking keys.`);
+      })
+      .catch((e) => {
+        console.warn('[PushBridge] Notice pre-seeding bookings:', e);
+      });
 
     onSnapshot(
       collection(db, 'bookings'),
@@ -56,14 +72,63 @@ export function startPushBridge(): void {
             const data = doc.data();
             const refKey = data.bookingRef ? String(data.bookingRef).trim().toUpperCase() : doc.id;
 
+            // 1. Skip if already known/seen
             if (knownIds.has(doc.id) || (data.bookingRef && knownIds.has(refKey))) {
               continue;
             }
 
+            // Always add to knownIds immediately to block duplicates
             knownIds.add(doc.id);
             if (data.bookingRef) knownIds.add(refKey);
 
-            console.log(`🛎️ [PushBridge] New booking detected: ${data.customerName} - ${data.serviceName} on ${data.date} at ${data.startTime}`);
+            // 2. Parse createdAt timestamp
+            let createdMs = 0;
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+              createdMs = data.createdAt.toDate().getTime();
+            } else if (typeof data.createdAt === 'string') {
+              createdMs = new Date(data.createdAt).getTime();
+            } else if (typeof data.createdAt === 'number') {
+              createdMs = data.createdAt;
+            }
+
+            // 3. Skip if no valid timestamp
+            if (!createdMs || isNaN(createdMs)) {
+              console.log(`[PushBridge] Skipping booking ${refKey} (no creation timestamp).`);
+              continue;
+            }
+
+            // 4. Skip historical bookings created before this server/bridge session started (10s buffer)
+            if (createdMs < bridgeStartTime - 10000) {
+              console.log(`[PushBridge] Skipping historical booking ${refKey} created in the past.`);
+              continue;
+            }
+
+            // 5. Skip stale bookings (created > 5 minutes ago)
+            if (Date.now() - createdMs > 5 * 60 * 1000) {
+              console.log(`[PushBridge] Skipping stale booking ${refKey} (older than 5m).`);
+              continue;
+            }
+
+            // 6. Skip appointments scheduled on past dates
+            const todayColombo = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Colombo' }).format(new Date());
+            if (data.date && data.date < todayColombo) {
+              console.log(`[PushBridge] Skipping past-dated booking ${refKey} (${data.date}).`);
+              continue;
+            }
+
+            // 7. Skip cancelled or completed bookings
+            if (data.status === 'cancelled' || data.status === 'completed') {
+              continue;
+            }
+
+            // 8. Skip if already pushed
+            if (alreadyPushedKeys.has(refKey) || alreadyPushedKeys.has(doc.id)) {
+              continue;
+            }
+            alreadyPushedKeys.add(refKey);
+            alreadyPushedKeys.add(doc.id);
+
+            console.log(`🛎️ [PushBridge] Real-time new booking confirmed: ${data.customerName} - ${data.serviceName} on ${data.date} at ${data.startTime}`);
 
             // Retrieve registered push subscriptions from Firestore
             try {

@@ -31,10 +31,26 @@ export function startPushDaemon() {
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  const daemonStartTime = Date.now();
   const knownIds = new Set();
+  const alreadyPushedKeys = new Set();
   let isInitial = true;
 
   console.log('⚡ [PushDaemon] Watching Cloud Firestore bookings in real time...');
+
+  // Pre-seed known IDs from Firestore immediately on start so existing records never trigger alerts
+  getDocs(collection(db, 'bookings'))
+    .then((existingSnap) => {
+      existingSnap.forEach((doc) => {
+        knownIds.add(doc.id);
+        const data = doc.data();
+        if (data.bookingRef) knownIds.add(String(data.bookingRef).trim().toUpperCase());
+      });
+      console.log(`⚡ [PushDaemon] Pre-seeded ${knownIds.size} historical booking keys.`);
+    })
+    .catch((e) => {
+      console.warn('[PushDaemon] Notice pre-seeding bookings:', e);
+    });
 
   onSnapshot(
     collection(db, 'bookings'),
@@ -58,14 +74,63 @@ export function startPushDaemon() {
           const data = doc.data();
           const refKey = data.bookingRef ? String(data.bookingRef).trim().toUpperCase() : doc.id;
 
+          // 1. Skip if already known/seen
           if (knownIds.has(doc.id) || (data.bookingRef && knownIds.has(refKey))) {
             continue;
           }
 
+          // Mark known immediately
           knownIds.add(doc.id);
           if (data.bookingRef) knownIds.add(refKey);
 
-          console.log(`🛎️ [PushDaemon] NEW BOOKING: ${data.customerName || 'Guest'} (${data.serviceName} on ${data.date} at ${data.startTime}) Ref: ${refKey}`);
+          // 2. Parse createdAt timestamp
+          let createdMs = 0;
+          if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+            createdMs = data.createdAt.toDate().getTime();
+          } else if (typeof data.createdAt === 'string') {
+            createdMs = new Date(data.createdAt).getTime();
+          } else if (typeof data.createdAt === 'number') {
+            createdMs = data.createdAt;
+          }
+
+          // 3. Skip if no valid timestamp
+          if (!createdMs || isNaN(createdMs)) {
+            console.log(`[PushDaemon] Skipping booking ${refKey} (no creation timestamp).`);
+            continue;
+          }
+
+          // 4. Skip historical bookings created before this daemon started (10s buffer)
+          if (createdMs < daemonStartTime - 10000) {
+            console.log(`[PushDaemon] Skipping historical booking ${refKey} created in the past.`);
+            continue;
+          }
+
+          // 5. Skip stale bookings (created > 5 minutes ago)
+          if (Date.now() - createdMs > 5 * 60 * 1000) {
+            console.log(`[PushDaemon] Skipping stale booking ${refKey} (older than 5m).`);
+            continue;
+          }
+
+          // 6. Skip appointments scheduled on past dates
+          const todayColombo = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Colombo' }).format(new Date());
+          if (data.date && data.date < todayColombo) {
+            console.log(`[PushDaemon] Skipping past-dated booking ${refKey} (${data.date}).`);
+            continue;
+          }
+
+          // 7. Skip cancelled or completed bookings
+          if (data.status === 'cancelled' || data.status === 'completed') {
+            continue;
+          }
+
+          // 8. Skip if already pushed
+          if (alreadyPushedKeys.has(refKey) || alreadyPushedKeys.has(doc.id)) {
+            continue;
+          }
+          alreadyPushedKeys.add(refKey);
+          alreadyPushedKeys.add(doc.id);
+
+          console.log(`🛎️ [PushDaemon] NEW REAL-TIME BOOKING: ${data.customerName || 'Guest'} (${data.serviceName} on ${data.date} at ${data.startTime}) Ref: ${refKey}`);
 
           // Fetch push subscriptions
           try {
