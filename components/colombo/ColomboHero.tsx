@@ -38,10 +38,14 @@ export default function ColomboHero() {
       }
     };
 
-    video.load();
+    if (video.readyState >= 2) {
+      tryPlay();
+    } else {
+      video.addEventListener('loadeddata', tryPlay, { once: true });
+      video.addEventListener('canplay', tryPlay, { once: true });
+    }
+
     tryPlay();
-    video.addEventListener('loadeddata', tryPlay, { once: true });
-    video.addEventListener('canplay', tryPlay, { once: true });
 
     return () => {
       video.removeEventListener('loadeddata', tryPlay);
@@ -66,7 +70,7 @@ export default function ColomboHero() {
           preload="auto"
           onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
           onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
-          poster="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75&fm=webp"
+          poster="/images/colombo/colombo-hair-treatment-1.jpg"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#070709]"
         >
           <source src="/videos/colombo-hero-bg.mp4" type="video/mp4" />

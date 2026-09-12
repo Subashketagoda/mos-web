@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface CinematicLoaderProps {
@@ -10,21 +10,22 @@ interface CinematicLoaderProps {
 
 export default function CinematicLoader({
   onComplete,
-  durationMs = 3000,
+  durationMs = 1600,
 }: CinematicLoaderProps) {
   const shouldReduceMotion = useReducedMotion();
   const [isFinished, setIsFinished] = useState(false);
   const [progress, setProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const finish = useCallback(() => {
     if (isFinished) return;
     setIsFinished(true);
     setTimeout(() => {
       onComplete();
-    }, 500);
+    }, 400);
   }, [isFinished, onComplete]);
 
-  // Guaranteed 3-second progress ticker and completion
+  // Fast 1.6-second progress ticker and smooth exit
   useEffect(() => {
     const startTime = performance.now();
     let animFrame: number;
@@ -45,6 +46,16 @@ export default function CinematicLoader({
     return () => cancelAnimationFrame(animFrame);
   }, [durationMs, finish]);
 
+  // Ensure background video plays smoothly
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.playsInline = true;
+    v.play().catch(() => {});
+  }, []);
+
   return (
     <AnimatePresence>
       {!isFinished && (
@@ -53,8 +64,8 @@ export default function CinematicLoader({
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
-            scale: 1.02,
-            transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+            scale: 1.03,
+            transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
           }}
           className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#050507] select-none overflow-hidden"
           style={{ minHeight: '100svh' }}
@@ -62,52 +73,47 @@ export default function CinematicLoader({
           aria-label="Loading MOSPHERE"
         >
           {/* ============================================================
-               01 — BACKGROUND ARCHITECTURAL VISUAL WITH SLOW PAN
+               01 — REAL MOSPHERE SALON VIDEO BACKGROUND
                ============================================================ */}
-          <motion.div
-            initial={{ scale: 1.08, opacity: 0.2 }}
-            animate={{
-              scale: isFinished ? 1.02 : 1.0,
-              opacity: isFinished ? 0.45 : 0.3,
-            }}
-            transition={{
-              duration: durationMs / 1000 + 0.4,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="absolute inset-0 bg-cover bg-center transform-gpu will-change-transform pointer-events-none"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2000&q=80&fm=webp')`,
-            }}
-          />
-
-          {/* Layered Noir Vignettes for Crystal Center Focus */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/80 to-[#050507]/90 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,7,0.3)_0%,rgba(5,5,7,0.95)_100%)] pointer-events-none" />
-          <div className="absolute inset-0 film-grain pointer-events-none opacity-30" />
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <video
+              ref={videoRef}
+              src="/videos/colombo/fresh-hair-confidence.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="/images/colombo/colombo-hair-treatment-1.jpg"
+              className="w-full h-full object-cover opacity-35 scale-105 filter blur-[0.5px]"
+            />
+            {/* Layered Luxury Vignettes */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/80 to-[#050507]/90 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,7,0.35)_0%,rgba(5,5,7,0.96)_100%)] pointer-events-none" />
+            <div className="absolute inset-0 film-grain pointer-events-none opacity-25" />
+          </div>
 
           {/* ============================================================
-               04 — ANIMATED LIGHT EFFECT BEHIND LOGO (Cinematic Gallery Beam)
+               02 — AMBIENT GOLD HALO GLOW
                ============================================================ */}
           <motion.div
             animate={
               shouldReduceMotion
                 ? undefined
                 : {
-                    x: ['-18%', '18%'],
-                    y: ['-8%', '8%'],
-                    opacity: [0.35, 0.7, 0.35],
+                    scale: [1, 1.12, 1],
+                    opacity: [0.35, 0.65, 0.35],
                   }
             }
             transition={{
-              duration: 5,
+              duration: 3.5,
               repeat: Infinity,
-              repeatType: 'reverse',
               ease: 'easeInOut',
             }}
-            className="absolute w-[450px] sm:w-[650px] h-[320px] sm:h-[450px] rounded-full pointer-events-none blur-3xl transform-gpu"
+            className="absolute w-[400px] sm:w-[580px] h-[280px] sm:h-[380px] rounded-full pointer-events-none blur-3xl transform-gpu"
             style={{
               background:
-                'radial-gradient(ellipse 65% 45% at center, rgba(229, 184, 66, 0.15) 0%, rgba(212, 175, 55, 0.04) 50%, transparent 75%)',
+                'radial-gradient(ellipse 65% 50% at center, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.04) 50%, transparent 75%)',
             }}
           />
 
@@ -115,7 +121,7 @@ export default function CinematicLoader({
           <motion.div
             initial={{ x: '-120%', opacity: 0 }}
             animate={{ x: '220%', opacity: [0, 0.6, 0] }}
-            transition={{ duration: 2.4, delay: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 1.8, delay: 0.1, ease: 'easeInOut' }}
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
@@ -124,101 +130,75 @@ export default function CinematicLoader({
           />
 
           {/* ============================================================
-               02 & 03 — BRAND REVEAL & LUXURY TYPOGRAPHY
+               03 — OFFICIAL FULL GOLD LOGO & BRAND REVEAL (LARGE & BOLD)
                ============================================================ */}
           <motion.div
-            animate={{
-              y: isFinished ? -28 : 0,
-              opacity: isFinished ? 0.9 : 1,
-            }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 flex flex-col items-center text-center px-4 max-w-lg mx-auto"
+            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+            animate={{ opacity: 1, scale: 1.0, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-xl mx-auto"
           >
-            {/* Official MOSPHERE Golden Emblem */}
+            {/* Official MOSPHERE Full Logo Gold (Emblem + Wordmark + GRAB LIFE) - FULL & LARGE */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 14 }}
-              animate={{ opacity: 1, scale: 1.0, y: 0 }}
-              transition={{
-                duration: 0.85,
-                delay: 0.1,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="relative w-14 h-14 sm:w-18 sm:h-18 rounded-full border border-[#E5B842]/50 bg-black/70 backdrop-blur-md p-2 flex items-center justify-center shadow-[0_0_35px_rgba(229,184,66,0.35)] mb-3 sm:mb-4"
+              animate={
+                shouldReduceMotion
+                  ? undefined
+                  : {
+                      filter: [
+                        'drop-shadow(0 0 25px rgba(212,175,55,0.65)) drop-shadow(0 12px 24px rgba(0,0,0,0.85))',
+                        'drop-shadow(0 0 45px rgba(212,175,55,0.95)) drop-shadow(0 12px 24px rgba(0,0,0,0.85))',
+                        'drop-shadow(0 0 25px rgba(212,175,55,0.65)) drop-shadow(0 12px 24px rgba(0,0,0,0.85))',
+                      ],
+                    }
+              }
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-64 xs:w-72 sm:w-96 md:w-[420px] max-w-[86vw] flex items-center justify-center mb-6 sm:mb-8"
             >
               <img
-                src="/images/mosphere-emblem-gold.png"
-                alt="MOSPHERE Emblem"
+                src="/images/mosphere-full-logo-gold.png"
+                alt="MOSPHERE GRAB LIFE"
                 loading="eager"
                 decoding="async"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(229,184,66,0.75)]"
+                className="w-full h-auto object-contain max-h-[38vh] sm:max-h-[42vh] select-none pointer-events-none"
               />
             </motion.div>
 
-            {/* MOSPHERE Luxury Wordmark */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 12 }}
-              animate={{ opacity: 1, scale: 1.0, y: 0 }}
-              transition={{
-                duration: 0.9,
-                delay: 0.2,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="flex flex-col items-center"
-            >
-              <h1 className="font-serif text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-light text-white tracking-[0.42em] sm:tracking-[0.52em] uppercase leading-none pl-[0.42em] sm:pl-[0.52em] drop-shadow-[0_2px_15px_rgba(0,0,0,0.9)]">
-                MOSPHERE
-              </h1>
-
-              {/* Sub-motto with balanced accent lines */}
-              <div className="flex items-center gap-2.5 sm:gap-3 mt-2 sm:mt-2.5">
-                <span className="h-[1px] w-6 sm:w-8 bg-gradient-to-r from-transparent to-[#E5B842]/70 shadow-[0_0_6px_#E5B842]" />
-                <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.45em] text-[#E5B842] uppercase font-semibold pl-[0.45em]">
-                  GRAB LIFE
-                </span>
-                <span className="h-[1px] w-6 sm:w-8 bg-gradient-to-l from-transparent to-[#E5B842]/70 shadow-[0_0_6px_#E5B842]" />
-              </div>
-            </motion.div>
-
             {/* ============================================================
-                 06 — PROGRESS INDICATOR (Minimal Horizontal Line)
+                 04 — SLIM LUXURY GOLD PROGRESS BAR
                  ============================================================ */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.25 }}
-              className="w-36 sm:w-52 h-[1.5px] bg-white/10 relative overflow-hidden mt-6 mb-3 sm:mb-4 rounded-full"
-            >
+            <div className="w-48 sm:w-72 h-[2.5px] bg-white/10 relative overflow-hidden rounded-full mb-3.5 shadow-inner">
               <motion.div
-                className="h-full bg-gradient-to-r from-[#B8860B] via-[#E5B842] to-[#FFF3C4] shadow-[0_0_10px_rgba(229,184,66,0.9)]"
+                className="h-full bg-gradient-to-r from-[#B8860B] via-[#E5B842] to-[#FFF3C4] shadow-[0_0_15px_rgba(212,175,55,1)]"
                 style={{ width: `${progress}%` }}
                 transition={{ ease: 'linear' }}
               />
-            </motion.div>
+            </div>
 
             {/* ============================================================
-                 05 — MOSPHERE SIGNATURE LINE (Fade-in Character)
+                 05 — SIGNATURE BRAND LINE
                  ============================================================ */}
             <motion.p
               initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 0.85, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45, ease: 'easeOut' }}
-              className="text-[9px] sm:text-[11px] font-mono tracking-[0.32em] sm:tracking-[0.42em] text-[#F3E5AB]/80 uppercase text-center pl-[0.32em] sm:pl-[0.42em]"
+              animate={{ opacity: 0.9, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25, ease: 'easeOut' }}
+              className="text-[10px] sm:text-[11px] font-mono tracking-[0.3em] sm:tracking-[0.42em] text-[#F3E5AB] uppercase text-center pl-[0.3em] sm:pl-[0.42em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
             >
-              BEAUTY • STYLE • EXPERIENCE
+              HAUTE BEAUTY &bull; PRECISION GROOMING
             </motion.p>
           </motion.div>
 
-          {/* Ambient Brand Cue */}
+          {/* Bottom Cue */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0.25, 0.6, 0.25] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-6 sm:bottom-8 text-[9px] font-mono tracking-[0.3em] text-[#E5B842]/60 uppercase pointer-events-none"
+            animate={{ opacity: [0.3, 0.65, 0.3] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute bottom-5 sm:bottom-7 text-[8px] sm:text-[9px] font-mono tracking-[0.32em] text-[#E5B842]/70 uppercase pointer-events-none"
           >
-            MOSPHERE SALON &bull; SRI LANKA
+            COLOMBO &bull; NEGOMBO
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
+

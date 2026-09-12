@@ -59,10 +59,10 @@ export default function HomePage() {
       {/* Bespoke Desktop Cursor */}
       <CustomCursor />
 
-      {/* Cinematic Brand Intro Loading Screen (Guaranteed 3 Seconds) */}
+      {/* Cinematic Brand Intro Loading Screen */}
       <AnimatePresence mode="wait">
         {showCinematicLoader && (
-          <CinematicLoader durationMs={3000} onComplete={handleLoaderComplete} />
+          <CinematicLoader durationMs={2200} onComplete={handleLoaderComplete} />
         )}
       </AnimatePresence>
 

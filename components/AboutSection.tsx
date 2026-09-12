@@ -43,7 +43,7 @@ export default function AboutSection() {
             {/* Primary Large Image */}
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1000&q=80"
+                src="/images/colombo/colombo-precision-hair-styling.jpg"
                 alt="Mosphere Craftsmanship"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
@@ -62,8 +62,8 @@ export default function AboutSection() {
             {/* Overlapping Small Secondary Image */}
             <div className="hidden sm:block absolute -bottom-10 -right-8 w-52 sm:w-60 aspect-square rounded-2xl overflow-hidden border-2 border-mosphere-gold/40 shadow-2xl bg-black">
               <img
-                src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=80"
-                alt="Bio-Active Formulations"
+                src="/images/colombo/colombo-nails-tipsy-tips-1.jpg"
+                alt="Bio-Active Formulations & Nails Lounge"
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
               />
             </div>

@@ -12,7 +12,7 @@ export default function ExperienceSection() {
         <div
           className="w-full h-full bg-cover bg-fixed bg-center scale-105"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=75')`,
+            backgroundImage: `url('/images/colombo/colombo-precision-hair-styling.jpg')`,
           }}
         />
         <div className="absolute inset-0 bg-[#070709]/80 backdrop-blur-[1px]" />

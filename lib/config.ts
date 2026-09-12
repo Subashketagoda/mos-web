@@ -72,8 +72,8 @@ export const salonConfig = {
       googleMapsEmbed: 'https://maps.google.com/maps?q=422A+Nawala+Rd,+Rajagiriya,+Sri+Lanka&t=&z=16&ie=UTF8&iwloc=&output=embed',
       instagram: 'https://www.instagram.com/mosphere_nawala/',
       instagramHandle: '@mosphere_nawala',
-      heroImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85',
-      experienceImage: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=2400&q=85',
+      heroImage: '/images/colombo/colombo-hair-treatment-1.jpg',
+      experienceImage: '/images/colombo/colombo-precision-hair-styling.jpg',
     } as BranchConfig,
 
     negombo: {

@@ -1,3 +1,4 @@
+
 # Google Calendar API Integration Setup Guide for Mosphere
 
 This guide explains how to connect your real Google Calendar to the **Mosphere Appointment Booking Platform** using Google Cloud Service Account credentials.

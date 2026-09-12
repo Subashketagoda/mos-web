@@ -17,7 +17,7 @@ const colomboServices = [
     duration: '90 MIN',
     price: 'Starting LKR 14,500',
     description: 'Intense amino-collagen infusion to seal cuticles, eliminate humidity frizz, and restore glass-like shine.',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-1.jpg',
     tag: 'Signature Ritual',
   },
   {
@@ -28,7 +28,7 @@ const colomboServices = [
     duration: '120 MIN',
     price: 'Starting LKR 18,500',
     description: 'Structural bio-smoothing protein therapy for mirror-smooth manageability and long-lasting silkiness.',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-2.jpg',
     tag: 'Long Lasting',
   },
   {
@@ -50,7 +50,7 @@ const colomboServices = [
     duration: '60 MIN',
     price: 'Starting LKR 4,500',
     description: 'Architectural haircut tailored to your facial geometry, finished with a high-volume runway blowout.',
-    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-precision-hair-styling.jpg',
     tag: 'Couture Styling',
   },
   {
@@ -96,6 +96,28 @@ const colomboServices = [
     description: 'Enzyme pore purification, antioxidant hydration infusion, and jade-stone lymphatic sculpting.',
     image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
     tag: 'Skin Glow',
+  },
+  {
+    id: 'srv-col-tipsy-nails',
+    number: '09',
+    name: 'Tipsy Tips Luxury Gel Nails & Artistry',
+    category: 'Nails & Beauty Lounge',
+    duration: '60 MIN',
+    price: 'Starting LKR 6,500',
+    description: 'Bespoke manicure architecture, precision cuticle preparation, and artisanal gel extensions at Tipsy Tips by Mosphere.',
+    image: '/images/colombo/colombo-nails-tipsy-tips-1.jpg',
+    tag: 'Tipsy Tips Exclusive',
+  },
+  {
+    id: 'srv-col-tipsy-pedicure',
+    number: '10',
+    name: 'Tipsy Tips Prim & Perfect Spa Pedicure',
+    category: 'Nails & Beauty Lounge',
+    duration: '60 MIN',
+    price: 'Starting LKR 5,800',
+    description: 'Aromatic foot soak, exfoliating sugar scrub, callous smoothing, and high-shine gel glaze finish.',
+    image: '/images/colombo/colombo-nails-tipsy-tips-2.jpg',
+    tag: 'Tipsy Tips Spa',
   },
 ];
 
