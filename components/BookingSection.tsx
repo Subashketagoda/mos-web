@@ -308,7 +308,7 @@ export default function BookingSection({
     };
   }, []);
 
-  // Lock body scroll and handle ESC key when modal is open
+  // Lock body scroll and stop Lenis when modal is open
   useEffect(() => {
     if (!isModalOpen) return;
 
@@ -322,9 +322,18 @@ export default function BookingSection({
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    // Safely stop Lenis from intercepting scroll/wheel inside the modal
+    const lenis = (window as any).__lenis;
+    if (lenis && typeof lenis.stop === 'function') {
+      lenis.stop();
+    }
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = originalOverflow;
+      if (lenis && typeof lenis.start === 'function') {
+        lenis.start();
+      }
     };
   }, [isModalOpen, handleCloseModal]);
   
@@ -865,6 +874,7 @@ export default function BookingSection({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            data-lenis-prevent="true"
             className="fixed inset-0 z-[99990] bg-black/85 backdrop-blur-2xl flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden"
             onClick={handleCloseModal}
           >
@@ -873,6 +883,7 @@ export default function BookingSection({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              data-lenis-prevent="true"
               className={`relative w-full max-w-5xl h-[94vh] sm:h-[90vh] max-h-[94vh] rounded-2xl sm:rounded-3xl border shadow-[0_25px_80px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden ${
                 isNegombo ? 'bg-[#031812] border-emerald-500/40' : 'bg-[#09090D] border-mosphere-gold/40'
               }`}
@@ -906,7 +917,13 @@ export default function BookingSection({
               {/* Scrollable Wizard Body */}
               <div
                 ref={modalScrollRef}
-                className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6"
+                data-lenis-prevent="true"
+                data-lenis-prevent-wheel="true"
+                data-lenis-prevent-touch="true"
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar p-3 sm:p-6"
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                }}
               >
                 {/* Booking Card & Wizard */}
                 <div id="booking-wizard" className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
