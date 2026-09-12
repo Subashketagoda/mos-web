@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CustomCursor from '@/components/CustomCursor';
 import LocationSelector from '@/components/LocationSelector';
@@ -37,12 +37,25 @@ import InstagramSection from '@/components/InstagramSection';
 import MobileBottomDock from '@/components/MobileBottomDock';
 
 export default function HomePage() {
-  const [showCinematicLoader, setShowCinematicLoader] = useState(true);
+  const [showCinematicLoader, setShowCinematicLoader] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<'colombo' | 'negombo' | null>(null);
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [selectedServiceFromMenu, setSelectedServiceFromMenu] = useState<any>(null);
 
+  // Show cinematic intro once per session for lightning-fast subsequent loads
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasSeen = sessionStorage.getItem('mosphere_intro_seen');
+      if (!hasSeen) {
+        setShowCinematicLoader(true);
+      }
+    }
+  }, []);
+
   const handleLoaderComplete = () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('mosphere_intro_seen', 'true');
+    }
     setShowCinematicLoader(false);
   };
 
@@ -62,7 +75,7 @@ export default function HomePage() {
       {/* Cinematic Brand Intro Loading Screen */}
       <AnimatePresence mode="wait">
         {showCinematicLoader && (
-          <CinematicLoader durationMs={2200} onComplete={handleLoaderComplete} />
+          <CinematicLoader durationMs={950} onComplete={handleLoaderComplete} />
         )}
       </AnimatePresence>
 

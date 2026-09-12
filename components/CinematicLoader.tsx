@@ -10,22 +10,21 @@ interface CinematicLoaderProps {
 
 export default function CinematicLoader({
   onComplete,
-  durationMs = 1600,
+  durationMs = 950,
 }: CinematicLoaderProps) {
   const shouldReduceMotion = useReducedMotion();
   const [isFinished, setIsFinished] = useState(false);
   const [progress, setProgress] = useState(0);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const finish = useCallback(() => {
     if (isFinished) return;
     setIsFinished(true);
     setTimeout(() => {
       onComplete();
-    }, 400);
+    }, 250);
   }, [isFinished, onComplete]);
 
-  // Fast 1.6-second progress ticker and smooth exit
+  // Ultra-snappy progress ticker and smooth exit
   useEffect(() => {
     const startTime = performance.now();
     let animFrame: number;
@@ -46,16 +45,6 @@ export default function CinematicLoader({
     return () => cancelAnimationFrame(animFrame);
   }, [durationMs, finish]);
 
-  // Ensure background video plays smoothly
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = true;
-    v.defaultMuted = true;
-    v.playsInline = true;
-    v.play().catch(() => {});
-  }, []);
-
   return (
     <AnimatePresence>
       {!isFinished && (
@@ -64,33 +53,30 @@ export default function CinematicLoader({
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
-            scale: 1.03,
-            transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+            scale: 1.02,
+            transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
           }}
-          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#050507] select-none overflow-hidden"
+          onClick={finish}
+          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#050507] select-none overflow-hidden cursor-pointer"
           style={{ minHeight: '100svh' }}
           role="dialog"
           aria-label="Loading MOSPHERE"
         >
           {/* ============================================================
-               01 — REAL MOSPHERE SALON VIDEO BACKGROUND
+               01 — LIGHTWEIGHT LUXURY AMBIENCE (0-BANDWIDTH DELAY)
                ============================================================ */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <video
-              ref={videoRef}
-              src="/videos/colombo/fresh-hair-confidence.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              poster="/images/colombo/colombo-hair-treatment-1.jpg"
-              className="w-full h-full object-cover opacity-35 scale-105 filter blur-[0.5px]"
+            <img
+              src="/images/colombo/colombo-hair-treatment-1.jpg"
+              alt="Mosphere Ambience"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover opacity-25 scale-105 filter blur-[1px]"
             />
             {/* Layered Luxury Vignettes */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/80 to-[#050507]/90 pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,7,0.35)_0%,rgba(5,5,7,0.96)_100%)] pointer-events-none" />
-            <div className="absolute inset-0 film-grain pointer-events-none opacity-25" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/85 to-[#050507]/90 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,5,7,0.3)_0%,rgba(5,5,7,0.98)_100%)] pointer-events-none" />
+            <div className="absolute inset-0 film-grain pointer-events-none opacity-20" />
           </div>
 
           {/* ============================================================

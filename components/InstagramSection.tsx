@@ -201,65 +201,50 @@ const colomboVideoReels: VideoReel[] = [
 // Subcomponent: Reel Card that automatically plays video seamlessly in a loop
 function ReelCard({ reel, onSelect }: { reel: VideoReel; onSelect: () => void }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
+  // High-performance lazy playback: only play when in viewport
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    const card = cardRef.current;
+    if (!video || !card) return;
 
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
 
-    const tryPlay = () => {
-      video.muted = true;
-      const p = video.play();
-      if (p !== undefined) {
-        p.catch(() => {
-          const unlock = () => {
-            video.muted = true;
+    // Use IntersectionObserver so offscreen carousel videos never consume network or CPU
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
             video.play().catch(() => {});
-            ['click', 'touchstart', 'scroll', 'pointerdown'].forEach((ev) =>
-              window.removeEventListener(ev, unlock)
-            );
-          };
-          ['click', 'touchstart', 'scroll', 'pointerdown'].forEach((ev) =>
-            window.addEventListener(ev, unlock, { passive: true, once: true })
-          );
+          } else {
+            video.pause();
+          }
         });
-      }
-    };
+      },
+      { threshold: 0.25 }
+    );
 
-    if (video.readyState >= 2) {
-      tryPlay();
-    } else {
-      video.addEventListener('loadeddata', tryPlay, { once: true });
-      video.addEventListener('canplay', tryPlay, { once: true });
-    }
-
-    tryPlay();
-
-    return () => {
-      video.removeEventListener('loadeddata', tryPlay);
-      video.removeEventListener('canplay', tryPlay);
-    };
-  }, [reel.src]);
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
+      ref={cardRef}
       onClick={onSelect}
+      onMouseEnter={() => videoRef.current?.play().catch(() => {})}
       className="group relative rounded-2xl overflow-hidden aspect-[9/16] bg-[#0E0E14] border border-white/10 hover:border-mosphere-gold/60 cursor-pointer shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(212,175,55,0.35)]"
     >
       <video
         ref={videoRef}
         src={reel.src}
-        autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out bg-black"
       />
 

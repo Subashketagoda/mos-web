@@ -66,7 +66,7 @@ export default function NegomboHero() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
           onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
           poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75&fm=webp"

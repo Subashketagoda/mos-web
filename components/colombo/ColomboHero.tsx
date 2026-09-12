@@ -67,7 +67,7 @@ export default function ColomboHero() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
           onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
           poster="/images/colombo/colombo-hair-treatment-1.jpg"
