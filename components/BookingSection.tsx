@@ -21,6 +21,7 @@ import {
   RotateCcw,
   Bell,
   BellRing,
+  X,
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 import { syncBookingToFirestore } from '@/lib/firebaseService';
@@ -92,6 +93,8 @@ interface AvailableSlot {
 export interface BookingSectionProps {
   initialSelectedService?: Service | null;
   initialLocation?: 'colombo' | 'negombo';
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const fallbackServices: Service[] = [
@@ -211,18 +214,43 @@ function generateClientFallbackSlots(dateStr: string, durationMinutes: number = 
   return slots;
 }
 
-export default function BookingSection({ initialSelectedService, initialLocation = 'colombo' }: BookingSectionProps) {
+export default function BookingSection({
+  initialSelectedService,
+  initialLocation = 'colombo',
+  isOpen: controlledIsOpen,
+  onClose: controlledOnClose,
+}: BookingSectionProps) {
   // Wizard Steps: 1 = Service, 2 = Date, 3 = Time, 4 = Details, 5 = Confirmed
   const [step, setStep] = useState(1);
   const [activeLocation, setActiveLocation] = useState<'colombo' | 'negombo'>(initialLocation);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isModalOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
   const isInitialMount = useRef(true);
+  const modalScrollRef = useRef<HTMLDivElement | null>(null);
+
+  const handleCloseModal = useCallback(() => {
+    if (controlledOnClose) {
+      controlledOnClose();
+    } else {
+      setInternalIsOpen(false);
+    }
+  }, [controlledOnClose]);
+
+  const handleOpenModal = useCallback(() => {
+    setInternalIsOpen(true);
+  }, []);
 
   // Smoothly scrolls user back to the top of the booking wizard
   const scrollToBookingTop = useCallback((smooth = true) => {
+    if (modalScrollRef.current) {
+      modalScrollRef.current.scrollTo({
+        top: 0,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
     if (typeof window === 'undefined') return;
     const target = document.getElementById('booking-wizard') || document.getElementById('booking');
-    if (target) {
-      // Offset for fixed top navbar (approx 85-95px)
+    if (target && !isModalOpen) {
       const navbarOffset = 90;
       const elementPosition = target.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
@@ -232,10 +260,9 @@ export default function BookingSection({ initialSelectedService, initialLocation
         behavior: smooth ? 'smooth' : 'auto',
       });
     }
-  }, []);
+  }, [isModalOpen]);
 
-  // When step changes (e.g. 1->2, 2->3, 3->4, 4->5 or previous steps),
-  // automatically scroll user back up to the top of the booking wizard
+  // When step changes, automatically scroll modal body back up to top
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -248,6 +275,58 @@ export default function BookingSection({ initialSelectedService, initialLocation
 
     return () => clearTimeout(timer);
   }, [step, scrollToBookingTop]);
+
+  // Intercept any click to #booking or #booking-wizard across the page to open the popup modal
+  useEffect(() => {
+    const handleGlobalBookingClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest(
+        'a[href="#booking"], a[href="/#booking"], a[href="#booking-wizard"], [data-booking-trigger="true"]'
+      );
+      if (target) {
+        e.preventDefault();
+        setInternalIsOpen(true);
+      }
+    };
+
+    const handleCustomOpenEvent = (e: any) => {
+      if (e.detail?.service) {
+        setSelectedService(e.detail.service);
+        setStep(2);
+      }
+      if (e.detail?.location) {
+        setActiveLocation(e.detail.location);
+      }
+      setInternalIsOpen(true);
+    };
+
+    window.addEventListener('click', handleGlobalBookingClick);
+    window.addEventListener('open-booking-modal' as any, handleCustomOpenEvent);
+
+    return () => {
+      window.removeEventListener('click', handleGlobalBookingClick);
+      window.removeEventListener('open-booking-modal' as any, handleCustomOpenEvent);
+    };
+  }, []);
+
+  // Lock body scroll and handle ESC key when modal is open
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isModalOpen, handleCloseModal]);
   
   // Data State
   const [services, setServices] = useState<Service[]>(fallbackServices);
@@ -352,6 +431,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
     if (initialSelectedService) {
       setSelectedService(initialSelectedService);
       setStep(2);
+      setInternalIsOpen(true);
       // Ensure smooth scroll to booking date selection
       if (typeof window !== 'undefined') {
         setTimeout(() => {
@@ -729,11 +809,110 @@ export default function BookingSection({ initialSelectedService, initialLocation
           </a>
         </div>
 
-        {/* Booking Card & Wizard */}
-        <div id="booking-wizard" className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
-          
-          {/* Top Gold Border */}
-          <div className="h-1 w-full bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark" />
+        {/* On-Page Luxury Booking Portal Launch Card */}
+        <div className="relative rounded-3xl overflow-hidden border border-mosphere-gold/30 bg-gradient-to-br from-white/[0.04] via-black/40 to-black/80 p-8 sm:p-14 text-center shadow-2xl backdrop-blur-sm mb-4">
+          <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-mosphere-gold/15 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-mosphere-gold/10 blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-mosphere-gold/10 border border-mosphere-gold/30 text-mosphere-gold text-xs font-mono uppercase tracking-widest mb-6">
+              <Sparkles className="w-3.5 h-3.5" />
+              BESPOKE APPOINTMENTS
+            </span>
+
+            <h3 className="font-serif text-2xl sm:text-4xl text-white font-light tracking-wide mb-4">
+              Schedule Your Sanctuary Session
+            </h3>
+
+            <p className="text-sm sm:text-base text-white/65 font-light leading-relaxed mb-8 max-w-lg">
+              Launch our interactive reservation popup to select your bespoke hair architecture, skin aesthetics, or precision grooming ritual with real-time slot verification.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={handleOpenModal}
+                className="w-full sm:w-auto px-8 py-4 rounded-full text-xs font-bold font-mono tracking-[0.2em] uppercase text-black transition-all duration-300 shadow-goldGlow hover:shadow-[0_0_35px_rgba(212,175,55,0.9)] hover:scale-105 flex items-center justify-center gap-2.5"
+                style={{
+                  background: 'linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #B8860B 100%)',
+                }}
+              >
+                <CalendarIcon className="w-4 h-4 text-black" />
+                <span>OPEN BOOKING POPUP</span>
+              </button>
+
+              <a
+                href={`https://wa.me/${branchConfig.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-7 py-4 rounded-full text-xs font-mono font-semibold tracking-wider uppercase text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/40 transition-all flex items-center justify-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4 fill-current" />
+                <span>WHATSAPP CONCIERGE</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* ============================================================
+           MOSPHERE LUXURY BOOKING POPUP MODAL
+           ============================================================ */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99990] bg-black/85 backdrop-blur-2xl flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden"
+            onClick={handleCloseModal}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className={`relative w-full max-w-5xl h-[94vh] sm:h-[90vh] max-h-[94vh] rounded-2xl sm:rounded-3xl border shadow-[0_25px_80px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden ${
+                isNegombo ? 'bg-[#031812] border-emerald-500/40' : 'bg-[#09090D] border-mosphere-gold/40'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Top Header Bar */}
+              <div className="flex items-center justify-between px-5 sm:px-8 py-3.5 sm:py-4 border-b border-white/10 bg-black/70 backdrop-blur-md shrink-0">
+                <div className="flex items-center gap-3">
+                  <span className={`w-2.5 h-2.5 rounded-full ${isNegombo ? 'bg-[#E5B842]' : 'bg-mosphere-gold'} animate-pulse`} />
+                  <div>
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-mosphere-gold block">
+                      MOSPHERE CONCIERGE &bull; ONLINE RESERVATIONS
+                    </span>
+                    <h3 className="font-serif text-base sm:text-xl text-white font-light">
+                      Bespoke Appointment Booking
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  aria-label="Close Booking Modal"
+                  className="p-2 sm:p-2.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white/70 hover:text-white transition-all hover:scale-105 active:scale-95 group"
+                >
+                  <X className="w-5 h-5 text-white/70 group-hover:text-mosphere-gold transition-colors" />
+                </button>
+              </div>
+
+              {/* Scrollable Wizard Body */}
+              <div
+                ref={modalScrollRef}
+                className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6"
+              >
+                {/* Booking Card & Wizard */}
+                <div id="booking-wizard" className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
+                  
+                  {/* Top Gold Border */}
+                  <div className="h-1 w-full bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark" />
 
           {/* Progress Step Header + Branch Selector */}
           {step < 5 && (
@@ -1444,7 +1623,7 @@ export default function BookingSection({ initialSelectedService, initialLocation
                   </button>
                 </div>
 
-                <div>
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -1460,14 +1639,26 @@ export default function BookingSection({ initialSelectedService, initialLocation
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Book Another Appointment</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-white/70 hover:text-white transition-colors px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Close Portal</span>
+                  </button>
                 </div>
               </motion.div>
             )}
 
           </div>
         </div>
-
       </div>
+    </motion.div>
+  </motion.div>
+)}
+</AnimatePresence>
     </section>
   );
 }
