@@ -6,10 +6,12 @@ import { Calendar, ArrowRight, ArrowDown, Sparkles } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 
 export default function ColomboHero() {
+  const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const video = videoRef.current;
+    const section = sectionRef.current;
     if (!video) return;
 
     video.muted = true;
@@ -19,12 +21,16 @@ export default function ColomboHero() {
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
 
+    let isHeroInView = true;
+
     const tryPlay = () => {
+      if (!isHeroInView) return;
       video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
           const unlock = () => {
+            if (!isHeroInView) return;
             video.muted = true;
             video.play().catch(() => {});
             ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
@@ -47,14 +53,35 @@ export default function ColomboHero() {
 
     tryPlay();
 
+    // Pause video when hero is scrolled out of view to free 100% GPU video decoding bandwidth
+    let observer: IntersectionObserver | null = null;
+    if (section) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isHeroInView = entry.isIntersecting;
+            if (entry.isIntersecting) {
+              tryPlay();
+            } else {
+              video.pause();
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(section);
+    }
+
     return () => {
       video.removeEventListener('loadeddata', tryPlay);
       video.removeEventListener('canplay', tryPlay);
+      if (observer) observer.disconnect();
     };
   }, []);
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
       className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-4 sm:px-8 lg:px-16 bg-[#070709]"
     >

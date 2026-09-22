@@ -68,7 +68,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070709] text-mosphere-cream overflow-x-hidden selection:bg-mosphere-gold selection:text-black">
+    <main className="min-h-screen bg-[#070709] text-mosphere-cream overflow-x-clip selection:bg-mosphere-gold selection:text-black">
       {/* Bespoke Desktop Cursor */}
       <CustomCursor />
 

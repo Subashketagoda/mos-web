@@ -10,12 +10,12 @@ export default function ExperienceSection() {
       {/* Background with Parallax and Vignette */}
       <div className="absolute inset-0 z-0">
         <div
-          className="w-full h-full bg-cover bg-fixed bg-center scale-105"
+          className="w-full h-full bg-cover bg-center scale-105 transform-gpu"
           style={{
             backgroundImage: `url('/images/colombo/colombo-precision-hair-styling.jpg')`,
           }}
         />
-        <div className="absolute inset-0 bg-[#070709]/80 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-[#070709]/85" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-[#070709]" />
       </div>
 

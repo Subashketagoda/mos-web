@@ -14,8 +14,8 @@ export default function CustomCursor() {
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  const cursorX = useSpring(mouseX, { damping: 35, stiffness: 600, mass: 0.15 });
-  const cursorY = useSpring(mouseY, { damping: 35, stiffness: 600, mass: 0.15 });
+  const cursorX = useSpring(mouseX, { damping: 40, stiffness: 850, mass: 0.08 });
+  const cursorY = useSpring(mouseY, { damping: 40, stiffness: 850, mass: 0.08 });
 
   useEffect(() => {
     // Only enable on desktop fine pointer devices

@@ -43,6 +43,7 @@ html {
   color-scheme: dark;
   text-rendering: optimizeLegibility;
   scroll-behavior: auto !important;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -51,6 +52,7 @@ body {
   background-color: var(--bg-primary);
   color: #f7f4ee;
   min-height: 100vh;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

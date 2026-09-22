@@ -32,7 +32,7 @@ export default function FeaturedVisual() {
 
       {/* Cinematic Overlays */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-black/40 to-[#070709]" />
-      <div className="absolute inset-0 bg-black/35 backdrop-blur-[0.5px]" />
+      <div className="absolute inset-0 bg-black/40" />
       <div className="absolute inset-0 film-grain pointer-events-none" />
 
       {/* Minimalist Overlay Typography */}

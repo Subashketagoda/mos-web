@@ -5,11 +5,13 @@ import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, ArrowDown, Sparkles } from 'lucide-react';
 
 export default function NegomboHero() {
+  const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Ultra-robust autoplay with gesture unlock fallback
   useEffect(() => {
     const video = videoRef.current;
+    const section = sectionRef.current;
     if (!video) return;
 
     video.muted = true;
@@ -19,13 +21,17 @@ export default function NegomboHero() {
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
 
+    let isHeroInView = true;
+
     const tryPlay = () => {
+      if (!isHeroInView) return;
       video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
           // Browser autoplay restrictions: unlock on first touch/click/scroll
           const unlock = () => {
+            if (!isHeroInView) return;
             video.muted = true;
             video.play().catch(() => {});
             ['click', 'touchstart', 'pointerdown', 'scroll'].forEach((ev) =>
@@ -46,14 +52,35 @@ export default function NegomboHero() {
     video.addEventListener('loadeddata', tryPlay, { once: true });
     video.addEventListener('canplay', tryPlay, { once: true });
 
+    // Pause video when hero is scrolled out of view to save GPU video decoders
+    let observer: IntersectionObserver | null = null;
+    if (section) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isHeroInView = entry.isIntersecting;
+            if (entry.isIntersecting) {
+              tryPlay();
+            } else {
+              video.pause();
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(section);
+    }
+
     return () => {
       video.removeEventListener('loadeddata', tryPlay);
       video.removeEventListener('canplay', tryPlay);
+      if (observer) observer.disconnect();
     };
   }, []);
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
       className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-10 px-4 sm:px-8 lg:px-16 bg-[#02180F]"
     >

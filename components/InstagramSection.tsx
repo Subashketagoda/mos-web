@@ -198,44 +198,29 @@ const colomboVideoReels: VideoReel[] = [
   },
 ];
 
-// Subcomponent: Reel Card that automatically plays video seamlessly in a loop
+// Subcomponent: Reel Card that plays smoothly on hover or opens full-screen player
 function ReelCard({ reel, onSelect }: { reel: VideoReel; onSelect: () => void }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const cardRef = useRef<HTMLDivElement | null>(null);
 
-  // High-performance lazy playback: only play when in viewport
-  useEffect(() => {
+  const handleMouseEnter = () => {
     const video = videoRef.current;
-    const card = cardRef.current;
-    if (!video || !card) return;
+    if (video) {
+      video.play().catch(() => {});
+    }
+  };
 
-    video.muted = true;
-    video.defaultMuted = true;
-    video.playsInline = true;
-
-    // Use IntersectionObserver so offscreen carousel videos never consume network or CPU
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
-
-    observer.observe(card);
-    return () => observer.disconnect();
-  }, []);
+  const handleMouseLeave = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+    }
+  };
 
   return (
     <div
-      ref={cardRef}
       onClick={onSelect}
-      onMouseEnter={() => videoRef.current?.play().catch(() => {})}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className="group relative rounded-2xl overflow-hidden aspect-[9/16] bg-[#0E0E14] border border-white/10 hover:border-mosphere-gold/60 cursor-pointer shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(212,175,55,0.35)]"
     >
       <video
