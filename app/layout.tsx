@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: 'MOSPHERE',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://mosphere.lk/images/colombo/colombo-hair-treatment-1.jpg',
         width: 1200,
         height: 630,
         alt: 'Mosphere Salon Colombo',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'MOSPHERE | Luxury Beauty & Hair Salon in Colombo',
     description: 'Bespoke beauty & grooming at 422A Nawala Rd, Sri Jayawardenepura Kotte. Book online with real-time Google Calendar sync.',
-    images: ['https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80'],
+    images: ['https://mosphere.lk/images/colombo/colombo-hair-treatment-1.jpg'],
   },
   icons: {
     icon: [
@@ -85,7 +85,7 @@ export default function RootLayout({
     '@type': 'BeautySalon',
     name: 'MOSPHERE',
     description: 'High-end beauty and lifestyle salon in Colombo, Sri Lanka.',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://mosphere.lk/images/colombo/colombo-hair-treatment-1.jpg',
     telephone: salonConfig.phone,
     address: {
       '@type': 'PostalAddress',
@@ -117,10 +117,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${plusJakarta.variable}`}>
       <head>
         {/* Performance Resource Hints for Fast Asset Discovery */}
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="preload" as="image" href="/images/mosphere-full-logo-gold.png" type="image/png" fetchPriority="high" />
-        <link rel="preload" as="image" href="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75&fm=webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/images/colombo/colombo-hair-treatment-1.jpg" fetchPriority="high" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

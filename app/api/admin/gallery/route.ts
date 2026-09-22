@@ -122,8 +122,21 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    await query.run('DELETE FROM gallery WHERE id = ?', [id]);
-    return NextResponse.json({ success: true, message: 'Image deleted.' });
+    // 1. Delete from local SQLite
+    await query.run('DELETE FROM gallery WHERE id = ? OR imageUrl = ?', [id, id]);
+
+    // 2. Dual-delete from Cloud Firestore
+    try {
+      const { deleteGalleryPhotoFromFirestore } = await import('@/lib/firebaseService');
+      await deleteGalleryPhotoFromFirestore(id);
+    } catch (fsErr) {
+      console.warn('Notice: Firestore delete in /api/admin/gallery:', fsErr);
+    }
+
+    return NextResponse.json(
+      { success: true, message: 'Image deleted.' },
+      { headers: { 'Cache-Control': 'no-store' } }
+    );
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

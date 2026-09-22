@@ -38,14 +38,14 @@ interface Service {
 }
 
 const serviceImages: Record<string, string> = {
-  'srv-hair-botox': 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80',
-  'srv-keratin-silk': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
-  'srv-gents-cut-beard': 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80',
-  'srv-ladies-couture-cut': 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=80',
-  'srv-color-balayage': 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80',
-  'srv-beard-sculpt': 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80',
-  'srv-scalp-detox': 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
-  'srv-glow-facial': 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80',
+  'srv-hair-botox': '/images/colombo/colombo-hair-treatment-1.jpg',
+  'srv-keratin-silk': '/images/colombo/colombo-hair-treatment-2.jpg',
+  'srv-gents-cut-beard': '/images/colombo/colombo-precision-hair-styling.jpg',
+  'srv-ladies-couture-cut': '/images/colombo/colombo-precision-hair-styling.jpg',
+  'srv-color-balayage': '/images/colombo/colombo-hair-treatment-1.jpg',
+  'srv-beard-sculpt': '/images/colombo/colombo-precision-hair-styling.jpg',
+  'srv-scalp-detox': '/images/colombo/colombo-hair-treatment-2.jpg',
+  'srv-glow-facial': '/images/colombo/colombo-nails-tipsy-tips-1.jpg',
 };
 
 export function getServiceImage(service: { id?: string; name?: string; category?: string; image?: string }): string {
@@ -55,30 +55,18 @@ export function getServiceImage(service: { id?: string; name?: string; category?
   const cat = (service.category || '').toLowerCase();
 
   if (name.includes('botox') || name.includes('hydrate') || name.includes('repair')) {
-    return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+    return '/images/colombo/colombo-hair-treatment-1.jpg';
   }
   if (name.includes('keratin') || name.includes('smoothing') || name.includes('silk')) {
-    return 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80';
+    return '/images/colombo/colombo-hair-treatment-2.jpg';
   }
-  if (name.includes('beard') || name.includes('shave')) {
-    return 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80';
+  if (name.includes('nail') || name.includes('tipsy') || name.includes('pedicure') || name.includes('manicure')) {
+    return '/images/colombo/colombo-nails-tipsy-tips-1.jpg';
   }
-  if (name.includes('gent') || name.includes('fade') || name.includes('men') || cat.includes('gent')) {
-    return 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80';
+  if (name.includes('beard') || name.includes('shave') || name.includes('gent') || name.includes('ladies') || name.includes('cut')) {
+    return '/images/colombo/colombo-precision-hair-styling.jpg';
   }
-  if (name.includes('balayage') || name.includes('color') || name.includes('highlight') || cat.includes('color')) {
-    return 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80';
-  }
-  if (name.includes('scalp') || name.includes('detox')) {
-    return 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80';
-  }
-  if (name.includes('facial') || name.includes('skin') || name.includes('glow') || cat.includes('skin')) {
-    return 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80';
-  }
-  if (name.includes('ladies') || name.includes('cut') || name.includes('blowout') || cat.includes('ladies')) {
-    return 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=80';
-  }
-  return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+  return '/images/colombo/colombo-hair-treatment-1.jpg';
 }
 
 interface AvailableSlot {
@@ -105,7 +93,7 @@ const fallbackServices: Service[] = [
     duration: 90,
     price: 14500,
     category: 'Restorative Hair Lab',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-hair-treatment-1.jpg'
   },
   {
     id: 'srv-keratin-silk',
@@ -114,7 +102,7 @@ const fallbackServices: Service[] = [
     duration: 120,
     price: 18500,
     category: 'Restorative Hair Lab',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-hair-treatment-2.jpg'
   },
   {
     id: 'srv-gents-cut-beard',
@@ -123,7 +111,7 @@ const fallbackServices: Service[] = [
     duration: 45,
     price: 3500,
     category: 'Gents Bespoke Grooming',
-    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-precision-hair-styling.jpg'
   },
   {
     id: 'srv-ladies-couture-cut',
@@ -132,7 +120,7 @@ const fallbackServices: Service[] = [
     duration: 60,
     price: 4500,
     category: 'Ladies Hair & Styling',
-    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-precision-hair-styling.jpg'
   },
   {
     id: 'srv-color-balayage',
@@ -141,7 +129,7 @@ const fallbackServices: Service[] = [
     duration: 120,
     price: 15500,
     category: 'Color & Highlights',
-    image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-hair-treatment-1.jpg'
   },
   {
     id: 'srv-beard-sculpt',
@@ -150,7 +138,7 @@ const fallbackServices: Service[] = [
     duration: 30,
     price: 2200,
     category: 'Gents Bespoke Grooming',
-    image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-precision-hair-styling.jpg'
   },
   {
     id: 'srv-scalp-detox',
@@ -159,7 +147,7 @@ const fallbackServices: Service[] = [
     duration: 45,
     price: 5500,
     category: 'Scalp & Hair Wellness',
-    image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-hair-treatment-2.jpg'
   },
   {
     id: 'srv-glow-facial',
@@ -168,7 +156,7 @@ const fallbackServices: Service[] = [
     duration: 60,
     price: 7500,
     category: 'Skin & Aesthetics',
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80'
+    image: '/images/colombo/colombo-nails-tipsy-tips-1.jpg'
   }
 ];
 

@@ -39,7 +39,6 @@ const colomboServices = [
     duration: '45 MIN',
     price: 'Starting LKR 3,500',
     description: 'Precision taper or fade consultation, eucalyptus hot towel prep, and sharp straight-razor detailing.',
-    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Master Barber',
   },
   {
@@ -61,7 +60,6 @@ const colomboServices = [
     duration: '120 MIN',
     price: 'Starting LKR 15,500',
     description: 'Bespoke hand-painted highlights with seamless transitions and a radiant pH-balancing gloss tone.',
-    image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Bespoke Color',
   },
   {
@@ -72,7 +70,6 @@ const colomboServices = [
     duration: '30 MIN',
     price: 'Starting LKR 2,200',
     description: 'Crisp beard contouring, dual aromatic hot towel compresses, and soothing sandalwood balm finish.',
-    image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
     tag: 'Classic Shave',
   },
   {
@@ -83,7 +80,6 @@ const colomboServices = [
     duration: '45 MIN',
     price: 'Starting LKR 5,500',
     description: 'Exfoliating scalp cleanse, ozone stimulation, and botanical nourishment for healthy follicle growth.',
-    image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
     tag: 'Scalp Health',
   },
   {
@@ -94,7 +90,6 @@ const colomboServices = [
     duration: '60 MIN',
     price: 'Starting LKR 7,500',
     description: 'Enzyme pore purification, antioxidant hydration infusion, and jade-stone lymphatic sculpting.',
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
     tag: 'Skin Glow',
   },
   {

@@ -17,7 +17,7 @@ const negomboServices = [
     duration: '90 MIN',
     price: 'Starting LKR 14,500',
     description: 'Intense amino-collagen infusion to eliminate humidity frizz and deliver luminous coastal glass shine.',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-1.jpg',
     tag: 'Negombo Signature',
   },
   {
@@ -28,7 +28,7 @@ const negomboServices = [
     duration: '120 MIN',
     price: 'Starting LKR 18,500',
     description: 'Structural bio-smoothing protein therapy for mirror-smooth manageability, humidity defense, and silkiness.',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-2.jpg',
     tag: 'Long Lasting',
   },
   {
@@ -39,7 +39,6 @@ const negomboServices = [
     duration: '45 MIN',
     price: 'Starting LKR 3,500',
     description: 'Precision fade consultation, eucalyptus hot towel steam prep, and sharp straight-razor detailing.',
-    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Master Barber',
   },
   {
@@ -50,7 +49,7 @@ const negomboServices = [
     duration: '60 MIN',
     price: 'Starting LKR 4,500',
     description: 'Architectural haircut tailored to your density and facial geometry, finished with a high-volume blowout.',
-    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-precision-hair-styling.jpg',
     tag: 'Couture Styling',
   },
   {
@@ -61,7 +60,6 @@ const negomboServices = [
     duration: '120 MIN',
     price: 'Starting LKR 15,500',
     description: 'Sun-kissed coastal tones and organic placement with seamless transitions and restorative gloss melt.',
-    image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
     tag: 'Coastal Tone',
   },
   {
@@ -72,7 +70,6 @@ const negomboServices = [
     duration: '30 MIN',
     price: 'Starting LKR 2,200',
     description: 'Crisp beard sculpting, warm aromatic towel compress, and soothing botanical balm treatment.',
-    image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
     tag: 'Gents Ritual',
   },
   {
@@ -83,7 +80,6 @@ const negomboServices = [
     duration: '45 MIN',
     price: 'Starting LKR 5,500',
     description: 'Purifying scalp exfoliation, high-frequency ozone stimulation, and coastal botanical oil infusion.',
-    image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
     tag: 'Scalp Health',
   },
   {
@@ -94,7 +90,6 @@ const negomboServices = [
     duration: '60 MIN',
     price: 'Starting LKR 7,500',
     description: 'Enzyme pore purification, antioxidant hydration infusion, and chilled jade stone lymphatic sculpting.',
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
     tag: 'Skin Glow',
   },
 ];

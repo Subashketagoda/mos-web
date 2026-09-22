@@ -22,30 +22,30 @@ import { salonConfig } from '@/lib/config';
 const negomboInstagramPosts = [
   {
     id: 'ig-neg-1',
-    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=75&fm=webp',
+    src: '/images/colombo/colombo-hair-treatment-1.jpg',
     likes: '194',
     caption: 'Restorative Tropical Hair Botox with deep ocean radiance at Negombo Coastal Studio. ✨',
     postUrl: 'https://www.instagram.com/mosphere_negombo/',
   },
   {
     id: 'ig-neg-2',
-    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=75&fm=webp',
+    src: '/images/colombo/colombo-precision-hair-styling.jpg',
     likes: '235',
     caption: 'Coastal sanctuary vibes. Step into serene tropical luxury in Galison Mawatha, Negombo. 🌴',
     postUrl: 'https://www.instagram.com/mosphere_negombo/',
   },
   {
     id: 'ig-neg-3',
-    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=600&q=75&fm=webp',
+    src: '/images/colombo/colombo-nails-tipsy-tips-1.jpg',
     likes: '210',
-    caption: 'Sun-kissed honey and champagne balayage hand-painted for effortless coastal glam. ☀️',
+    caption: 'Sun-kissed manicure and bespoke nail extensions for effortless coastal glam. ☀️',
     postUrl: 'https://www.instagram.com/mosphere_negombo/',
   },
   {
     id: 'ig-neg-4',
-    src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=75&fm=webp',
+    src: '/images/colombo/colombo-hair-treatment-2.jpg',
     likes: '185',
-    caption: 'Master Barbering & coastal grooming ritual with iced eucalyptus compress in Negombo. ✂️',
+    caption: 'Signature hair smoothing and silk rejuvenation ritual in Negombo. ✨',
     postUrl: 'https://www.instagram.com/mosphere_negombo/',
   },
 ];

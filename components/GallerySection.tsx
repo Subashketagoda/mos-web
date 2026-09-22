@@ -52,13 +52,6 @@ const galleryItems = [
     aspect: 'portrait',
     src: '/images/colombo/colombo-nails-tipsy-tips-2.jpg',
   },
-  {
-    id: 'gal-col-6',
-    title: 'Bespoke Finishing & Runway Texture',
-    category: 'Haute Styling',
-    aspect: 'landscape',
-    src: '/images/colombo/colombo-precision-hair-styling.jpg',
-  },
 ];
 
 import {
@@ -85,20 +78,20 @@ export default function GallerySection() {
   // Live Firestore subscription - ONLY Show Colombo Studio photos
   React.useEffect(() => {
     const unsub = subscribeToGallery((livePhotos) => {
-      if (livePhotos && livePhotos.length > 0) {
+      if (livePhotos) {
         // Strict Location Filter: only photos uploaded for Colombo or general
         const colomboPhotos = livePhotos.filter((p) => !p.location || p.location === 'colombo' || p.location === 'all');
-        setItems((prev) => {
+        if (colomboPhotos.length > 0) {
           const liveFormatted = colomboPhotos.map((p) => ({
             id: p.id,
             title: p.title,
             category: p.category,
             src: p.imageUrl,
           }));
-          const liveIds = new Set(liveFormatted.map((l) => l.id));
-          const remaining = galleryItems.filter((item) => !liveIds.has(item.id));
-          return [...liveFormatted, ...remaining];
-        });
+          setItems(liveFormatted);
+        } else {
+          setItems(galleryItems);
+        }
       }
     });
     return () => unsub();
@@ -493,7 +486,7 @@ export default function GallerySection() {
                           alt="Preview"
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as any).src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+                            (e.target as any).src = '/images/colombo/colombo-hair-treatment-1.jpg';
                           }}
                         />
                       </div>

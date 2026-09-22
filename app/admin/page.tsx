@@ -42,7 +42,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
-import { subscribeToBookings, subscribeToGallery, uploadImageFile } from '@/lib/firebaseService';
+import { subscribeToBookings, subscribeToGallery, uploadImageFile, deleteGalleryPhotoFromFirestore } from '@/lib/firebaseService';
 import {
   requestNotificationPermission,
   sendLockScreenNotification,
@@ -761,10 +761,29 @@ export default function AdminPage() {
   }
 
   async function deleteGallery(id: string) {
-    await fetch(`/api/admin/gallery?id=${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    if (!confirm('Are you sure you want to delete this photo from the gallery?')) return;
+
+    // 1. Optimistic instant UI update
+    setGallery((prev) => prev.filter((item) => item.id !== id && item.imageUrl !== id));
+
+    // 2. Direct Cloud Firestore deletion
+    try {
+      await deleteGalleryPhotoFromFirestore(id);
+    } catch (fsErr) {
+      console.warn('Client Firestore delete notice:', fsErr);
+    }
+
+    // 3. API delete (SQLite + Firestore fallback)
+    try {
+      await fetch(`/api/admin/gallery?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (apiErr) {
+      console.warn('API delete notice:', apiErr);
+    }
+
+    // 4. Resync all data
     loadAllData();
   }
 

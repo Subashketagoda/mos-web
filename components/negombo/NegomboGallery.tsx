@@ -18,39 +18,33 @@ import {
 const negomboGalleryItems = [
   {
     id: 'neg-gal-1',
-    title: 'Coastal Suite & Styling Bar',
-    category: 'Sanctuary Interior',
-    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=75&fm=webp',
+    title: 'Hair Botox & Silk Frizz Repair Therapy',
+    category: 'Hair Botox',
+    src: '/images/colombo/colombo-hair-treatment-1.jpg',
   },
   {
     id: 'neg-gal-2',
-    title: 'Bespoke Hair Architecture',
-    category: 'Haute Artistry',
-    src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=75&fm=webp',
+    title: 'Intense Keratin & Botanical Rejuvenation',
+    category: 'Hair Botox',
+    src: '/images/colombo/colombo-hair-treatment-2.jpg',
   },
   {
     id: 'neg-gal-3',
-    title: 'Precision Razor & Steam Shave',
-    category: 'Gents Grooming',
-    src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=75&fm=webp',
+    title: 'Precise & Prim Architectural Hair Styling',
+    category: 'Haute Styling',
+    src: '/images/colombo/colombo-precision-hair-styling.jpg',
   },
   {
     id: 'neg-gal-4',
-    title: 'Hydro-Radiance Skincare Lounge',
-    category: 'Facial Aesthetics',
-    src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=75&fm=webp',
+    title: 'Tipsy Tips Luxury Gel Nails & Artistry',
+    category: 'Nail Artistry',
+    src: '/images/colombo/colombo-nails-tipsy-tips-1.jpg',
   },
   {
     id: 'neg-gal-5',
-    title: 'Sunlit Balayage & Glaze',
-    category: 'Color Artistry',
-    src: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=600&q=75&fm=webp',
-  },
-  {
-    id: 'neg-gal-6',
-    title: 'Coastal Marine Scalp Therapy',
-    category: 'Scalp Sanctuary',
-    src: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=75&fm=webp',
+    title: 'Tipsy Tips Prim & Perfect Pedicure',
+    category: 'Nail Artistry',
+    src: '/images/colombo/colombo-nails-tipsy-tips-2.jpg',
   },
 ];
 
@@ -76,20 +70,20 @@ export default function NegomboGallery() {
   // Live Firestore subscription - ONLY Show Negombo photos
   React.useEffect(() => {
     const unsub = subscribeToGallery((livePhotos) => {
-      if (livePhotos && livePhotos.length > 0) {
-        // Strict Location Filter: only photos uploaded for Negombo
-        const negomboPhotos = livePhotos.filter((p) => p.location === 'negombo');
-        setItems((prev) => {
+      if (livePhotos) {
+        // Strict Location Filter: only photos uploaded for Negombo or all
+        const negomboPhotos = livePhotos.filter((p) => p.location === 'negombo' || p.location === 'all');
+        if (negomboPhotos.length > 0) {
           const liveFormatted = negomboPhotos.map((p) => ({
             id: p.id,
             title: p.title,
             category: p.category,
             src: p.imageUrl,
           }));
-          const liveIds = new Set(liveFormatted.map((l) => l.id));
-          const remaining = negomboGalleryItems.filter((item) => !liveIds.has(item.id));
-          return [...liveFormatted, ...remaining];
-        });
+          setItems(liveFormatted);
+        } else {
+          setItems(negomboGalleryItems);
+        }
       }
     });
     return () => unsub();
@@ -479,7 +473,7 @@ export default function NegomboGallery() {
                           alt="Preview"
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as any).src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+                            (e.target as any).src = '/images/colombo/colombo-hair-treatment-1.jpg';
                           }}
                         />
                       </div>

@@ -17,7 +17,7 @@ const verifiedServices = [
     duration: '90 MIN',
     price: 'Starting LKR 14,500',
     description: 'Signature restorative ritual infusing amino acids, marine collagen, and caviar oil to seal open cuticles, banish humidity frizz, and create luminous glass-like shine.',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-1.jpg',
     tag: 'Signature Ritual',
   },
   {
@@ -28,7 +28,7 @@ const verifiedServices = [
     duration: '120 MIN',
     price: 'Starting LKR 18,500',
     description: 'Structural bio-smoothing protein therapy that reinforces the cortex, controls volume, and provides mirror-smooth, silky manageability for months.',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-2.jpg',
     tag: 'Long Lasting',
   },
   {
@@ -39,7 +39,7 @@ const verifiedServices = [
     duration: '45 MIN',
     price: 'Starting LKR 3,500',
     description: 'Facial-structure consultation, precision gradient taper or skin fade, eucalyptus hot towel steam prep, crisp straight razor edging, and botanical conditioning oil.',
-    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-precision-hair-styling.jpg',
     tag: 'Master Barber',
   },
   {
@@ -50,7 +50,7 @@ const verifiedServices = [
     duration: '60 MIN',
     price: 'Starting LKR 4,500',
     description: 'Custom layered architectural haircut tailored to hair density, scalp massage cleanse ritual, and runway-level blowout finish for maximum volume and bounce.',
-    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-precision-hair-styling.jpg',
     tag: 'Couture Styling',
   },
   {
@@ -61,7 +61,7 @@ const verifiedServices = [
     duration: '120 MIN',
     price: 'Starting LKR 15,500',
     description: 'Bespoke hand-painted freehand highlights, seamless blonde/caramel transitions, and pH-balancing gloss glaze for rich multi-tonal brilliance.',
-    image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-1.jpg',
     tag: 'Bespoke Color',
   },
   {
@@ -72,7 +72,7 @@ const verifiedServices = [
     duration: '30 MIN',
     price: 'Starting LKR 2,200',
     description: 'Sharp silhouette beard contouring, dual hot & cold aromatic towel compress, and soothing post-shave sandalwood balm application.',
-    image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-precision-hair-styling.jpg',
     tag: 'Classic Shave',
   },
   {
@@ -83,7 +83,7 @@ const verifiedServices = [
     duration: '45 MIN',
     price: 'Starting LKR 5,500',
     description: 'Purifying scalp exfoliation, ozone follicular stimulation, essential botanical oil infusion, and therapeutic acupressure to promote strong hair growth.',
-    image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-hair-treatment-2.jpg',
     tag: 'Scalp Health',
   },
   {
@@ -94,7 +94,7 @@ const verifiedServices = [
     duration: '60 MIN',
     price: 'Starting LKR 7,500',
     description: 'Enzyme deep cleanse, gentle pore refinement, concentrated antioxidant serum infusion, and cryo-jade stone lymphatic drainage for immediate skin luminosity.',
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/colombo/colombo-nails-tipsy-tips-1.jpg',
     tag: 'Skin Glow',
   },
 ];

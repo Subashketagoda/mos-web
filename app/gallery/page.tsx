@@ -79,27 +79,6 @@ const defaultGalleryItems: GalleryItem[] = [
     category: 'Facial Aesthetics',
     aspectRatio: 'portrait',
   },
-  {
-    id: 'gal-6',
-    imageUrl: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
-    title: 'Gents Master Skin Fade & Beard Architecture',
-    category: 'Gents Grooming',
-    aspectRatio: 'portrait',
-  },
-  {
-    id: 'gal-7',
-    imageUrl: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=80',
-    title: 'Bio-Active Caviar & Scalp Wellness Ritual',
-    category: 'Scalp & Care',
-    aspectRatio: 'square',
-  },
-  {
-    id: 'gal-8',
-    imageUrl: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=80',
-    title: 'Hot Towel Steam Shave & Precision Razor Edge',
-    category: 'Gents Grooming',
-    aspectRatio: 'portrait',
-  },
 ];
 
 const defaultReviewItems: ReviewItem[] = [
@@ -204,21 +183,21 @@ export default function GalleryAndReviewsPage() {
     fetchReviews();
 
     const unsubGallery = subscribeToGallery((livePhotos) => {
-      if (livePhotos && livePhotos.length > 0) {
-        const formatted: GalleryItem[] = livePhotos.map((p) => ({
-          id: p.id,
-          imageUrl: p.imageUrl,
-          title: p.title,
-          category: p.category,
-          aspectRatio: p.aspectRatio,
-          active: p.active,
-          createdAt: p.createdAt,
-        }));
-        setGalleryList((prev) => {
-          const liveIds = new Set(formatted.map((p) => p.id));
-          const remaining = prev.filter((item) => !liveIds.has(item.id));
-          return [...formatted, ...remaining];
-        });
+      if (livePhotos) {
+        if (livePhotos.length > 0) {
+          const formatted: GalleryItem[] = livePhotos.map((p) => ({
+            id: p.id,
+            imageUrl: p.imageUrl,
+            title: p.title,
+            category: p.category,
+            aspectRatio: p.aspectRatio,
+            active: p.active,
+            createdAt: p.createdAt,
+          }));
+          setGalleryList(formatted);
+        } else {
+          setGalleryList(defaultGalleryItems);
+        }
       }
     });
 
@@ -814,7 +793,7 @@ export default function GalleryAndReviewsPage() {
                           alt="Preview"
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as any).src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80';
+                            (e.target as any).src = '/images/colombo/colombo-hair-treatment-1.jpg';
                           }}
                         />
                       </div>

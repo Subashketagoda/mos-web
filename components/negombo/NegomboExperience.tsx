@@ -26,7 +26,7 @@ export default function NegomboExperience() {
         style={{
           scale,
           y,
-          backgroundImage: `url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=75&fm=webp')`,
+          backgroundImage: `url('/images/colombo/colombo-hair-treatment-1.jpg')`,
         }}
       />
 

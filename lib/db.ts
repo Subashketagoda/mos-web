@@ -307,52 +307,44 @@ export async function initDatabase(): Promise<void> {
     const now = new Date().toISOString();
     const defaultGallery = [
       {
-        id: 'gal-1',
-        imageUrl: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=80',
-        title: 'Bespoke Hair Architecture',
-        category: 'Hair',
+        id: 'gal-col-1',
+        imageUrl: '/images/colombo/colombo-hair-treatment-1.jpg',
+        title: 'Hair Botox Deep Hydration & Silk Glaze',
+        category: 'Hair Botox',
         aspectRatio: 'portrait',
         sortOrder: 1
       },
       {
-        id: 'gal-2',
-        imageUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80',
-        title: 'Mosphere Salon Interior & Styling Suite',
-        category: 'Interior',
-        aspectRatio: 'landscape',
+        id: 'gal-col-2',
+        imageUrl: '/images/colombo/colombo-hair-treatment-2.jpg',
+        title: 'Keratin Protein Smoothing & Frizz Control',
+        category: 'Hair Botox',
+        aspectRatio: 'portrait',
         sortOrder: 2
       },
       {
-        id: 'gal-3',
-        imageUrl: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1000&q=80',
-        title: 'Precision Styling & Wash Ritual',
-        category: 'Styling',
-        aspectRatio: 'square',
+        id: 'gal-col-3',
+        imageUrl: '/images/colombo/colombo-precision-hair-styling.jpg',
+        title: 'Precise & Prim Architectural Hair Styling',
+        category: 'Ladies Styling',
+        aspectRatio: 'portrait',
         sortOrder: 3
       },
       {
-        id: 'gal-4',
-        imageUrl: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1000&q=80',
-        title: 'Luxury Formulations & Care',
-        category: 'Products',
+        id: 'gal-col-4',
+        imageUrl: '/images/colombo/colombo-nails-tipsy-tips-1.jpg',
+        title: 'Tipsy Tips Luxury Gel Nails & Artistry',
+        category: 'Nail Artistry',
         aspectRatio: 'portrait',
         sortOrder: 4
       },
       {
-        id: 'gal-5',
-        imageUrl: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1000&q=80',
-        title: 'Editorial Glow & Tone Finish',
-        category: 'Hair',
-        aspectRatio: 'landscape',
-        sortOrder: 5
-      },
-      {
-        id: 'gal-6',
-        imageUrl: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1000&q=80',
-        title: 'Skincare & Hydration Lounge',
-        category: 'Beauty',
+        id: 'gal-col-5',
+        imageUrl: '/images/colombo/colombo-nails-tipsy-tips-2.jpg',
+        title: 'Tipsy Tips Prim & Perfect Pedicure',
+        category: 'Nail Artistry',
         aspectRatio: 'portrait',
-        sortOrder: 6
+        sortOrder: 5
       }
     ];
 

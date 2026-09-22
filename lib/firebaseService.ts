@@ -363,6 +363,34 @@ export async function addGalleryPhotoToFirestore(photo: {
   return { success: true, id: firestoreDocId };
 }
 
+/**
+ * Deletes a photo from Cloud Firestore by doc ID or imageUrl/id field.
+ */
+export async function deleteGalleryPhotoFromFirestore(id: string): Promise<void> {
+  if (!db || !id) return;
+
+  // 1. Direct document delete attempt
+  try {
+    const docRef = doc(db, 'gallery', id);
+    await deleteDoc(docRef);
+  } catch (err) {
+    console.warn('Could not delete gallery doc directly by ID:', err);
+  }
+
+  // 2. Query check for matching id or imageUrl in case id was passed differently
+  try {
+    const snapshot = await getDocs(collection(db, 'gallery'));
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data();
+      if (docSnap.id === id || data.id === id || data.imageUrl === id) {
+        await deleteDoc(docSnap.ref);
+      }
+    }
+  } catch (err) {
+    console.warn('Deep gallery delete scan notice:', err);
+  }
+}
+
 /* =========================================================================
    3. BOOKINGS REAL-TIME SERVICE
    ========================================================================= */

@@ -99,8 +99,8 @@ export const salonConfig = {
       googleMapsEmbed: 'https://maps.google.com/maps?q=51+Galison+Mawatha,+Negombo,+Sri+Lanka&t=&z=16&ie=UTF8&iwloc=&output=embed',
       instagram: 'https://www.instagram.com/mosphere_negombo/',
       instagramHandle: '@mosphere_negombo',
-      heroImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85',
-      experienceImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2400&q=85',
+      heroImage: '/images/colombo/colombo-hair-treatment-1.jpg',
+      experienceImage: '/images/colombo/colombo-precision-hair-styling.jpg',
     } as BranchConfig,
   },
 

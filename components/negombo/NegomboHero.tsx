@@ -69,7 +69,7 @@ export default function NegomboHero() {
           preload="metadata"
           onLoadedMetadata={(e) => e.currentTarget.play().catch(() => {})}
           onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
-          poster="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=75&fm=webp"
+          poster="/images/colombo/colombo-hair-treatment-1.jpg"
           className="absolute inset-0 w-full h-full object-cover transform-gpu will-change-transform bg-[#02180F]"
         >
           <source src="/videos/negombo-hero-bg.mp4" type="video/mp4" />
