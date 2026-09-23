@@ -401,27 +401,8 @@ export default function BookingSection({
     return `https://wa.me/${targetWhatsApp}?text=${encodeURIComponent(msg)}`;
   };
 
-  // Automated WhatsApp Dispatch Countdown in Step 5
-  useEffect(() => {
-    if (step !== 5 || !confirmedBooking || waAutoRedirectDone) return;
-
-    const timer = setInterval(() => {
-      setWaCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setWaAutoRedirectDone(true);
-          const targetUrl = buildWhatsAppUrl(confirmedBooking, activeLocation);
-          if (typeof window !== 'undefined') {
-            window.location.href = targetUrl;
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [step, confirmedBooking, waAutoRedirectDone, activeLocation]);
+  // User keeps control: no forced automatic page navigation away from site.
+  // WhatsApp confirmation button is directly clickable in Step 5.
 
   // Sync external selected service from ServicesSection
   useEffect(() => {
@@ -542,17 +523,6 @@ export default function BookingSection({
     setSubmitting(true);
     setBookingError(null);
 
-    // Synchronously create a window on desktop click gesture to bypass popup blocker
-    const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    let preOpenedWaWindow: Window | null = null;
-    if (!isMobile && typeof window !== 'undefined') {
-      try {
-        preOpenedWaWindow = window.open('about:blank', '_blank');
-      } catch (e) {
-        console.warn('Popup blank tab notice:', e);
-      }
-    }
-
     try {
       const res = await fetch('/api/bookings', {
         method: 'POST',
@@ -591,19 +561,7 @@ export default function BookingSection({
 
         setConfirmedBooking(confirmed);
         setSubmitting(false);
-        setWaCountdown(3);
-        setWaAutoRedirectDone(false);
         setStep(5);
-
-        // Auto-deliver to Salon WhatsApp
-        try {
-          const waUrl = buildWhatsAppUrl(confirmed, activeLocation);
-          if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
-            preOpenedWaWindow.location.href = waUrl;
-          }
-        } catch (waErr) {
-          console.warn('WhatsApp auto-redirect notice:', waErr);
-        }
 
         // Background sync to Cloud Firestore (non-blocking, safe from undefined values)
         try {
@@ -628,9 +586,6 @@ export default function BookingSection({
         }
         return;
       } else {
-        if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
-          preOpenedWaWindow.close();
-        }
         // Race condition / double booking
         setSubmitting(false);
         setBookingError(data.error || 'This time slot was just booked. Please select another time.');
@@ -661,19 +616,7 @@ export default function BookingSection({
         };
         setConfirmedBooking(fallbackBooking);
         setSubmitting(false);
-        setWaCountdown(3);
-        setWaAutoRedirectDone(false);
         setStep(5);
-
-        // Auto-deliver to Salon WhatsApp
-        try {
-          const waUrl = buildWhatsAppUrl(fallbackBooking, activeLocation);
-          if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
-            preOpenedWaWindow.location.href = waUrl;
-          }
-        } catch (waErr) {
-          console.warn('WhatsApp auto-redirect notice:', waErr);
-        }
 
         try {
           syncBookingToFirestore(fallbackBooking);
@@ -681,9 +624,6 @@ export default function BookingSection({
           console.warn('Firestore fallback sync notice:', fsErr);
         }
       } catch (fallbackErr) {
-        if (preOpenedWaWindow && !preOpenedWaWindow.closed) {
-          preOpenedWaWindow.close();
-        }
         setSubmitting(false);
         setBookingError('Something went wrong. Please try again or message via WhatsApp.');
       }
@@ -1497,43 +1437,30 @@ export default function BookingSection({
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-mosphere-gold to-emerald-500" />
 
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                     <span className="text-xs font-mono tracking-widest text-emerald-400 font-bold uppercase">
-                      ✦ AUTOMATIC SALON WHATSAPP DISPATCH ✦
+                      ✦ SALON WHATSAPP CONCIERGE ✦
                     </span>
                   </div>
 
                   <h4 className="font-serif text-xl sm:text-2xl text-white font-medium mb-2">
-                    {waAutoRedirectDone ? 'Reservation Forwarded to WhatsApp' : `Opening WhatsApp in ${waCountdown}s...`}
+                    Forward to Salon Concierge
                   </h4>
 
                   <p className="text-xs sm:text-sm text-emerald-100/75 max-w-md mx-auto mb-5 leading-relaxed">
-                    Your appointment is being forwarded automatically to Mosphere Salon at{' '}
-                    <strong className="text-emerald-300 font-mono">077 729 1629</strong> with all reservation details pre-formatted.
+                    Tap below to open WhatsApp with your reservation details pre-formatted and connect directly with our concierge at{' '}
+                    <strong className="text-emerald-300 font-mono">077 729 1629</strong>.
                   </p>
 
                   <a
                     href={buildWhatsAppUrl(confirmedBooking, activeLocation)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => setWaAutoRedirectDone(true)}
                     className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-xs sm:text-sm font-bold tracking-wider text-black bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 hover:brightness-110 shadow-[0_0_25px_rgba(52,211,153,0.7)] hover:scale-[1.02] transition-all uppercase"
                   >
                     <MessageSquare className="w-4 h-4 text-black fill-current" />
-                    <span>OPEN WHATSAPP NOW & DELIVER RESERVATION</span>
+                    <span>OPEN IN WHATSAPP & FORWARD RESERVATION</span>
                   </a>
-
-                  {!waAutoRedirectDone && (
-                    <div className="mt-3">
-                      <button
-                        type="button"
-                        onClick={() => setWaAutoRedirectDone(true)}
-                        className="text-[11px] text-white/50 hover:text-white underline underline-offset-4 tracking-wider uppercase transition-colors"
-                      >
-                        Cancel auto-redirect (stay on this page)
-                      </button>
-                    </div>
-                  )}
                 </div>
 
                 {/* Details Breakdown */}

@@ -42,6 +42,33 @@ export default function HomePage() {
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [selectedServiceFromMenu, setSelectedServiceFromMenu] = useState<any>(null);
 
+  // Branch persistence & URL deep linking (?branch=negombo / ?branch=colombo)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // 1. Check URL search params first (enables direct branch links)
+    const params = new URLSearchParams(window.location.search);
+    const branchParam = params.get('branch')?.toLowerCase();
+    if (branchParam === 'colombo' || branchParam === 'negombo') {
+      setSelectedLocation(branchParam);
+      try {
+        localStorage.setItem('mosphere_selected_branch', branchParam);
+      } catch (e) {}
+      return;
+    }
+
+    // 2. Check localStorage memory
+    try {
+      const savedBranch = localStorage.getItem('mosphere_selected_branch');
+      if (savedBranch === 'colombo' || savedBranch === 'negombo') {
+        setSelectedLocation(savedBranch);
+        const url = new URL(window.location.href);
+        url.searchParams.set('branch', savedBranch);
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch (e) {}
+  }, []);
+
   // Show cinematic intro once per session for lightning-fast subsequent loads
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -65,6 +92,14 @@ export default function HomePage() {
 
   const handleLocationSelected = (loc: 'colombo' | 'negombo') => {
     setSelectedLocation(loc);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('mosphere_selected_branch', loc);
+        const url = new URL(window.location.href);
+        url.searchParams.set('branch', loc);
+        window.history.replaceState({}, '', url.toString());
+      } catch (e) {}
+    }
   };
 
   return (

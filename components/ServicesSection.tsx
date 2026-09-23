@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Clock, Sparkles, Check } from 'lucide-react';
 
@@ -101,6 +101,46 @@ const verifiedServices = [
 
 export default function ServicesSection({ onSelectService }: ServicesSectionProps) {
   const [activeServiceIndex, setActiveServiceIndex] = useState(0);
+  const [servicesList, setServicesList] = useState(verifiedServices);
+
+  // Dynamic live pricing and photo synchronization
+  useEffect(() => {
+    async function fetchLiveServices() {
+      try {
+        const res = await fetch('/api/services?t=' + Date.now());
+        const data = await res.json();
+        if (data.success && data.services && data.services.length > 0) {
+          setServicesList((prev) =>
+            prev.map((item) => {
+              const live = data.services.find(
+                (s: any) =>
+                  s.id === item.id ||
+                  s.id === item.id.replace('srv-col-', 'srv-') ||
+                  s.name.toLowerCase().includes(item.name.toLowerCase().substring(0, 10)) ||
+                  item.name.toLowerCase().includes(s.name.toLowerCase().substring(0, 10))
+              );
+              if (live) {
+                return {
+                  ...item,
+                  price: live.price !== undefined ? `Starting LKR ${Number(live.price).toLocaleString()}` : item.price,
+                  duration: live.duration ? `${live.duration} MIN` : item.duration,
+                  name: live.name || item.name,
+                  description: live.description || item.description,
+                  image: live.image || item.image,
+                  rawPrice: live.price,
+                };
+              }
+              return item;
+            })
+          );
+        }
+      } catch (err) {
+        console.warn('Notice: Using default services in ServicesSection:', err);
+      }
+    }
+
+    fetchLiveServices();
+  }, []);
 
   const handleSelectItem = (index: number, service: any) => {
     setActiveServiceIndex(index);
@@ -120,7 +160,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
     }
   };
 
-  const activeService = verifiedServices[activeServiceIndex];
+  const activeService = servicesList[activeServiceIndex] || servicesList[0] || verifiedServices[0];
 
   return (
     <section id="services" className="py-28 sm:py-36 relative bg-[#070709] border-t border-white/5 overflow-hidden">
@@ -158,7 +198,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           
           {/* Left Column: Vertical Editorial Service List */}
           <div className="lg:col-span-7 flex flex-col divide-y divide-white/10">
-            {verifiedServices.map((service, index) => {
+            {servicesList.map((service, index) => {
               const isHovered = activeServiceIndex === index;
               return (
                 <div

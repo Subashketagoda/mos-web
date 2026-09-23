@@ -144,6 +144,7 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
                   duration: `${live.duration} MIN`,
                   name: live.name || item.name,
                   description: live.description || item.description,
+                  image: live.image || item.image,
                   rawPrice: live.price,
                 };
               }

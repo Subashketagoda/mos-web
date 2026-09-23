@@ -101,19 +101,20 @@ export async function GET(req: NextRequest) {
         // Background sync to SQLite
         for (const s of fsServices) {
           query.run(
-            `INSERT INTO services (id, name, description, duration, price, category, active, isActive, sortOrder, createdAt, updatedAt)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `INSERT INTO services (id, name, description, duration, price, category, image, active, isActive, sortOrder, createdAt, updatedAt)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(id) DO UPDATE SET
                name = excluded.name,
                description = excluded.description,
                duration = excluded.duration,
                price = excluded.price,
                category = excluded.category,
+               image = excluded.image,
                active = excluded.active,
                isActive = excluded.isActive,
                sortOrder = excluded.sortOrder,
                updatedAt = excluded.updatedAt`,
-            [s.id, s.name, s.description || '', s.duration, s.price, s.category || 'Hair', s.active !== false ? 1 : 0, s.active !== false ? 1 : 0, s.sortOrder || 0, new Date().toISOString(), new Date().toISOString()]
+            [s.id, s.name, s.description || '', s.duration, s.price, s.category || 'Hair', s.image || '', s.active !== false ? 1 : 0, s.active !== false ? 1 : 0, s.sortOrder || 0, new Date().toISOString(), new Date().toISOString()]
           ).catch(() => {});
         }
       }
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
   try {
     await initDatabase();
     const body = await req.json();
-    const { name, description, duration, price, category, sortOrder } = body;
+    const { name, description, duration, price, category, image, sortOrder } = body;
 
     if (!name || !duration || price === undefined) {
       return NextResponse.json(
@@ -185,12 +186,13 @@ export async function POST(req: NextRequest) {
     const cat = category || 'Hair';
     const sort = parseInt(sortOrder || 0, 10);
     const desc = (description || '').trim();
+    const img = (image || '').trim();
 
     // 1. Dual-write to SQLite
     await query.run(
-      `INSERT INTO services (id, name, description, duration, price, category, active, isActive, sortOrder, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?)`,
-      [id, name.trim(), desc, numDuration, numPrice, cat, sort, now, now]
+      `INSERT INTO services (id, name, description, duration, price, category, image, active, isActive, sortOrder, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?)`,
+      [id, name.trim(), desc, numDuration, numPrice, cat, img, sort, now, now]
     );
 
     // 2. Dual-write to Cloud Firestore
@@ -203,6 +205,7 @@ export async function POST(req: NextRequest) {
         duration: numDuration,
         price: numPrice,
         category: cat,
+        image: img,
         active: true,
         sortOrder: sort,
         updatedAt: now,

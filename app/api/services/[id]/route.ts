@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const existing = await query.get('SELECT * FROM services WHERE id = ?', [id]);
     const body = await req.json();
-    const { name, description, duration, price, category, active, isActive, sortOrder } = body;
+    const { name, description, duration, price, category, image, active, isActive, sortOrder } = body;
     const now = new Date().toISOString();
 
     const updatedName = name !== undefined ? name.trim() : (existing?.name || 'Service');
@@ -21,19 +21,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const updatedDuration = duration !== undefined ? parseInt(duration, 10) : (existing?.duration || 60);
     const updatedPrice = price !== undefined ? parseFloat(price) : (existing?.price || 0);
     const updatedCat = category !== undefined ? category : (existing?.category || 'Hair');
+    const updatedImage = image !== undefined ? image.trim() : (existing?.image || '');
     const updatedActive = active !== undefined ? (active ? 1 : 0) : (isActive !== undefined ? (isActive ? 1 : 0) : (existing?.active ?? 1));
     const updatedSort = sortOrder !== undefined ? parseInt(sortOrder, 10) : (existing?.sortOrder || 0);
 
     // 1. Dual-persist to SQLite (UPSERT)
     await query.run(
-      `INSERT INTO services (id, name, description, duration, price, category, active, isActive, sortOrder, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO services (id, name, description, duration, price, category, image, active, isActive, sortOrder, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
          name = excluded.name,
          description = excluded.description,
          duration = excluded.duration,
          price = excluded.price,
          category = excluded.category,
+         image = excluded.image,
          active = excluded.active,
          isActive = excluded.isActive,
          sortOrder = excluded.sortOrder,
@@ -45,6 +47,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         updatedDuration,
         updatedPrice,
         updatedCat,
+        updatedImage,
         updatedActive,
         updatedActive,
         updatedSort,
@@ -63,6 +66,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         duration: updatedDuration,
         price: updatedPrice,
         category: updatedCat,
+        image: updatedImage,
         active: Boolean(updatedActive),
         sortOrder: updatedSort,
         updatedAt: now,
@@ -81,6 +85,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           duration: updatedDuration,
           price: updatedPrice,
           category: updatedCat,
+          image: updatedImage,
           active: updatedActive,
           updatedAt: now,
         }

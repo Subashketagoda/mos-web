@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
 import { subscribeToBookings, subscribeToGallery, uploadImageFile, deleteGalleryPhotoFromFirestore } from '@/lib/firebaseService';
+import { getServiceImage } from '@/components/BookingSection';
 import {
   requestNotificationPermission,
   sendLockScreenNotification,
@@ -103,8 +104,8 @@ export default function AdminPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Auth Form State
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('adminPassword123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
 
@@ -148,6 +149,11 @@ export default function AdminPage() {
   const [srvPrice, setSrvPrice] = useState(4500);
   const [srvCategory, setSrvCategory] = useState('Hair');
   const [srvDesc, setSrvDesc] = useState('');
+  const [srvImage, setSrvImage] = useState('');
+  const [srvImageFile, setSrvImageFile] = useState<File | null>(null);
+  const [srvImagePreview, setSrvImagePreview] = useState('');
+  const [srvUploadMode, setSrvUploadMode] = useState<'device' | 'url'>('device');
+  const [srvUploading, setSrvUploading] = useState(false);
 
   // Blocked Date form
   const [blkDate, setBlkDate] = useState('');
@@ -628,11 +634,18 @@ export default function AdminPage() {
   async function submitService(e: React.FormEvent) {
     e.preventDefault();
     if (!token) return;
-    const isEdit = Boolean(serviceModal?.id);
-    const url = isEdit ? `/api/services/${serviceModal.id}` : '/api/services';
-    const method = isEdit ? 'PUT' : 'POST';
+    setSrvUploading(true);
 
     try {
+      let finalImageUrl = srvImage.trim();
+      if (srvImageFile) {
+        finalImageUrl = await uploadImageFile(srvImageFile);
+      }
+
+      const isEdit = Boolean(serviceModal?.id);
+      const url = isEdit ? `/api/services/${serviceModal.id}` : '/api/services';
+      const method = isEdit ? 'PUT' : 'POST';
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -642,18 +655,22 @@ export default function AdminPage() {
           price: srvPrice,
           category: srvCategory,
           description: srvDesc,
+          image: finalImageUrl,
         }),
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
         setServiceModal(null);
+        setSrvImage('');
+        setSrvImageFile(null);
+        setSrvImagePreview('');
         // Immediately update local state so changes reflect instantly in UI
         if (isEdit && serviceModal?.id) {
           setServices((prev) =>
             prev.map((s) =>
               s.id === serviceModal.id
-                ? { ...s, name: srvName, duration: srvDuration, price: srvPrice, category: srvCategory, description: srvDesc }
+                ? { ...s, name: srvName, duration: srvDuration, price: srvPrice, category: srvCategory, description: srvDesc, image: finalImageUrl }
                 : s
             )
           );
@@ -666,6 +683,8 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       alert('Network error saving service: ' + err.message);
+    } finally {
+      setSrvUploading(false);
     }
   }
 
@@ -1842,6 +1861,10 @@ export default function AdminPage() {
                     setSrvPrice(4500);
                     setSrvCategory('Hair');
                     setSrvDesc('');
+                    setSrvImage('');
+                    setSrvImageFile(null);
+                    setSrvImagePreview('');
+                    setSrvUploadMode('device');
                   }}
                   className="self-start sm:self-auto px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark shadow-goldGlow uppercase active:scale-95 hover:brightness-110 transition-all flex items-center gap-1.5"
                 >
@@ -1851,61 +1874,109 @@ export default function AdminPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {services.map((s) => (
-                  <div
-                    key={s.id}
-                    className="p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-[#13131D]/85 to-[#0A0A0F]/90 border border-white/10 hover:border-mosphere-gold/40 transition-all duration-300 flex flex-col justify-between shadow-xl relative overflow-hidden group"
-                  >
-                    <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-mosphere-gold/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider text-mosphere-gold bg-mosphere-gold/10 border border-mosphere-gold/30 font-semibold">
-                          {s.category}
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono text-white/60 bg-white/5 border border-white/10 flex items-center gap-1">
-                          <Clock className="w-2.5 h-2.5" />
-                          <span>{s.duration} mins</span>
-                        </span>
-                      </div>
-                      <h3 className="font-serif text-lg font-medium text-white mb-2 tracking-wide group-hover:text-mosphere-goldLight transition-colors">
-                        {s.name}
-                      </h3>
-                      <p className="text-xs text-white/60 font-light leading-relaxed mb-5 line-clamp-3">
-                        {s.description || 'Exclusive luxury salon service tailored to your styling preferences.'}
-                      </p>
-                    </div>
+                {services.map((s) => {
+                  const serviceImg = s.image || getServiceImage(s);
+                  return (
+                    <div
+                      key={s.id}
+                      className="rounded-2xl bg-gradient-to-b from-[#13131D]/85 to-[#0A0A0F]/90 border border-white/10 hover:border-mosphere-gold/40 transition-all duration-300 flex flex-col justify-between shadow-xl relative overflow-hidden group"
+                    >
+                      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-mosphere-gold/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
 
-                    <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] font-mono uppercase text-white/40 block">Price</span>
-                        <span className="font-serif text-lg font-bold text-mosphere-goldLight">LKR {s.price.toLocaleString()}</span>
+                      {/* Service Photo Banner with Quick Photo Edit */}
+                      <div className="relative h-44 w-full overflow-hidden bg-black/60 border-b border-white/5">
+                        <img
+                          src={serviceImg}
+                          alt={s.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#13131D] via-black/30 to-transparent" />
+
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider text-mosphere-gold bg-black/75 backdrop-blur-md border border-mosphere-gold/40 font-semibold shadow-md">
+                            {s.category}
+                          </span>
+                        </div>
+
+                        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setServiceModal(s);
+                              setSrvName(s.name);
+                              setSrvDuration(s.duration);
+                              setSrvPrice(s.price);
+                              setSrvCategory(s.category);
+                              setSrvDesc(s.description || '');
+                              setSrvImage(s.image || '');
+                              setSrvImageFile(null);
+                              setSrvImagePreview(s.image || '');
+                              setSrvUploadMode(s.image && !s.image.startsWith('data:') ? 'url' : 'device');
+                            }}
+                            className="px-2.5 py-1 rounded-full text-[10px] font-mono text-white/90 bg-black/80 hover:bg-mosphere-gold hover:text-black backdrop-blur-md border border-white/20 hover:border-mosphere-gold flex items-center gap-1 transition-all shadow-md cursor-pointer"
+                            title="Change Service Photo"
+                          >
+                            <ImageIcon className="w-2.5 h-2.5" />
+                            <span>Change Photo</span>
+                          </button>
+                        </div>
+
+                        <div className="absolute bottom-2.5 right-3">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-white/80 bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5 text-mosphere-gold" />
+                            <span>{s.duration} mins</span>
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setServiceModal(s);
-                            setSrvName(s.name);
-                            setSrvDuration(s.duration);
-                            setSrvPrice(s.price);
-                            setSrvCategory(s.category);
-                            setSrvDesc(s.description || '');
-                          }}
-                          className="p-2 text-white/70 hover:text-white rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 active:scale-90 transition-all"
-                          title="Edit Service"
-                        >
-                          <Edit2 className="w-3.5 h-3.5 text-mosphere-gold" />
-                        </button>
-                        <button
-                          onClick={() => deleteService(s.id)}
-                          className="p-2 text-rose-400 hover:text-rose-300 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 active:scale-90 transition-all"
-                          title="Delete Service"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+
+                      <div className="p-5 sm:p-6 flex flex-col justify-between flex-1">
+                        <div>
+                          <h3 className="font-serif text-lg font-medium text-white mb-2 tracking-wide group-hover:text-mosphere-goldLight transition-colors">
+                            {s.name}
+                          </h3>
+                          <p className="text-xs text-white/60 font-light leading-relaxed mb-5 line-clamp-3">
+                            {s.description || 'Exclusive luxury salon service tailored to your styling preferences.'}
+                          </p>
+                        </div>
+
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                          <div>
+                            <span className="text-[10px] font-mono uppercase text-white/40 block">Price</span>
+                            <span className="font-serif text-lg font-bold text-mosphere-goldLight">LKR {s.price.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setServiceModal(s);
+                                setSrvName(s.name);
+                                setSrvDuration(s.duration);
+                                setSrvPrice(s.price);
+                                setSrvCategory(s.category);
+                                setSrvDesc(s.description || '');
+                                setSrvImage(s.image || '');
+                                setSrvImageFile(null);
+                                setSrvImagePreview(s.image || '');
+                                setSrvUploadMode(s.image && !s.image.startsWith('data:') ? 'url' : 'device');
+                              }}
+                              className="p-2 text-white/70 hover:text-white rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 active:scale-90 transition-all flex items-center gap-1.5 text-xs"
+                              title="Edit Service & Photo"
+                            >
+                              <Edit2 className="w-3.5 h-3.5 text-mosphere-gold" />
+                              <span className="font-mono text-[10px]">Edit</span>
+                            </button>
+                            <button
+                              onClick={() => deleteService(s.id)}
+                              className="p-2 text-rose-400 hover:text-rose-300 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 active:scale-90 transition-all"
+                              title="Delete Service"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -2526,6 +2597,111 @@ export default function AdminPage() {
                 />
               </div>
 
+              {/* Service Photo Section */}
+              <div className="space-y-2 pt-2 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] uppercase font-mono tracking-wider text-mosphere-gold font-semibold flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Service Photo</span>
+                  </label>
+                  <div className="flex items-center gap-1 p-0.5 bg-white/5 rounded-lg border border-white/10 text-[10px] font-mono">
+                    <button
+                      type="button"
+                      onClick={() => setSrvUploadMode('device')}
+                      className={`px-2.5 py-1 rounded-md transition-all ${
+                        srvUploadMode === 'device' ? 'bg-mosphere-gold text-black font-bold' : 'text-white/60 hover:text-white'
+                      }`}
+                    >
+                      Device
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSrvUploadMode('url')}
+                      className={`px-2.5 py-1 rounded-md transition-all ${
+                        srvUploadMode === 'url' ? 'bg-mosphere-gold text-black font-bold' : 'text-white/60 hover:text-white'
+                      }`}
+                    >
+                      Image URL
+                    </button>
+                  </div>
+                </div>
+
+                {/* Preview Thumbnail if present */}
+                {(srvImagePreview || srvImage) && (
+                  <div className="relative rounded-2xl overflow-hidden border border-mosphere-gold/40 bg-black h-40 flex items-center justify-center group shadow-xl">
+                    <img
+                      src={srvImagePreview || srvImage}
+                      alt="Service preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <label
+                        htmlFor="admin-service-file-input"
+                        className="cursor-pointer px-3.5 py-1.5 rounded-full bg-white text-black text-xs font-bold font-mono uppercase hover:brightness-110 transition-all"
+                      >
+                        Change
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSrvImage('');
+                          setSrvImageFile(null);
+                          setSrvImagePreview('');
+                        }}
+                        className="px-3.5 py-1.5 rounded-full bg-rose-500 text-white text-xs font-bold font-mono uppercase hover:bg-rose-600 transition-all"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Device Upload Input */}
+                {srvUploadMode === 'device' ? (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="admin-service-file-input"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSrvImageFile(file);
+                          setSrvImagePreview(URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                    {!srvImagePreview && !srvImage && (
+                      <label
+                        htmlFor="admin-service-file-input"
+                        className="cursor-pointer border-2 border-dashed border-mosphere-gold/40 hover:border-mosphere-gold bg-black/40 hover:bg-mosphere-gold/5 rounded-2xl p-5 flex flex-col items-center justify-center gap-2 transition-all group"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-mosphere-gold/15 border border-mosphere-gold/30 flex items-center justify-center text-mosphere-gold group-hover:scale-110 transition-transform">
+                          <Upload className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs font-semibold text-white tracking-wide">Upload Photo from Device</span>
+                        <span className="text-[10px] text-white/40 font-mono">JPG, PNG, WEBP (auto-compressed)</span>
+                      </label>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="url"
+                      value={srvImage}
+                      onChange={(e) => {
+                        setSrvImage(e.target.value);
+                        setSrvImagePreview(e.target.value);
+                        setSrvImageFile(null);
+                      }}
+                      placeholder="https://... or /images/colombo/..."
+                      className="w-full bg-black/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-white/30 focus:outline-none focus:border-mosphere-gold/70 focus:ring-1 focus:ring-mosphere-gold/40 transition-all font-mono"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                 <button
                   type="button"
@@ -2536,10 +2712,20 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark shadow-goldGlow uppercase active:scale-95 hover:brightness-110 transition-all flex items-center gap-1.5"
+                  disabled={srvUploading}
+                  className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-wider text-black bg-gradient-to-r from-mosphere-gold via-mosphere-goldLight to-mosphere-goldDark shadow-goldGlow uppercase active:scale-95 hover:brightness-110 disabled:opacity-50 transition-all flex items-center gap-1.5"
                 >
-                  <CheckCircle className="w-3.5 h-3.5" />
-                  <span>Save Service</span>
+                  {srvUploading ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Optimizing & Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>Save Service</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

@@ -532,6 +532,7 @@ export interface FirebaseServiceItem {
   duration: number;
   price: number;
   category: string;
+  image?: string;
   active?: boolean | number;
   sortOrder?: number;
   updatedAt?: string;
@@ -555,6 +556,7 @@ export async function getServicesFromFirestore(): Promise<FirebaseServiceItem[]>
         duration: Number(data.duration) || 60,
         price: Number(data.price) || 0,
         category: data.category || 'Hair',
+        image: data.image || '',
         active: data.active !== undefined ? Boolean(data.active) : true,
         sortOrder: Number(data.sortOrder) || 0,
         updatedAt: data.updatedAt || new Date().toISOString(),
@@ -579,6 +581,7 @@ export async function saveServiceToFirestore(service: {
   duration: number;
   price: number;
   category?: string;
+  image?: string;
   active?: boolean | number;
   sortOrder?: number;
   updatedAt?: string;
@@ -596,6 +599,7 @@ export async function saveServiceToFirestore(service: {
         duration: Number(service.duration),
         price: Number(service.price),
         category: service.category || 'Hair',
+        image: service.image || '',
         active: service.active !== false && service.active !== 0,
         sortOrder: Number(service.sortOrder) || 0,
         updatedAt: service.updatedAt || new Date().toISOString(),
@@ -645,6 +649,7 @@ export function subscribeToServices(
             duration: Number(data.duration) || 60,
             price: Number(data.price) || 0,
             category: data.category || 'Hair',
+            image: data.image || '',
             active: data.active !== undefined ? Boolean(data.active) : true,
             sortOrder: Number(data.sortOrder) || 0,
             updatedAt: data.updatedAt || new Date().toISOString(),

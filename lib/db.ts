@@ -81,6 +81,7 @@ export async function initDatabase(): Promise<void> {
       duration INTEGER NOT NULL,
       price REAL NOT NULL,
       category TEXT NOT NULL DEFAULT 'Hair',
+      image TEXT,
       active INTEGER NOT NULL DEFAULT 1,
       isActive INTEGER DEFAULT 1,
       sortOrder INTEGER NOT NULL DEFAULT 0,
@@ -186,6 +187,9 @@ export async function initDatabase(): Promise<void> {
     if (!colNames.includes('active')) {
       await query.run(`ALTER TABLE services ADD COLUMN active INTEGER DEFAULT 1;`);
       await query.run(`UPDATE services SET active = COALESCE(isActive, 1);`);
+    }
+    if (!colNames.includes('image')) {
+      await query.run(`ALTER TABLE services ADD COLUMN image TEXT;`);
     }
   } catch (e) {
     // column already exists

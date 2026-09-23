@@ -9,13 +9,17 @@ import webpush from 'web-push';
 const vapidPublicKey =
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
   'BGzWKJ8VD6koWDYTAw5bU7Y4d3nNa-t3p6Rg5n1J2w4LXV_Agvra4M98N-ODk8uxoEbO7NA_4xMEeSZjjRdn3S0';
-const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || 'jKcf-C4CRZ3rUzNS641wRm13NsgAyhBJ8UVMy7YLQv8';
+const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || '';
 const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:concierge@mosphere.lk';
 
-try {
-  webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
-} catch (e) {
-  console.warn('VAPID init note:', e);
+if (vapidPublicKey && vapidPrivateKey) {
+  try {
+    webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+  } catch (e) {
+    console.warn('VAPID init note:', e);
+  }
+} else {
+  console.warn('[PushDaemon] VAPID_PRIVATE_KEY not configured in environment.');
 }
 
 const firebaseConfig = {
