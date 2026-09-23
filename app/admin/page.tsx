@@ -42,7 +42,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { salonConfig } from '@/lib/config';
-import { subscribeToBookings, subscribeToGallery, uploadImageFile, deleteGalleryPhotoFromFirestore } from '@/lib/firebaseService';
+import { subscribeToBookings, subscribeToGallery, uploadImageFile, compressImage, deleteGalleryPhotoFromFirestore } from '@/lib/firebaseService';
 import { getServiceImage } from '@/components/BookingSection';
 import {
   requestNotificationPermission,
@@ -639,7 +639,7 @@ export default function AdminPage() {
     try {
       let finalImageUrl = srvImage.trim();
       if (srvImageFile) {
-        finalImageUrl = await uploadImageFile(srvImageFile);
+        finalImageUrl = await uploadImageFile(srvImageFile, true);
       }
 
       const isEdit = Boolean(serviceModal?.id);
@@ -1883,8 +1883,8 @@ export default function AdminPage() {
                     >
                       <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-mosphere-gold/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
 
-                      {/* Service Photo Banner with Quick Photo Edit */}
-                      <div className="relative h-44 w-full overflow-hidden bg-black/60 border-b border-white/5">
+                      {/* Service Photo Banner with Quick Photo Edit (1:1 Ratio) */}
+                      <div className="relative aspect-square w-full overflow-hidden bg-black/60 border-b border-white/5">
                         <img
                           src={serviceImg}
                           alt={s.name}
@@ -2626,14 +2626,19 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Preview Thumbnail if present */}
+                {/* Preview Thumbnail if present (1:1 Ratio) */}
                 {(srvImagePreview || srvImage) && (
-                  <div className="relative rounded-2xl overflow-hidden border border-mosphere-gold/40 bg-black h-40 flex items-center justify-center group shadow-xl">
+                  <div className="relative aspect-square max-w-[220px] mx-auto rounded-2xl overflow-hidden border-2 border-mosphere-gold/40 bg-black flex items-center justify-center group shadow-xl">
                     <img
                       src={srvImagePreview || srvImage}
                       alt="Service preview"
                       className="w-full h-full object-cover"
                     />
+                    <div className="absolute top-2 left-2 pointer-events-none">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-mono uppercase bg-black/80 text-mosphere-gold border border-mosphere-gold/30">
+                        1:1 Square
+                      </span>
+                    </div>
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                       <label
                         htmlFor="admin-service-file-input"
@@ -2668,7 +2673,9 @@ export default function AdminPage() {
                         const file = e.target.files?.[0];
                         if (file) {
                           setSrvImageFile(file);
-                          setSrvImagePreview(URL.createObjectURL(file));
+                          compressImage(file, 800, 0.8, true)
+                            .then((sq) => setSrvImagePreview(sq))
+                            .catch(() => setSrvImagePreview(URL.createObjectURL(file)));
                         }
                       }}
                     />
@@ -2681,7 +2688,7 @@ export default function AdminPage() {
                           <Upload className="w-4 h-4" />
                         </div>
                         <span className="text-xs font-semibold text-white tracking-wide">Upload Photo from Device</span>
-                        <span className="text-[10px] text-white/40 font-mono">JPG, PNG, WEBP (auto-compressed)</span>
+                        <span className="text-[10px] text-mosphere-gold/80 font-mono">Auto-cropped to 1:1 Square • Max 150KB</span>
                       </label>
                     )}
                   </div>

@@ -231,9 +231,9 @@ export default function ColomboServices({ onSelectService }: ColomboServicesProp
                     : 'border-white/10 hover:border-mosphere-gold/50'
                 }`}
               >
-                {/* Visual Image Header */}
+                {/* Visual Image Header (1:1 Ratio) */}
                 {service.image && (
-                  <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-black/50">
+                  <div className="relative aspect-square w-full overflow-hidden bg-black/50">
                     <img
                       src={service.image}
                       alt={service.name}

@@ -19,7 +19,7 @@ import { db, storage } from './firebase';
  * Compresses an image file in the browser to a lightweight, high-quality Data URL (under 150KB).
  * This ensures large smartphone photos (5MB - 10MB) fit easily within Firestore's 1MB limit.
  */
-export async function compressImage(file: File, maxWidth = 1200, quality = 0.75): Promise<string> {
+export async function compressImage(file: File, maxWidth = 1200, quality = 0.75, squareCrop = false): Promise<string> {
   if (typeof window === 'undefined') {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -39,23 +39,39 @@ export async function compressImage(file: File, maxWidth = 1200, quality = 0.75)
           let width = img.width;
           let height = img.height;
 
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          } else if (height > maxWidth) {
-            width = Math.round((width * maxWidth) / height);
-            height = maxWidth;
+          if (squareCrop) {
+            const side = Math.min(width, height);
+            const sx = (width - side) / 2;
+            const sy = (height - side) / 2;
+            const targetDim = Math.min(side, maxWidth);
+            canvas.width = targetDim;
+            canvas.height = targetDim;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(event.target?.result as string);
+              return;
+            }
+            ctx.drawImage(img, sx, sy, side, side, 0, 0, targetDim, targetDim);
+          } else {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else if (height > maxWidth) {
+              width = Math.round((width * maxWidth) / height);
+              height = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(event.target?.result as string);
+              return;
+            }
+
+            ctx.drawImage(img, 0, 0, width, height);
           }
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            resolve(event.target?.result as string);
-            return;
-          }
-
-          ctx.drawImage(img, 0, 0, width, height);
           const dataUrl = canvas.toDataURL('image/jpeg', quality);
           resolve(dataUrl);
         } catch (e) {
@@ -73,18 +89,24 @@ export async function compressImage(file: File, maxWidth = 1200, quality = 0.75)
 /**
  * Uploads an image file with automatic client-side compression and fast fallback.
  */
-export async function uploadImageFile(file: File): Promise<string> {
-  // 1. Instantly compress in-browser (converts 5-10MB phone photo to ~100KB)
-  const compressedDataUrl = await compressImage(file, 1200, 0.75);
+export async function uploadImageFile(file: File, squareCrop = false): Promise<string> {
+  // 1. Instantly compress in-browser (converts 5-10MB phone photo to ~100KB, with optional 1:1 square crop)
+  const compressedDataUrl = await compressImage(file, 1200, 0.75, squareCrop);
 
   // 2. Try Firebase Storage with 2s timeout safeguard
   if (storage) {
     try {
       const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const storageRef = ref(storage, `gallery/${Date.now()}_${cleanName}`);
+      const folder = squareCrop ? 'services' : 'gallery';
+      const storageRef = ref(storage, `${folder}/${Date.now()}_${cleanName}`);
       
       const uploadPromise = (async () => {
-        await uploadBytes(storageRef, file);
+        let uploadPayload: Blob | File = file;
+        if (squareCrop && compressedDataUrl.startsWith('data:')) {
+          const res = await fetch(compressedDataUrl);
+          uploadPayload = await res.blob();
+        }
+        await uploadBytes(storageRef, uploadPayload);
         return await getDownloadURL(storageRef);
       })();
 

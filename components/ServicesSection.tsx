@@ -290,8 +290,8 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           <div className="lg:col-span-5 sticky top-28 hidden lg:block">
             <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0E0E14] shadow-2xl p-2 group">
               
-              {/* Active Image Box with Fade Transition */}
-              <div className="relative aspect-[4/5] rounded-xl overflow-hidden">
+              {/* Active Image Box with Fade Transition (1:1 Ratio) */}
+              <div className="relative aspect-square rounded-xl overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={activeService.id}

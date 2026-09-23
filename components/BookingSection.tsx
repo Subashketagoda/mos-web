@@ -957,9 +957,9 @@ export default function BookingSection({
                             : 'bg-[#0E0E14] border-white/10 hover:border-mosphere-gold/50 hover:bg-[#14141E]'
                         }`}
                       >
-                        {/* Service Photo Header */}
+                        {/* Service Photo Header (1:1 Ratio) */}
                         {imageUrl && (
-                          <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-black/60">
+                          <div className="relative aspect-square w-full overflow-hidden bg-black/60">
                             <img
                               src={imageUrl}
                               alt={s.name}
